@@ -30,4 +30,6 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
+export const NAV_SECTION_IDS = NAV_ITEMS.map((item) => item.sectionId);
+
 export default NAV_ITEMS;

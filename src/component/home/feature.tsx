@@ -3,14 +3,15 @@ import { Button, Space } from "antd";
 import { Link } from "react-router-dom";
 import { UN_AUTH_ROUTES } from "../../router/constant";
 import { RESOURCES } from "../../lib/resources";
-import { Paragraph, Title } from "../ui/typography";
 import { scrollToSection } from "../../lib/utils";
+import AnimateOnScroll from "../common/animate-on-scroll";
+import { Paragraph, Title } from "../ui/typography";
 
 function Feature() {
   return (
     <section className="bg-header-background" id="feature">
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-10 sm:px-6 nav:grid-cols-2 nav:gap-12 nav:py-20 lg:px-10 lg:py-24">
-        <div className="flex w-full flex-col gap-6 nav:gap-8">
+        <AnimateOnScroll immediate variant="fade-up" className="flex w-full flex-col gap-6 nav:gap-8">
           <div className="flex flex-col gap-4 nav:gap-5">
             <Title level={1} className="text-3xl leading-tight font-bold sm:text-4xl nav:text-5xl lg:text-[3.25rem]">
               <span className="text-zinc-800">Sync your workflow,</span>
@@ -47,11 +48,11 @@ function Feature() {
               </Button>
             </Link>
           </Space>
-        </div>
+        </AnimateOnScroll>
 
-        <div className="mx-auto w-[80%] overflow-hidden rounded-2xl bg-hero-surface p-3 sm:p-4 nav:rounded-[32px] nav:p-6 lg:p-8">
+        <AnimateOnScroll immediate variant="fade-right" delay={120} className="mx-auto w-[80%] overflow-hidden rounded-2xl bg-hero-surface p-3 sm:p-4 nav:rounded-[32px] nav:p-6 lg:p-8">
           <img src={RESOURCES.IMAGES.LAPTOP} alt="FlowSync dashboard preview" className="h-auto w-full object-contain" />
-        </div>
+        </AnimateOnScroll>
       </div>
     </section>
   );

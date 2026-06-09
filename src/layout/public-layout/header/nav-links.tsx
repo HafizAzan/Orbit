@@ -7,6 +7,7 @@ type NavLinksProps = {
   className?: string;
   onNavigate?: () => void;
   headerOffset?: number;
+  activeSectionId?: string;
 };
 
 function getNavLinkClass(isActive: boolean) {
@@ -16,7 +17,7 @@ function getNavLinkClass(isActive: boolean) {
   );
 }
 
-function NavLinks({ className, onNavigate, headerOffset = 0 }: NavLinksProps) {
+function NavLinks({ className, onNavigate, headerOffset = 0, activeSectionId }: NavLinksProps) {
   const { pathname, hash } = useLocation();
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
@@ -32,7 +33,7 @@ function NavLinks({ className, onNavigate, headerOffset = 0 }: NavLinksProps) {
           <a
             href={`#${item.sectionId}`}
             onClick={(event) => handleClick(event, item.sectionId)}
-            className={getNavLinkClass(isSectionActive(item.sectionId, pathname, hash))}
+            className={getNavLinkClass(isSectionActive(item.sectionId, pathname, hash, "/", activeSectionId))}
           >
             {item.label}
           </a>

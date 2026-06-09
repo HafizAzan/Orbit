@@ -16,12 +16,24 @@ export function scrollToSection(sectionId: string, offset = 0) {
   return true;
 }
 
-export function isSectionActive(sectionId: string, pathname: string, hash: string, homePath = "/") {
+export function isSectionActive(
+  sectionId: string,
+  pathname: string,
+  hash: string,
+  homePath = "/",
+  activeSectionId?: string,
+) {
+  if (pathname !== homePath) return false;
+
+  if (activeSectionId) {
+    return activeSectionId === sectionId;
+  }
+
   const activeHash = hash.replace("#", "");
 
   if (activeHash) {
     return activeHash === sectionId;
   }
 
-  return pathname === homePath && sectionId === "feature";
+  return sectionId === "feature";
 }

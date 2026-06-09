@@ -47,6 +47,81 @@
 
   /* Kanban section */
   --color-kanban-title: #8b8fa8;
+
+  /* Insights section */
+  --color-insights-background: #f5f5fa;
+
+  /* FAQ */
+  --color-faq-surface: #f4f5ff;
+
+  /* CTA */
+  --color-cta-background: #3b36db;
+  --color-cta-glow: #818cf8;
+
+  /* Animations */
+  --animate-fade-in-up: fade-in-up 0.65s ease-out both;
+  --animate-fade-in: fade-in 0.65s ease-out both;
+  --animate-fade-in-left: fade-in-left 0.65s ease-out both;
+  --animate-fade-in-right: fade-in-right 0.65s ease-out both;
+  --animate-scale-in: scale-in 0.55s ease-out both;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @layer base {
@@ -57,6 +132,18 @@
   }
 
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply overflow-x-hidden bg-background font-sans text-foreground antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in-up,
+    .animate-fade-in,
+    .animate-fade-in-left,
+    .animate-fade-in-right,
+    .animate-scale-in {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }

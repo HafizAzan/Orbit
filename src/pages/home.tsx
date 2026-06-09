@@ -1,8 +1,14 @@
 import React from "react";
+import CtaSection from "../component/home/cta-section";
+import FaqSection from "../component/home/faq-section";
 import Feature from "../component/home/feature";
 import FeaturesSection from "../component/home/features-section";
+import InsightsSection from "../component/home/insights-section";
 import KanbanSection from "../component/home/kanban-section";
+import PricingSection from "../component/home/pricing-section";
+import ResourcesSection from "../component/home/resources-section";
 import SocialProof from "../component/home/social-proof";
+import TestimonialsSection from "../component/home/testimonials-section";
 
 function Home() {
   return (
@@ -11,6 +17,12 @@ function Home() {
       <SocialProof />
       <FeaturesSection />
       <KanbanSection />
+      <InsightsSection />
+      <PricingSection />
+      <ResourcesSection />
+      <TestimonialsSection />
+      <FaqSection />
+      <CtaSection />
     </>
   );
 }

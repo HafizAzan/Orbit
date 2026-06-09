@@ -3,6 +3,8 @@ import { CloseOutlined, MenuOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { Link } from "react-router-dom";
 import Logo from "../../../component/logo";
+import { NAV_SECTION_IDS } from "../../../data/nav-items";
+import useActiveSection from "../../../hooks/use-active-section";
 import { UN_AUTH_ROUTES } from "../../../router/constant";
 import HeaderActions from "./header-actions";
 import MobileMenu from "./mobile-menu";
@@ -15,6 +17,7 @@ function Header() {
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const openMenu = useCallback(() => setMenuOpen(true), []);
+  const activeSectionId = useActiveSection(NAV_SECTION_IDS, headerHeight);
 
   useLayoutEffect(() => {
     const header = headerRef.current;
@@ -39,7 +42,11 @@ function Header() {
           </div>
 
           <nav className="hidden nav:block nav:justify-self-center">
-            <NavLinks className="flex items-center gap-10" headerOffset={headerHeight} />
+            <NavLinks
+              className="flex items-center gap-10"
+              headerOffset={headerHeight}
+              activeSectionId={activeSectionId}
+            />
           </nav>
 
           <div className="flex items-center nav:justify-self-end">
@@ -54,7 +61,12 @@ function Header() {
         </div>
       </header>
 
-      <MobileMenu open={menuOpen} headerHeight={headerHeight} onClose={closeMenu} />
+      <MobileMenu
+        open={menuOpen}
+        headerHeight={headerHeight}
+        activeSectionId={activeSectionId}
+        onClose={closeMenu}
+      />
     </div>
   );
 }

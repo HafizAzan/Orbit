@@ -8,10 +8,11 @@ import { UN_AUTH_ROUTES } from "../../../router/constant";
 type MobileMenuProps = {
   open: boolean;
   headerHeight: number;
+  activeSectionId?: string;
   onClose: () => void;
 };
 
-function MobileMenu({ open, headerHeight, onClose }: MobileMenuProps) {
+function MobileMenu({ open, headerHeight, activeSectionId, onClose }: MobileMenuProps) {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
@@ -61,7 +62,7 @@ function MobileMenu({ open, headerHeight, onClose }: MobileMenuProps) {
         <ul className="flex flex-col gap-1 px-6 py-4">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = isSectionActive(item.sectionId, pathname, hash);
+            const isActive = isSectionActive(item.sectionId, pathname, hash, "/", activeSectionId);
 
             return (
               <li key={item.sectionId}>
