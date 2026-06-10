@@ -1,15 +1,10 @@
 import React, { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import { toast } from "../lib/toast";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-} | null;
+import type { AuthUser } from "../lib/auth";
 
 type AppContextValue = {
-  user: User;
-  setUser: (user: User) => void;
+  user: AuthUser | null;
+  setUser: (user: AuthUser | null) => void;
   isAuthenticated: boolean;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -22,7 +17,7 @@ type AppProviderProps = {
 };
 
 function AppProvider({ children }: AppProviderProps) {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const value = useMemo(

@@ -1,0 +1,25 @@
+---
+description: FlowSync auth flow, OTP, and signup conventions
+globs: src/component/auth/**,src/pages/login.tsx,src/pages/register.tsx,src/pages/verify-*.tsx,src/lib/auth.ts
+alwaysApply: false
+---
+
+# Auth
+
+## Flow
+
+1. Login / Register submit → `sendOtp()` → navigate to `/verify-otp`
+2. OTP verify → login sets user; register creates org with role **`owner`** (Organization Owner)
+3. Forgot password → `/verify-email` (separate from OTP flow)
+
+## Files
+
+- Mock auth logic: `src/lib/auth.ts`
+- Email normalize / OTP / delay: import from `src/lib/helper.ts`
+- Auth preview mock data: `src/data/auth-previews.ts` (not inline in preview components)
+- Reusable auth UI: `auth-form-layout.tsx`, `auth-form-card.tsx`, `auth-page-shell.tsx`
+
+## UI
+
+- Split layout for login/register; centered shell for forgot/verify pages
+- Use `ConfirmModal` pattern only where confirmation is needed (admin logout, not login submit)

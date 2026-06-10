@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Logo from "../../../component/logo";
 import { NAV_SECTION_IDS } from "../../../data/nav-items";
 import useActiveSection from "../../../hooks/use-active-section";
-import { UN_AUTH_ROUTES } from "../../../router/constant";
+import { UN_AUTH_ROUTES } from "../../../router/public-routes";
 import HeaderActions from "./header-actions";
 import MobileMenu from "./mobile-menu";
 import NavLinks from "./nav-links";
@@ -36,7 +36,7 @@ function Header() {
       <header ref={headerRef} className="border-b border-header-border">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 nav:grid nav:grid-cols-[1fr_auto_1fr] nav:px-8 nav:py-5 lg:px-10">
           <div className="justify-self-start">
-            <Link to={UN_AUTH_ROUTES.HOME}>
+            <Link to={UN_AUTH_ROUTES.HOME} className="inline-flex transition-opacity duration-300 hover:opacity-90">
               <Logo />
             </Link>
           </div>

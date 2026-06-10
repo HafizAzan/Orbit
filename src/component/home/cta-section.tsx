@@ -1,7 +1,7 @@
 import React from "react";
 import CtaBanner from "../common/cta-banner";
 import AnimateOnScroll from "../common/animate-on-scroll";
-import { UN_AUTH_ROUTES } from "../../router/constant";
+import { UN_AUTH_ROUTES } from "../../router/public-routes";
 
 function CtaSection() {
   return (

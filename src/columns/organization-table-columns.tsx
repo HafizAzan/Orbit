@@ -1,0 +1,115 @@
+import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
+import { Button, Dropdown, type MenuProps } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { PLAN_STYLES, STATUS_STYLES, type OrganizationRecord } from "../data/admin-organizations";
+import { formatDate, getInitial } from "../lib/helper";
+import { cn } from "../lib/utils";
+
+function getActionItems(record: OrganizationRecord): MenuProps["items"] {
+  return [
+    { key: "view", label: "View details", icon: <EyeOutlined /> },
+    { key: "edit", label: "Edit organization", icon: <EditOutlined /> },
+    { type: "divider" },
+    {
+      key: "delete",
+      label: "Delete",
+      icon: <DeleteOutlined />,
+      danger: true,
+      disabled: record.status === "active",
+    },
+  ];
+}
+
+const ORGANIZATION_TABLE_COLUMNS: ColumnsType<OrganizationRecord> = [
+  {
+    title: "Organization Name",
+    dataIndex: "name",
+    key: "name",
+    render: (_, record) => (
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-feature-sync text-sm font-bold text-primary">
+            {getInitial(record.name)}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-foreground">{record.name}</p>
+          <p className="truncate text-xs text-muted">{record.slug}.flowsync.io</p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: "Owner",
+    key: "owner",
+    responsive: ["md"],
+    render: (_, record) => (
+      <div className="min-w-0">
+        <p className="font-medium text-foreground">{record.ownerName}</p>
+        <p className="truncate text-xs text-muted">{record.ownerEmail}</p>
+      </div>
+    ),
+  },
+  {
+    title: "Plan",
+    dataIndex: "plan",
+    key: "plan",
+    responsive: ["lg"],
+    render: (plan: OrganizationRecord["plan"]) => (
+      <span
+        className={cn(
+          "inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
+          PLAN_STYLES[plan],
+        )}
+      >
+        {plan}
+      </span>
+    ),
+  },
+  {
+    title: "Users",
+    dataIndex: "users",
+    key: "users",
+    responsive: ["lg"],
+    render: (users: number) => <span className="font-medium text-foreground">{users}</span>,
+  },
+  {
+    title: "Projects",
+    dataIndex: "projects",
+    key: "projects",
+    responsive: ["xl"],
+    render: (projects: number) => <span className="font-medium text-foreground">{projects}</span>,
+  },
+  {
+    title: "Status",
+    dataIndex: "status",
+    key: "status",
+    render: (status: OrganizationRecord["status"]) => {
+      const config = STATUS_STYLES[status];
+
+      return (
+        <span className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
+          <span className={cn("h-2 w-2 rounded-full", config.dot)} />
+          {config.label}
+        </span>
+      );
+    },
+  },
+  {
+    title: "Created",
+    dataIndex: "createdAt",
+    key: "createdAt",
+    responsive: ["md"],
+    render: (date: string) => <span className="text-sm text-muted">{formatDate(date)}</span>,
+  },
+  {
+    title: "Actions",
+    key: "actions",
+    width: 48,
+    render: (_, record) => (
+      <Dropdown menu={{ items: getActionItems(record) }} trigger={["click"]} placement="bottomRight">
+        <Button type="text" icon={<EllipsisOutlined />} className="text-muted!" aria-label="Actions" />
+      </Dropdown>
+    ),
+  },
+];
+
+export default ORGANIZATION_TABLE_COLUMNS;

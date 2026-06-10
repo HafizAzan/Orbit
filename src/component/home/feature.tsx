@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Space } from "antd";
 import { Link } from "react-router-dom";
-import { UN_AUTH_ROUTES } from "../../router/constant";
+import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import { RESOURCES } from "../../lib/resources";
 import { scrollToSection } from "../../lib/utils";
 import AnimateOnScroll from "../common/animate-on-scroll";
@@ -50,7 +50,7 @@ function Feature() {
           </Space>
         </AnimateOnScroll>
 
-        <AnimateOnScroll immediate variant="fade-right" delay={120} className="mx-auto w-[80%] overflow-hidden rounded-2xl bg-hero-surface p-3 sm:p-4 nav:rounded-[32px] nav:p-6 lg:p-8">
+        <AnimateOnScroll immediate variant="fade-right" delay={120} className="mx-auto w-[80%] overflow-hidden">
           <img src={RESOURCES.IMAGES.LAPTOP} alt="FlowSync dashboard preview" className="h-auto w-full object-contain" />
         </AnimateOnScroll>
       </div>

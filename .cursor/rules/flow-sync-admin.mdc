@@ -1,0 +1,45 @@
+---
+description: FlowSync platform admin layout, theme, and pages
+globs: src/pages/admin/**,src/component/admin/**,src/layout/admin-layout/**,src/data/admin-*.ts,src/columns/**
+alwaysApply: false
+---
+
+# Platform Admin
+
+## Routes (5 pages)
+
+- `/admin/dashboard` — platform overview + analytics insights
+- `/admin/organizations`
+- `/admin/subscriptions`
+- `/admin/users`
+- `/admin/settings`
+
+## Theme
+
+- **Light theme** — same palette as public/dashboard (`bg-background`, `bg-card`, `border-border`, `text-primary`).
+- **No dark sidebar.** Sidebar uses `bg-card`, active link `bg-feature-sync text-primary`.
+- **Roboto** in admin layout only (`font-roboto` on admin shell + Ant Design `fontFamily`).
+
+## Layout
+
+- `AdminLayout`: sidebar + header + `<Outlet />`
+- Desktop (≥880px / `nav:`): fixed sidebar
+- Mobile: sidebar hidden; hamburger opens Ant Design `Drawer`
+- Logout: red primary danger button → `ConfirmModal` → clear user → `/login`
+
+## Admin pages pattern
+
+1. Page header (title, description, primary action)
+2. Stat cards from `src/data/admin-*.ts`
+3. Table with toolbar (search, filter, bulk actions)
+4. Use shared `Table` + `TablePaginationFooter`
+
+## Bulk delete pattern
+
+- Disabled until ≥1 row selected
+- Label shows count when selected: `Bulk Delete (3)`
+- Confirm via `ConfirmModal` before applying
+
+## Roles (future reference)
+
+Signup → **Organization Owner**. Platform Admin is separate (FlowSync owner). V1 roles: Platform Admin, Organization Owner, Admin, Manager, Member.

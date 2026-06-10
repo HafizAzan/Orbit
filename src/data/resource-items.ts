@@ -1,6 +1,6 @@
 import { BookOutlined, FileTextOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import type { ComponentType } from "react";
-import { UN_AUTH_ROUTES } from "../router/constant";
+import { UN_AUTH_ROUTES } from "../router/public-routes";
 
 export type ResourceCategory = "Guide" | "Template" | "Webinar";
 

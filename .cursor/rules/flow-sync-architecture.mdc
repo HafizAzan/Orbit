@@ -1,0 +1,44 @@
+---
+description: FlowSync folder structure, data, helpers, and routing conventions
+alwaysApply: true
+---
+
+# FlowSync Architecture
+
+## Data (`src/data/`)
+
+- **Never** define mock arrays, config objects, stat lists, nav items, or style maps inline in components/pages.
+- Put static/mock data in `src/data/` with a clear filename: `admin-organizations.ts`, `admin-nav-items.ts`, `auth-previews.ts`, etc.
+- Icon maps tied to data keys may live in the same data file (see `nav-items.ts`, `admin-dashboard.ts`).
+
+## Helpers vs utils
+
+| File | Purpose |
+|------|---------|
+| `src/lib/helper.ts` | Reusable data/formatting helpers: `formatDate`, `formatCurrency`, `pluralize`, `paginateItems`, `matchesSearchQuery`, `normalizeEmail`, `delay` |
+| `src/lib/utils.ts` | UI/DOM only: `cn`, `scrollToSection`, `isSectionActive` |
+
+Check `helper.ts` before adding a new formatter or string/number utility.
+
+## Routing
+
+- Public/auth routes → `src/router/public-routes.ts`
+- Admin routes → `src/router/admin-routes.ts`
+
+## Table columns
+
+- Define Ant Design table columns in `src/columns/`, one file per table: `organization-table-columns.tsx`
+- Pages/components import columns; keep render logic out of column files where possible.
+
+## Reusable UI (`src/component/ui/`)
+
+- `modal.tsx` — Ant Design Modal wrapper + `ConfirmModal` for confirmations
+- `table.tsx` — themed Ant Design Table + custom empty state props
+- `table-empty.tsx`, `table-pagination-footer.tsx` — empty UI and footer (summary left, pagination right)
+
+Use `ConfirmModal` for destructive actions (logout, bulk delete).
+
+## General
+
+- Match existing naming, Tailwind tokens, and Ant Design + ConfigProvider patterns.
+- Keep diffs focused; do not refactor unrelated code.

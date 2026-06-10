@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import NAV_ITEMS from "../../../data/nav-items";
 import { cn, isSectionActive, scrollToSection } from "../../../lib/utils";
-import { UN_AUTH_ROUTES } from "../../../router/constant";
+import { UN_AUTH_ROUTES } from "../../../router/public-routes";
 
 type MobileMenuProps = {
   open: boolean;

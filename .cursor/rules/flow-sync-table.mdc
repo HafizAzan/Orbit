@@ -1,0 +1,45 @@
+---
+description: FlowSync table, pagination, and empty-state patterns
+globs: src/component/ui/table*.tsx,src/component/admin/**/*table*.tsx,src/columns/**
+alwaysApply: false
+---
+
+# Tables
+
+## Stack
+
+- Wrap Ant Design Table via `src/component/ui/table.tsx`
+- Charts elsewhere: **Recharts** (already used on dashboard)
+
+## Column files
+
+```tsx
+// src/columns/organization-table-columns.tsx
+import type { ColumnsType } from "antd/es/table";
+const ORGANIZATION_TABLE_COLUMNS: ColumnsType<OrganizationRecord> = [ ... ];
+export default ORGANIZATION_TABLE_COLUMNS;
+```
+
+## Empty state
+
+Pass to `Table`:
+
+```tsx
+<Table
+  emptyTitle="No organizations found"
+  emptyDescription="Get started by creating your first organization."
+  emptyAction={<Button type="primary">Create Organization</Button>}
+/>
+```
+
+## Pagination footer
+
+- Disable built-in table pagination summary defaults when using custom footer
+- Use `pagination={false}` on `Table` + manual slice via `paginateItems()` from `helper.ts`
+- Render `TablePaginationFooter`: **summary left**, **pagination controls right**
+- Page size constants live in data file (e.g. `ORGANIZATIONS_PAGE_SIZE` in `admin-organizations.ts`)
+
+## Toolbar
+
+- Search/filter left; bulk actions right (e.g. Bulk Delete)
+- Result count (`Displaying X of Y results`) belongs in **pagination footer**, not the top toolbar

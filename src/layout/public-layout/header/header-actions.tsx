@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "../../../lib/utils";
 import { Link } from "react-router-dom";
-import { UN_AUTH_ROUTES } from "../../../router/constant";
+import { UN_AUTH_ROUTES } from "../../../router/public-routes";
 
 function HeaderActions({ className, onNavigate, stacked = false }: { className?: string; onNavigate?: () => void; stacked?: boolean }) {
   return (
