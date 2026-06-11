@@ -131,10 +131,115 @@
     @apply border-border;
   }
 
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-primary) 75%, transparent) transparent;
+  }
+
+  html::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--color-primary) 70%, transparent);
+    border-radius: 9999px;
+  }
+
+  html::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary);
+  }
+
   body {
     @apply overflow-x-hidden bg-background font-sans text-foreground antialiased;
   }
 
+}
+
+@layer components {
+  .scrollbar-hover,
+  .overflow-auto,
+  .overflow-x-auto,
+  .overflow-y-auto,
+  .overflow-scroll,
+  [class*="overflow-auto"],
+  [class*="overflow-x-auto"],
+  [class*="overflow-y-auto"],
+  [class*="overflow-scroll"] {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .scrollbar-hover:hover,
+  .overflow-auto:hover,
+  .overflow-x-auto:hover,
+  .overflow-y-auto:hover,
+  .overflow-scroll:hover,
+  [class*="overflow-auto"]:hover,
+  [class*="overflow-x-auto"]:hover,
+  [class*="overflow-y-auto"]:hover,
+  [class*="overflow-scroll"]:hover {
+    scrollbar-color: var(--color-primary) transparent;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar,
+  .overflow-auto::-webkit-scrollbar,
+  .overflow-x-auto::-webkit-scrollbar,
+  .overflow-y-auto::-webkit-scrollbar,
+  .overflow-scroll::-webkit-scrollbar,
+  [class*="overflow-auto"]::-webkit-scrollbar,
+  [class*="overflow-x-auto"]::-webkit-scrollbar,
+  [class*="overflow-y-auto"]::-webkit-scrollbar,
+  [class*="overflow-scroll"]::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-track,
+  .overflow-auto::-webkit-scrollbar-track,
+  .overflow-x-auto::-webkit-scrollbar-track,
+  .overflow-y-auto::-webkit-scrollbar-track,
+  .overflow-scroll::-webkit-scrollbar-track,
+  [class*="overflow-auto"]::-webkit-scrollbar-track,
+  [class*="overflow-x-auto"]::-webkit-scrollbar-track,
+  [class*="overflow-y-auto"]::-webkit-scrollbar-track,
+  [class*="overflow-scroll"]::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-thumb,
+  .overflow-auto::-webkit-scrollbar-thumb,
+  .overflow-x-auto::-webkit-scrollbar-thumb,
+  .overflow-y-auto::-webkit-scrollbar-thumb,
+  .overflow-scroll::-webkit-scrollbar-thumb,
+  [class*="overflow-auto"]::-webkit-scrollbar-thumb,
+  [class*="overflow-x-auto"]::-webkit-scrollbar-thumb,
+  [class*="overflow-y-auto"]::-webkit-scrollbar-thumb,
+  [class*="overflow-scroll"]::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  .scrollbar-hover:hover::-webkit-scrollbar-thumb,
+  .overflow-auto:hover::-webkit-scrollbar-thumb,
+  .overflow-x-auto:hover::-webkit-scrollbar-thumb,
+  .overflow-y-auto:hover::-webkit-scrollbar-thumb,
+  .overflow-scroll:hover::-webkit-scrollbar-thumb,
+  [class*="overflow-auto"]:hover::-webkit-scrollbar-thumb,
+  [class*="overflow-x-auto"]:hover::-webkit-scrollbar-thumb,
+  [class*="overflow-y-auto"]:hover::-webkit-scrollbar-thumb,
+  [class*="overflow-scroll"]:hover::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+  }
+
+}
+
+@layer base {
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-in-up,
     .animate-fade-in,

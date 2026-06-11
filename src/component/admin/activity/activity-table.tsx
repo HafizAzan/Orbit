@@ -1,60 +1,70 @@
-import { CalendarOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Input } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
-import ACTIVITY_TABLE_COLUMNS from "../../../columns/activity-table-columns";
-import {
-  ACTIVITIES_DATA,
-  ACTIVITIES_PAGE_SIZE,
-  ACTIVITY_FILTER_OPTIONS,
-  ACTIVITY_TABS,
-  type ActivityRecord,
-  type ActivityTabKey,
-} from "../../../data/admin-activity";
+import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { Badge, Button, Input } from "antd";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import createActivityTableColumns from "../../../columns/activity-table-columns";
+import { ACTIVITIES_PAGE_SIZE, ACTIVITY_TABS, type ActivityRecord } from "../../../data/admin-activity";
+import { useAdminActivity } from "../../../context/admin-activity-context";
+import useActivityFilters from "../../../hooks/use-activity-filters";
+import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
+import { countActiveActivityFilters, getActivityFilterChips, matchesActivityFilters } from "../../../lib/activity-filters";
 import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import ActivityFilterDrawer from "./activity-filter-drawer";
+import ActivityFlagModal from "./activity-flag-modal";
+import ActivityViewModal from "./activity-view-modal";
 
-type ActivityTableProps = {
-  data?: ActivityRecord[];
-};
-
-function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
-  const [rows, setRows] = useState(data);
-  const [activeTab, setActiveTab] = useState<ActivityTabKey>("all");
-  const [search, setSearch] = useState("");
+function ActivityTable() {
+  const { activities, deleteActivities, flagActivity, resolveActivity, unflagActivity } = useAdminActivity();
+  const { search, setSearch } = useAdminTableSearchParam();
+  const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useActivityFilters();
   const [page, setPage] = useState(1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<ActivityRecord | null>(null);
+  const [pendingFlag, setPendingFlag] = useState<ActivityRecord | null>(null);
+  const [viewRecord, setViewRecord] = useState<ActivityRecord | null>(null);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    setRows(data);
-  }, [data]);
+  const columns = useMemo(
+    () =>
+      createActivityTableColumns({
+        onView: setViewRecord,
+        onFlag: setPendingFlag,
+        onResolve: (record) => resolveActivity(record.id),
+        onUnflag: (record) => unflagActivity(record.id),
+        onDelete: setPendingDelete,
+      }),
+    [resolveActivity, unflagActivity],
+  );
 
-  const tabbedData = useMemo(() => {
-    if (activeTab === "all") return rows;
-    return rows.filter((row) => row.category === activeTab);
-  }, [rows, activeTab]);
+  const activeFilterCount = countActiveActivityFilters(filters);
+  const filterChips = getActivityFilterChips(filters);
+  const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
 
   const filteredData = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return tabbedData;
 
-    return tabbedData.filter(
-      (activity) =>
+    return activities.filter((activity) => {
+      if (!matchesActivityFilters(activity, filters)) return false;
+      if (!query) return true;
+
+      return (
         matchesSearchQuery(activity.title, query) ||
         matchesSearchQuery(activity.description, query) ||
         matchesSearchQuery(activity.organization, query) ||
-        matchesSearchQuery(activity.actor, query),
-    );
-  }, [tabbedData, search]);
+        matchesSearchQuery(activity.actor, query)
+      );
+    });
+  }, [activities, search, filters]);
 
   useEffect(() => {
     setPage(1);
     setSelectedRowKeys([]);
-  }, [search, activeTab, rows]);
+  }, [search, activities, filters]);
 
   const paginatedData = useMemo(() => paginateItems(filteredData, page, ACTIVITIES_PAGE_SIZE), [filteredData, page]);
 
@@ -62,13 +72,32 @@ function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
   const hasSelection = selectedCount > 0;
 
   const handleBulkDeleteConfirm = () => {
-    setRows((current) => current.filter((row) => !selectedRowKeys.includes(row.id)));
+    deleteActivities(selectedRowKeys.map(String));
     toast.success(`${selectedCount} activity ${pluralize(selectedCount, "log")} removed successfully`);
     setSelectedRowKeys([]);
     setBulkDeleteOpen(false);
   };
 
-  const activeTabLabel = ACTIVITY_TABS.find((tab) => tab.key === activeTab)?.label.toLowerCase() ?? "events";
+  const handleSingleDeleteConfirm = useCallback(() => {
+    if (!pendingDelete) return;
+
+    deleteActivities([pendingDelete.id]);
+    setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
+    toast.success("Activity log removed successfully");
+    setPendingDelete(null);
+  }, [deleteActivities, pendingDelete]);
+
+  const handleOpenFilters = () => {
+    setDraftFilters(filters);
+    setFilterDrawerOpen(true);
+  };
+
+  const handleApplyFilters = () => {
+    setFilters(draftFilters);
+    setFilterDrawerOpen(false);
+  };
+
+  const activeEventLabel = ACTIVITY_TABS.find((tab) => tab.key === filters.eventTab)?.label.toLowerCase() ?? "events";
 
   const resultsSummary = (
     <span className="text-sm text-muted">
@@ -79,15 +108,15 @@ function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
       {" to "}
       <span className="font-semibold text-foreground">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</span>
       {" of "}
-      <span className="font-semibold text-foreground">{filteredData.length}</span> {activeTab === "all" ? "events" : activeTabLabel}
+      <span className="font-semibold text-foreground">{filteredData.length}</span> {filters.eventTab === "all" ? "events" : activeEventLabel}
     </span>
   );
 
   return (
     <>
       <div className="rounded-2xl border border-border bg-card shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-border p-4 sm:p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex flex-1 flex-col gap-3">
             <Input
               allowClear
               prefix={<SearchOutlined className="text-muted" />}
@@ -97,49 +126,48 @@ function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
               className="max-w-md rounded-xl! bg-background!"
             />
 
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              disabled={!hasSelection}
-              onClick={() => setBulkDeleteOpen(true)}
-              className="w-fit shrink-0 font-semibold!"
-            >
-              Bulk Delete{hasSelection ? ` (${selectedCount})` : ""}
+            {filterChips.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-2">
+                {filterChips.map((chip) => (
+                  <span
+                    key={chip.key}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-feature-sync px-3 py-1 text-xs font-medium text-primary"
+                  >
+                    {chip.label}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-muted transition-colors hover:text-foreground"
+                >
+                  <CloseOutlined className="text-[10px]" />
+                  Clear filters
+                </button>
+              </div>
+            ) : null}
+          </div>
+
+          <Badge count={activeFilterCount} size="small" offset={[-4, 4]}>
+            <Button icon={<FilterOutlined />} onClick={handleOpenFilters} className="w-fit font-medium!">
+              Filter
             </Button>
-          </div>
+          </Badge>
 
-          <div className="flex flex-wrap gap-2">
-            {ACTIVITY_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={cn(
-                  "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                  activeTab === tab.key ? "bg-feature-sync text-primary" : "text-muted hover:bg-background hover:text-foreground",
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {ACTIVITY_FILTER_OPTIONS.map((filter) => (
-              <Button
-                key={filter.key}
-                icon={filter.key === "date-range" ? <CalendarOutlined /> : <FilterOutlined />}
-                className="font-medium!"
-              >
-                {filter.label}
-              </Button>
-            ))}
-          </div>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            disabled={!hasSelection}
+            onClick={() => setBulkDeleteOpen(true)}
+            className={cn("w-fit font-semibold!", filterChips.length > 0 && "self-start sm:self-center")}
+          >
+            Bulk Delete{hasSelection ? ` (${selectedCount})` : ""}
+          </Button>
         </div>
 
         <Table<ActivityRecord>
           rowKey="id"
-          columns={ACTIVITY_TABLE_COLUMNS}
+          columns={columns}
           dataSource={paginatedData}
           rowSelection={{
             type: "checkbox",
@@ -151,9 +179,9 @@ function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
           wrapperClassName="border-0! rounded-none! shadow-none!"
           emptyTitle="No activity found"
           emptyDescription={
-            search
+            hasQuery
               ? "Try adjusting your search or filters to find the event you are looking for."
-              : `There are no ${activeTabLabel} to display right now.`
+              : `There are no ${activeEventLabel} to display right now.`
           }
         />
 
@@ -168,6 +196,24 @@ function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
         ) : null}
       </div>
 
+      <ActivityViewModal record={viewRecord} onClose={() => setViewRecord(null)} />
+
+      <ActivityFlagModal
+        open={pendingFlag !== null}
+        record={pendingFlag}
+        onClose={() => setPendingFlag(null)}
+        onSubmit={flagActivity}
+      />
+
+      <ActivityFilterDrawer
+        open={filterDrawerOpen}
+        draftFilters={draftFilters}
+        onClose={() => setFilterDrawerOpen(false)}
+        onDraftChange={setDraftFilters}
+        onApply={handleApplyFilters}
+        onClear={clearFilters}
+      />
+
       <ConfirmModal
         open={bulkDeleteOpen}
         onClose={() => setBulkDeleteOpen(false)}
@@ -176,7 +222,22 @@ function ActivityTable({ data = ACTIVITIES_DATA }: ActivityTableProps) {
         description={`Are you sure you want to remove ${selectedCount} selected activity ${pluralize(selectedCount, "log")}? This action cannot be undone.`}
         confirmText="Remove"
         confirmDanger
-        icon={<DeleteOutlined className="text-xl text-red-500" />}
+        icon={<DeleteOutlined />}
+      />
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={handleSingleDeleteConfirm}
+        title="Remove activity log"
+        description={
+          pendingDelete
+            ? `Are you sure you want to remove "${pendingDelete.title}"? This action cannot be undone.`
+            : undefined
+        }
+        confirmText="Remove"
+        confirmDanger
+        icon={<DeleteOutlined />}
       />
     </>
   );

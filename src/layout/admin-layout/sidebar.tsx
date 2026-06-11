@@ -1,10 +1,11 @@
 import { LogoutOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Badge, Button } from "antd";
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Logo from "../../component/logo";
 import { ConfirmModal } from "../../component/ui/modal";
 import ADMIN_NAV_ITEMS from "../../data/admin-nav-items";
+import { useAdminActivity } from "../../context/admin-activity-context";
 import { useAppContext } from "../../context/app-context";
 import { toast } from "../../lib/toast";
 import { ADMIN_ROUTES } from "../../router/admin-routes";
@@ -19,6 +20,7 @@ type AdminSidebarContentProps = {
 function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps) {
   const navigate = useNavigate();
   const app = useAppContext();
+  const { flaggedCount } = useAdminActivity();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const handleLogoutConfirm = () => {
@@ -47,25 +49,32 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {ADMIN_NAV_ITEMS.map(({ key, label, path, icon: Icon }) => (
-          <NavLink
-            key={key}
-            to={path}
-            end
-            onClick={handleNavClick}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-feature-sync text-primary"
-                  : "text-muted hover:bg-background hover:text-foreground",
-              )
-            }
-          >
-            <Icon className="text-base" />
-            {label}
-          </NavLink>
-        ))}
+        {ADMIN_NAV_ITEMS.map(({ key, label, path, icon: Icon, badgeKey }) => {
+          const badgeCount = badgeKey === "activityReview" ? flaggedCount : 0;
+
+          return (
+            <NavLink
+              key={key}
+              to={path}
+              end
+              onClick={handleNavClick}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-feature-sync text-primary"
+                    : "text-muted hover:bg-background hover:text-foreground",
+                )
+              }
+            >
+              <Icon className="text-base" />
+              <span className="flex-1">{label}</span>
+              {badgeCount > 0 ? (
+                <Badge count={badgeCount} size="small" className="[&_.ant-badge-count]:bg-amber-500!" />
+              ) : null}
+            </NavLink>
+          );
+        })}
       </nav>
 
       <div className="mt-auto border-t border-border pt-4">
@@ -89,7 +98,7 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
         description="Are you sure you want to logout? You will need to sign in again to access the admin panel."
         confirmText="Logout"
         confirmDanger
-        icon={<LogoutOutlined className="text-xl text-red-500" />}
+        icon={<LogoutOutlined />}
       />
     </div>
   );

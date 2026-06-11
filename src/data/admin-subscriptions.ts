@@ -55,6 +55,25 @@ export const SUBSCRIPTION_TABS: { key: SubscriptionTabKey; label: string }[] = [
   { key: "cancelled", label: "Cancelled" },
 ];
 
+export const SUBSCRIPTION_PLAN_FILTER_OPTIONS: { value: OrganizationPlan; label: string }[] = [
+  { value: "ENTERPRISE", label: "Enterprise" },
+  { value: "BUSINESS", label: "Business" },
+  { value: "PRO", label: "Pro" },
+  { value: "FREE", label: "Free" },
+];
+
+export const SUBSCRIPTION_BILLING_FILTER_OPTIONS: { value: BillingCycle; label: string }[] = [
+  { value: "Annual", label: "Annual" },
+  { value: "Monthly", label: "Monthly" },
+];
+
+export const SUBSCRIPTION_STATUS_FILTER_OPTIONS: { value: SubscriptionStatus; label: string }[] = [
+  { value: "active", label: "Active" },
+  { value: "trial", label: "Trial" },
+  { value: "expired", label: "Expired" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
 export const SUBSCRIPTION_STATS: SubscriptionStat[] = [
   {
     id: "monthly-revenue",

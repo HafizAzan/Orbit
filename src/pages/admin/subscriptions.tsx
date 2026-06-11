@@ -1,14 +1,39 @@
 import { DownloadOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import PlanDistributionCard from "../../component/admin/subscriptions/plan-distribution-card";
 import RevenueOverviewChart from "../../component/admin/subscriptions/revenue-overview-chart";
+import SubscriptionEditBillingModal from "../../component/admin/subscriptions/subscription-edit-billing-modal";
 import SubscriptionStatCard from "../../component/admin/subscriptions/subscription-stat-card";
 import SubscriptionsTable from "../../component/admin/subscriptions/subscriptions-table";
 import { Paragraph, Title } from "../../component/ui/typography";
-import { PLAN_DISTRIBUTION, SUBSCRIPTION_REVENUE_DATA, SUBSCRIPTION_STATS } from "../../data/admin-subscriptions";
+import {
+  PLAN_DISTRIBUTION,
+  SUBSCRIPTION_REVENUE_DATA,
+  SUBSCRIPTION_STATS,
+  SUBSCRIPTIONS_DATA,
+  type SubscriptionRecord,
+} from "../../data/admin-subscriptions";
 
 function AdminSubscriptions() {
+  const [subscriptions, setSubscriptions] = useState(SUBSCRIPTIONS_DATA);
+  const [editBillingOpen, setEditBillingOpen] = useState(false);
+  const [editingSubscription, setEditingSubscription] = useState<SubscriptionRecord | null>(null);
+
+  const handleOpenEditBilling = useCallback((record: SubscriptionRecord) => {
+    setEditingSubscription(record);
+    setEditBillingOpen(true);
+  }, []);
+
+  const handleCloseEditBilling = useCallback(() => {
+    setEditBillingOpen(false);
+    setEditingSubscription(null);
+  }, []);
+
+  const handleSaveBilling = useCallback((subscription: SubscriptionRecord) => {
+    setSubscriptions((current) => current.map((item) => (item.id === subscription.id ? subscription : item)));
+  }, []);
+
   return (
     <div className="mx-auto max-w-8xl">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -39,7 +64,14 @@ function AdminSubscriptions() {
         <PlanDistributionCard items={PLAN_DISTRIBUTION} />
       </div>
 
-      <SubscriptionsTable />
+      <SubscriptionsTable data={subscriptions} onEditBilling={handleOpenEditBilling} />
+
+      <SubscriptionEditBillingModal
+        open={editBillingOpen}
+        record={editingSubscription}
+        onClose={handleCloseEditBilling}
+        onSave={handleSaveBilling}
+      />
     </div>
   );
 }

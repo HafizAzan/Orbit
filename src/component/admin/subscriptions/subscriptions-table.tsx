@@ -1,7 +1,7 @@
-import { DeleteOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
-import SUBSCRIPTION_TABLE_COLUMNS from "../../../columns/subscription-table-columns";
+import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { Badge, Button, Input } from "antd";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import createSubscriptionTableColumns from "../../../columns/subscription-table-columns";
 import {
   SUBSCRIPTIONS_DATA,
   SUBSCRIPTIONS_PAGE_SIZE,
@@ -9,23 +9,52 @@ import {
   type SubscriptionRecord,
   type SubscriptionTabKey,
 } from "../../../data/admin-subscriptions";
-import { paginateItems, pluralize } from "../../../lib/helper";
+import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
+import useSubscriptionFilters from "../../../hooks/use-subscription-filters";
+import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
+import {
+  countActiveSubscriptionFilters,
+  getSubscriptionFilterChips,
+  matchesSubscriptionFilters,
+} from "../../../lib/subscription-filters";
 import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import SubscriptionFilterDrawer from "./subscription-filter-drawer";
+import SubscriptionViewModal from "./subscription-view-modal";
 
 type SubscriptionsTableProps = {
   data?: SubscriptionRecord[];
+  onEditBilling?: (record: SubscriptionRecord) => void;
 };
 
-function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTableProps) {
+function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA, onEditBilling }: SubscriptionsTableProps) {
   const [rows, setRows] = useState(data);
+  const { search, setSearch } = useAdminTableSearchParam();
+  const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useSubscriptionFilters();
   const [activeTab, setActiveTab] = useState<SubscriptionTabKey>("active");
   const [page, setPage] = useState(1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<SubscriptionRecord | null>(null);
+  const [viewRecord, setViewRecord] = useState<SubscriptionRecord | null>(null);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  const columns = useMemo(
+    () =>
+      createSubscriptionTableColumns({
+        onView: setViewRecord,
+        onEditBilling: (record) => onEditBilling?.(record),
+        onDelete: setPendingDelete,
+      }),
+    [onEditBilling],
+  );
+
+  const activeFilterCount = countActiveSubscriptionFilters(filters);
+  const filterChips = getSubscriptionFilterChips(filters);
+  const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
 
   useEffect(() => {
     setRows(data);
@@ -34,13 +63,24 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTablePro
   const tabbedData = useMemo(() => rows.filter((row) => row.status === activeTab), [rows, activeTab]);
 
   const filteredData = useMemo(() => {
-    return tabbedData;
-  }, [tabbedData]);
+    const query = search.trim().toLowerCase();
+
+    return tabbedData.filter((subscription) => {
+      if (!matchesSubscriptionFilters(subscription, filters)) return false;
+      if (!query) return true;
+
+      return (
+        matchesSearchQuery(subscription.organizationName, query) ||
+        matchesSearchQuery(subscription.contactEmail, query) ||
+        matchesSearchQuery(subscription.plan, query)
+      );
+    });
+  }, [tabbedData, search, filters]);
 
   useEffect(() => {
     setPage(1);
     setSelectedRowKeys([]);
-  }, [activeTab, rows]);
+  }, [activeTab, rows, search, filters]);
 
   const paginatedData = useMemo(() => paginateItems(filteredData, page, SUBSCRIPTIONS_PAGE_SIZE), [filteredData, page]);
 
@@ -54,6 +94,25 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTablePro
     setBulkDeleteOpen(false);
   };
 
+  const handleSingleDeleteConfirm = useCallback(() => {
+    if (!pendingDelete) return;
+
+    setRows((current) => current.filter((row) => row.id !== pendingDelete.id));
+    setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
+    toast.success(`${pendingDelete.organizationName} subscription removed successfully`);
+    setPendingDelete(null);
+  }, [pendingDelete]);
+
+  const handleOpenFilters = () => {
+    setDraftFilters(filters);
+    setFilterDrawerOpen(true);
+  };
+
+  const handleApplyFilters = () => {
+    setFilters(draftFilters);
+    setFilterDrawerOpen(false);
+  };
+
   const resultsSummary = (
     <span className="text-sm text-muted">
       Displaying <span className="font-semibold text-foreground">{filteredData.length}</span> of{" "}
@@ -65,30 +124,76 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTablePro
     <>
       <div className="rounded-2xl border border-border bg-card shadow-sm">
         <div className="flex flex-col gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-          <div className="flex flex-wrap gap-2">
-            {SUBSCRIPTION_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={cn(
-                  "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                  activeTab === tab.key ? "bg-feature-sync text-primary" : "text-muted hover:bg-background hover:text-foreground",
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex flex-1 flex-col gap-3">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+              <Input
+                allowClear
+                prefix={<SearchOutlined className="text-muted" />}
+                placeholder="Search subscriptions by organization or email..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="max-w-xs rounded-xl! bg-background!"
+              />
+
+              <div className="flex flex-wrap gap-2">
+                {SUBSCRIPTION_TABS.map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    className={cn(
+                      "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                      activeTab === tab.key ? "bg-feature-sync text-primary" : "text-muted hover:bg-background hover:text-foreground",
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filterChips.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-2">
+                {filterChips.map((chip) => (
+                  <span
+                    key={chip.key}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-feature-sync px-3 py-1 text-xs font-medium text-primary"
+                  >
+                    {chip.label}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-muted transition-colors hover:text-foreground"
+                >
+                  <CloseOutlined className="text-[10px]" />
+                  Clear filters
+                </button>
+              </div>
+            ) : null}
           </div>
 
-          <Button danger icon={<DeleteOutlined />} disabled={!hasSelection} onClick={() => setBulkDeleteOpen(true)} className="w-fit font-semibold!">
+          <Badge count={activeFilterCount} size="small" offset={[-4, 4]}>
+            <Button icon={<FilterOutlined />} onClick={handleOpenFilters} className="w-fit font-medium!">
+              Filter
+            </Button>
+          </Badge>
+
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            disabled={!hasSelection}
+            onClick={() => setBulkDeleteOpen(true)}
+            className={cn("w-fit font-semibold!", filterChips.length > 0 && "self-start sm:self-center")}
+          >
             Bulk Delete{hasSelection ? ` (${selectedCount})` : ""}
           </Button>
         </div>
 
         <Table<SubscriptionRecord>
           rowKey="id"
-          columns={SUBSCRIPTION_TABLE_COLUMNS}
+          columns={columns}
           dataSource={paginatedData}
           rowSelection={{
             type: "checkbox",
@@ -99,7 +204,11 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTablePro
           pagination={false}
           wrapperClassName="border-0! rounded-none! shadow-none!"
           emptyTitle="No subscriptions found"
-          emptyDescription={`There are no ${activeTab} subscriptions to display right now.`}
+          emptyDescription={
+            hasQuery
+              ? "Try adjusting your search or filters to find the subscription you are looking for."
+              : `There are no ${activeTab} subscriptions to display right now.`
+          }
         />
 
         {filteredData.length > 0 ? (
@@ -113,6 +222,17 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTablePro
         ) : null}
       </div>
 
+      <SubscriptionViewModal record={viewRecord} onClose={() => setViewRecord(null)} />
+
+      <SubscriptionFilterDrawer
+        open={filterDrawerOpen}
+        draftFilters={draftFilters}
+        onClose={() => setFilterDrawerOpen(false)}
+        onDraftChange={setDraftFilters}
+        onApply={handleApplyFilters}
+        onClear={clearFilters}
+      />
+
       <ConfirmModal
         open={bulkDeleteOpen}
         onClose={() => setBulkDeleteOpen(false)}
@@ -121,7 +241,22 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA }: SubscriptionsTablePro
         description={`Are you sure you want to remove ${selectedCount} selected ${pluralize(selectedCount, "subscription")}? This action cannot be undone.`}
         confirmText="Remove"
         confirmDanger
-        icon={<DeleteOutlined className="text-xl text-red-500" />}
+        icon={<DeleteOutlined />}
+      />
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={handleSingleDeleteConfirm}
+        title="Remove subscription"
+        description={
+          pendingDelete
+            ? `Are you sure you want to remove the subscription for ${pendingDelete.organizationName}? This action cannot be undone.`
+            : undefined
+        }
+        confirmText="Remove"
+        confirmDanger
+        icon={<DeleteOutlined />}
       />
     </>
   );

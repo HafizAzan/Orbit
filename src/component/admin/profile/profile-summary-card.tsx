@@ -1,0 +1,46 @@
+import { MailOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Tag } from "antd";
+import React from "react";
+import { PLATFORM_ADMIN_ROLE_LABEL, type AdminProfile } from "../../../data/admin-profile";
+import { getAdminDisplayName } from "../../../lib/admin-profile";
+import { maskEmail } from "../../../lib/helper";
+
+type ProfileSummaryCardProps = {
+  profile: AdminProfile;
+};
+
+function ProfileSummaryCard({ profile }: ProfileSummaryCardProps) {
+  return (
+    <article className="rounded-2xl border border-border bg-linear-to-r from-card to-feature-sync/40 p-5 shadow-sm sm:p-6">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Avatar size={72} className="border-2 border-card bg-primary/10! text-primary! shadow-sm" src={profile.avatarUrl} />
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-bold text-foreground">{getAdminDisplayName(profile)}</h2>
+              <Tag color="processing" className="rounded-full! border-0! px-2.5! py-0.5! text-[10px]! font-semibold! uppercase">
+                {PLATFORM_ADMIN_ROLE_LABEL}
+              </Tag>
+            </div>
+            <p className="mt-1 flex items-center gap-2 text-sm text-muted">
+              <MailOutlined />
+              {maskEmail(profile.email)}
+            </p>
+            {profile.emailVerified ? (
+              <Tag icon={<SafetyCertificateOutlined />} color="success" className="mt-2 rounded-full!">
+                Verified account
+              </Tag>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/80 px-4 py-3 text-sm text-muted">
+          <UserOutlined className="text-lg text-primary" />
+          <span>Platform administrator account</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default React.memo(ProfileSummaryCard);

@@ -13,6 +13,10 @@ export type ActivityCategory = "organization" | "subscription" | "user" | "billi
 
 export type ActivitySeverity = "info" | "success" | "warning" | "critical";
 
+export type ActivityReviewStatus = "none" | "flagged" | "resolved";
+
+export type ActivityFlagReason = "security" | "billing" | "compliance" | "system" | "other";
+
 export type ActivityTabKey = "all" | ActivityCategory;
 
 export type ActivityRecord = {
@@ -24,6 +28,11 @@ export type ActivityRecord = {
   category: ActivityCategory;
   severity: ActivitySeverity;
   timestamp: string;
+  reviewStatus: ActivityReviewStatus;
+  flagReason?: ActivityFlagReason;
+  flagNote?: string;
+  flaggedAt?: string;
+  resolvedAt?: string;
 };
 
 export type ActivityStat = {
@@ -80,16 +89,38 @@ export const ACTIVITY_TABS: { key: ActivityTabKey; label: string }[] = [
   { key: "billing", label: "Billing" },
 ];
 
-export const ACTIVITY_FILTER_OPTIONS = [
-  { key: "severity", label: "Severity" },
-  { key: "organization", label: "Organization" },
-  { key: "actor", label: "Actor" },
-  { key: "date-range", label: "Date Range" },
-] as const;
-
 export const ACTIVITIES_PAGE_SIZE = 25;
 
-export const ACTIVITIES_DATA: ActivityRecord[] = [
+export const ACTIVITY_FLAG_REASON_OPTIONS: { value: ActivityFlagReason; label: string }[] = [
+  { value: "security", label: "Security concern" },
+  { value: "billing", label: "Billing issue" },
+  { value: "compliance", label: "Compliance review" },
+  { value: "system", label: "System anomaly" },
+  { value: "other", label: "Other" },
+];
+
+const ACTIVITY_REVIEW_SEED_OVERRIDES: Record<string, Partial<ActivityRecord>> = {
+  "5": {
+    reviewStatus: "flagged",
+    flagReason: "billing",
+    flagNote: "Auto-escalated after repeated payment failures",
+    flaggedAt: "3h ago",
+  },
+  "8": {
+    reviewStatus: "flagged",
+    flagReason: "security",
+    flagNote: "Production API rate limit exceeded — possible abuse",
+    flaggedAt: "6h ago",
+  },
+  "13": {
+    reviewStatus: "flagged",
+    flagReason: "system",
+    flagNote: "Webhook endpoint failing consistently",
+    flaggedAt: "15h ago",
+  },
+};
+
+const RAW_ACTIVITIES_DATA = [
   {
     id: "1",
     title: "New organization registered",
@@ -270,7 +301,13 @@ export const ACTIVITIES_DATA: ActivityRecord[] = [
     severity: "warning",
     timestamp: "2d ago",
   },
-];
+] as const satisfies Omit<ActivityRecord, "reviewStatus">[];
+
+export const ACTIVITIES_DATA: ActivityRecord[] = RAW_ACTIVITIES_DATA.map((activity) => ({
+  reviewStatus: "none" as const,
+  ...activity,
+  ...ACTIVITY_REVIEW_SEED_OVERRIDES[activity.id],
+}));
 
 export const ACTIVITY_STAT_ICONS: Record<ActivityStat["icon"], ComponentType<{ className?: string }>> = {
   events: FieldTimeOutlined,
@@ -292,6 +329,21 @@ export const ACTIVITY_CATEGORY_STYLES: Record<ActivityCategory, string> = {
   billing: "border-emerald-200 bg-emerald-50 text-emerald-700",
   system: "border-slate-200 bg-slate-100 text-slate-700",
 };
+
+export const ACTIVITY_SEVERITY_FILTER_OPTIONS: { value: ActivitySeverity; label: string }[] = [
+  { value: "info", label: "Info" },
+  { value: "success", label: "Success" },
+  { value: "warning", label: "Warning" },
+  { value: "critical", label: "Critical" },
+];
+
+export const ACTIVITY_CATEGORY_FILTER_OPTIONS: { value: ActivityCategory; label: string }[] = [
+  { value: "organization", label: "Organizations" },
+  { value: "subscription", label: "Subscriptions" },
+  { value: "user", label: "Users" },
+  { value: "billing", label: "Billing" },
+  { value: "system", label: "System" },
+];
 
 export const ACTIVITY_CATEGORY_LABELS: Record<ActivityCategory, string> = {
   organization: "Organization",

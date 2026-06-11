@@ -205,6 +205,28 @@ export const STATUS_STYLES: Record<OrganizationStatus, { dot: string; label: str
   suspended: { dot: "bg-red-500", label: "Suspended" },
 };
 
+export const ORGANIZATION_STATUS_FILTER_OPTIONS: { value: OrganizationStatus; label: string }[] = [
+  { value: "active", label: "Active" },
+  { value: "trial", label: "Trial" },
+  { value: "suspended", label: "Suspended" },
+];
+
+export const ORGANIZATION_PLAN_FILTER_OPTIONS: { value: OrganizationPlan; label: string }[] = [
+  { value: "ENTERPRISE", label: "Enterprise" },
+  { value: "BUSINESS", label: "Business" },
+  { value: "PRO", label: "Pro" },
+  { value: "FREE", label: "Free" },
+];
+
+export const ORGANIZATION_CREATED_FILTER_OPTIONS = [
+  { value: "all", label: "Any time" },
+  { value: "7d", label: "Last 7 days" },
+  { value: "30d", label: "Last 30 days" },
+  { value: "90d", label: "Last 90 days" },
+] as const;
+
+export type OrganizationCreatedDateFilter = (typeof ORGANIZATION_CREATED_FILTER_OPTIONS)[number]["value"];
+
 export const ORGANIZATIONS_PAGE_SIZE = 10;
 
 export const ORGANIZATION_STAT_ICONS: Record<

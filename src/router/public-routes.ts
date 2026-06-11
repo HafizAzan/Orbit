@@ -14,9 +14,11 @@ const UN_AUTH_ROUTES: Record<string, string> = {
   RESET_PASSWORD: "/reset-password",
   VERIFY_EMAIL: "/verify-email",
   VERIFY_OTP: "/verify-otp",
+  ABOUT: "/about",
   CONTACT: "/contact",
-  TERMS: "/terms",
-  PRIVACY: "/privacy",
+  HELP: "/help",
+  TERMS: "/terms-of-service",
+  PRIVACY: "/privacy-policy",
 };
 
 const AUTH_ROUTE_KEYS = ["LOGIN", "REGISTER", "FORGOT_PASSWORD", "VERIFY_EMAIL", "VERIFY_OTP", "RESET_PASSWORD"] as const;

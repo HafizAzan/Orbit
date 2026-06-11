@@ -14,6 +14,10 @@ export type SocialLink = {
 
 export const FOOTER_LINKS: FooterLink[] = [
   {
+    label: "About",
+    href: "/about",
+  },
+  {
     label: "Privacy Policy",
     href: "/privacy-policy",
   },
@@ -22,8 +26,12 @@ export const FOOTER_LINKS: FooterLink[] = [
     href: "/terms-of-service",
   },
   {
+    label: "Help Center",
+    href: "/help",
+  },
+  {
     label: "Contact Us",
-    href: "/contact-us",
+    href: "/contact",
   },
 ];
 

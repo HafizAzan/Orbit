@@ -66,13 +66,6 @@ export const USER_STATS: UserStat[] = [
   },
 ];
 
-export const USER_FILTER_OPTIONS = [
-  { key: "organization", label: "Organization" },
-  { key: "role", label: "Role" },
-  { key: "status", label: "Status" },
-  { key: "date-range", label: "Date Range" },
-] as const;
-
 export const USERS_PAGE_SIZE = 25;
 
 export const USERS_DATA: UserRecord[] = [
@@ -185,6 +178,22 @@ export const USERS_DATA: UserRecord[] = [
     status: "pending",
   },
 ];
+
+export const USER_STATUS_FILTER_OPTIONS: { value: UserStatus; label: string }[] = [
+  { value: "active", label: "Active" },
+  { value: "pending", label: "Pending" },
+  { value: "suspended", label: "Suspended" },
+];
+
+export const USER_ROLE_FILTER_OPTIONS: { value: UserRole; label: string }[] = [
+  { value: "Admin", label: "Admin" },
+  { value: "Manager", label: "Manager" },
+  { value: "Member", label: "Member" },
+];
+
+export const USER_ORGANIZATION_FILTER_OPTIONS = Array.from(new Set(USERS_DATA.map((user) => user.organization)))
+  .sort()
+  .map((name) => ({ value: name, label: name }));
 
 export const USER_STAT_ICONS: Record<UserStat["icon"], ComponentType<{ className?: string }>> = {
   total: TeamOutlined,

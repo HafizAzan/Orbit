@@ -1,6 +1,8 @@
 import { ConfigProvider, Drawer } from "antd";
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { AdminActivityProvider } from "../../context/admin-activity-context";
+import { AdminProfileProvider } from "../../context/admin-profile-context";
 import AdminHeader from "./header";
 import AdminSidebar, { AdminSidebarContent } from "./sidebar";
 
@@ -50,34 +52,38 @@ function AdminLayout() {
         },
       }}
     >
-      <div className="flex min-h-screen bg-background font-roboto [&_.font-sans]:font-roboto">
-        <AdminSidebar />
+      <AdminActivityProvider>
+        <div className="flex min-h-screen bg-background font-roboto [&_.font-sans]:font-roboto">
+          <AdminSidebar />
 
-        <Drawer
-          open={mobileOpen}
-          onClose={() => setMobileOpen(false)}
-          placement="left"
-          width={256}
-          closable
-          destroyOnClose={false}
-          classNames={{
-            header: "hidden!",
-            body: "p-0!",
-          }}
-          styles={{
-            body: { padding: 0 },
-          }}
-        >
-          <AdminSidebarContent onNavigate={() => setMobileOpen(false)} />
-        </Drawer>
+          <Drawer
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            placement="left"
+            width={256}
+            closable
+            destroyOnClose={false}
+            classNames={{
+              header: "hidden!",
+              body: "p-0!",
+            }}
+            styles={{
+              body: { padding: 0 },
+            }}
+          >
+            <AdminSidebarContent onNavigate={() => setMobileOpen(false)} />
+          </Drawer>
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <AdminHeader onMenuOpen={() => setMobileOpen(true)} />
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-            <Outlet />
-          </main>
+          <AdminProfileProvider>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <AdminHeader onMenuOpen={() => setMobileOpen(true)} />
+              <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <Outlet />
+              </main>
+            </div>
+          </AdminProfileProvider>
         </div>
-      </div>
+      </AdminActivityProvider>
     </ConfigProvider>
   );
 }

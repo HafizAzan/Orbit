@@ -12,7 +12,9 @@ export const ADMIN_ROUTES = {
   SUBSCRIPTIONS: "/admin/subscriptions",
   USERS: "/admin/users",
   ACTIVITY: "/admin/activity",
+  ACTIVITY_REVIEW: "/admin/activity-review",
   SETTINGS: "/admin/settings",
+  PROFILE: "/admin/profile",
 } as const;
 
 const ADMIN_ROUTE_KEYS = [
@@ -21,7 +23,9 @@ const ADMIN_ROUTE_KEYS = [
   "SUBSCRIPTIONS",
   "USERS",
   "ACTIVITY",
+  "ACTIVITY_REVIEW",
   "SETTINGS",
+  "PROFILE",
 ] as const;
 
 function resolveAdminPageImport(key: string) {
