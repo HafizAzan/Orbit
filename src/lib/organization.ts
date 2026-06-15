@@ -76,3 +76,4 @@ export function createOrganizationRecord(
     createdAt: new Date().toISOString().slice(0, 10),
   };
 }
+ 
