@@ -8,15 +8,21 @@ import type {
   SubscriptionStatus,
 } from "../data/admin-subscriptions";
 
+export type StatMetric = {
+  value: number;
+  percentage: number;
+};
+
 export type SubscriptionStats = {
-  monthlyRevenue: number;
-  annualRevenue: number;
-  activePlans: number;
-  expiredPlans: number;
+  monthlyRevenue: StatMetric;
+  annualRevenue: StatMetric;
+  activePlans: StatMetric;
+  expiredPlans: StatMetric;
 };
 
 export type PlanDistributionRecord = {
-  plan: OrganizationPlan;
+  code: OrganizationPlan;
+  name: string;
   count: number;
   percentage: number;
 };

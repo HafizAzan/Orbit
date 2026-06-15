@@ -94,7 +94,7 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
         name: record.name,
         ownerName: record.ownerName,
         ownerEmail: record.ownerEmail,
-        plan: record.plan.name,
+        plan: record.plan.code,
         status: record.status,
       });
     } else {

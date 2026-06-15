@@ -26,7 +26,7 @@ function OrganizationViewModal({ record, onClose }: OrganizationViewModalProps) 
           <RecordDetailField label="Owner" value={record.ownerName} />
           <RecordDetailField label="Owner email" value={record.ownerEmail} />
           <RecordDetailField label="Plan">
-            <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide", PLAN_STYLES[record.plan.name])}>
+            <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide", PLAN_STYLES[record.plan.code])}>
               {record.plan.name}
             </span>
           </RecordDetailField>

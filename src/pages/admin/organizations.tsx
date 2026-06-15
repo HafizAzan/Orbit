@@ -1,16 +1,13 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Spin } from "antd";
+import { Button } from "antd";
 import React, { useCallback, useState } from "react";
 import OrganizationCreateModal from "../../component/admin/organizations/organization-create-modal";
 import OrgStatCard from "../../component/admin/organizations/org-stat-card";
 import OrganizationsTable from "../../component/admin/organizations/organizations-table";
+import { AdminListPageSkeleton } from "../../component/skeletons";
 import { Paragraph, Title } from "../../component/ui/typography";
 import type { OrganizationRecord } from "../../data/admin-organizations";
-import {
-  useDeleteOrganization,
-  useOrganizationStats,
-  useOrganizations,
-} from "../../hooks/use-admin-organizations";
+import { useDeleteOrganization, useOrganizationStats, useOrganizations } from "../../hooks/use-admin-organizations";
 import { mapOrganizationStats } from "../../lib/admin-billing-mappers";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 
@@ -58,11 +55,7 @@ function AdminOrganizations() {
   );
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[320px] items-center justify-center">
-        <Spin size="large" />
-      </div>
-    );
+    return <AdminListPageSkeleton tableColumns={6} />;
   }
 
   return (
@@ -86,18 +79,9 @@ function AdminOrganizations() {
         ))}
       </div>
 
-      <OrganizationsTable
-        data={organizations}
-        emptyAction={createButton}
-        onEdit={handleOpenEdit}
-        onDelete={handleDelete}
-      />
+      <OrganizationsTable data={organizations} emptyAction={createButton} onEdit={handleOpenEdit} onDelete={handleDelete} />
 
-      <OrganizationCreateModal
-        open={formModalOpen}
-        record={editingOrganization}
-        onClose={handleCloseFormModal}
-      />
+      <OrganizationCreateModal open={formModalOpen} record={editingOrganization} onClose={handleCloseFormModal} />
     </div>
   );
 }

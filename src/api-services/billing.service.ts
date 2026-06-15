@@ -7,6 +7,7 @@ import type {
   BillingMessageResponse,
   CancelPlanRequest,
   ChangePlanRequest,
+  ConfirmCheckoutRequest,
   CreateCheckoutRequest,
   CreateCheckoutResponse,
   CurrentSubscriptionResponse,
@@ -29,6 +30,16 @@ const getCurrentSubscription = async (): Promise<CurrentSubscriptionResponse> =>
 const createCheckout = async (data: CreateCheckoutRequest): Promise<CreateCheckoutResponse> => {
   const response = await ApiService.post(API_ROUTES.BILLING.CHECKOUT, data, AUTH_REQUEST);
   return assertApiSuccess<CreateCheckoutResponse>(response);
+};
+
+const confirmCheckout = async (data: ConfirmCheckoutRequest): Promise<BillingMessageResponse> => {
+  const response = await ApiService.post(API_ROUTES.BILLING.CHECKOUT_CONFIRM, data, AUTH_REQUEST);
+  return assertApiSuccess<BillingMessageResponse>(response);
+};
+
+const selectPlan = async (data: CreateCheckoutRequest): Promise<BillingMessageResponse> => {
+  const response = await ApiService.post(API_ROUTES.BILLING.SELECT_PLAN, data, AUTH_REQUEST);
+  return assertApiSuccess<BillingMessageResponse>(response);
 };
 
 const cancelPlan = async (data: CancelPlanRequest = {}): Promise<BillingMessageResponse> => {
@@ -54,9 +65,11 @@ const listInvoices = async (): Promise<BillingInvoicesResponse> => {
 export {
   cancelPlan,
   changePlan,
+  confirmCheckout,
   createCheckout,
   getCatalog,
   getCurrentSubscription,
   listInvoices,
   refundPayment,
+  selectPlan,
 };

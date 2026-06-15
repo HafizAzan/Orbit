@@ -2,17 +2,20 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   cancelPlan,
   changePlan,
+  confirmCheckout,
   createCheckout,
   getCatalog,
   getCurrentSubscription,
   listInvoices,
   refundPayment,
+  selectPlan,
 } from "../api-services/billing.service";
 import { useAppContext } from "../context/app-context";
 import { canManageBilling } from "../lib/auth-routing";
 import type {
   CancelPlanRequest,
   ChangePlanRequest,
+  ConfirmCheckoutRequest,
   CreateCheckoutRequest,
   RefundPaymentRequest,
 } from "../types/billing.types";
@@ -60,6 +63,18 @@ export function useBillingInvoices() {
 export function useCreateCheckout() {
   return useMutation({
     mutationFn: (data: CreateCheckoutRequest) => createCheckout(data),
+  });
+}
+
+export function useConfirmCheckout() {
+  return useMutation({
+    mutationFn: (data: ConfirmCheckoutRequest) => confirmCheckout(data),
+  });
+}
+
+export function useSelectPlan() {
+  return useMutation({
+    mutationFn: (data: CreateCheckoutRequest) => selectPlan(data),
   });
 }
 

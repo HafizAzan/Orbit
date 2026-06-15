@@ -1,13 +1,18 @@
 import { LockOutlined, MailOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
 import { Button, Input, Tag } from "antd";
 import React, { useState } from "react";
-import { PROFILE_EMAIL_SECURITY_NOTE, type AdminProfile } from "../../../data/admin-profile";
+import { PROFILE_EMAIL_SECURITY_NOTE } from "../../../data/admin-profile";
 import { maskEmail } from "../../../lib/helper";
 import { Label } from "../../ui/typography";
 import ProfileEmailChangeModal from "./profile-email-change-modal";
 
+type ProfileEmailSecurityProfile = {
+  email: string;
+  emailVerified: boolean;
+};
+
 type ProfileEmailSecurityCardProps = {
-  profile: AdminProfile;
+  profile: ProfileEmailSecurityProfile;
   changingEmail?: boolean;
   onInitiateEmailChange: (newEmail: string, currentPassword: string) => Promise<boolean>;
   onCompleteEmailChange: (newEmail: string, otp: string) => Promise<boolean>;

@@ -7,11 +7,16 @@ import type {
   OrganizationStatus,
 } from "../data/admin-organizations";
 
+export type StatMetric = {
+  value: number;
+  percentage: number;
+};
+
 export type OrganizationStats = {
-  total: number;
-  active: number;
-  trial: number;
-  suspended: number;
+  total: StatMetric;
+  active: StatMetric;
+  trial: StatMetric;
+  suspended: StatMetric;
 };
 
 export type CreateOrganizationRequest = {

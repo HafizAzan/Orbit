@@ -5,17 +5,30 @@ import { PLATFORM_ADMIN_ROLE_LABEL, type AdminProfile } from "../../../data/admi
 import { toast } from "../../../lib/toast";
 import { Label } from "../../ui/typography";
 
+type ProfileInfoFormProfile = Pick<AdminProfile, "firstName" | "lastName" | "avatarUrl">;
+
 type ProfileInfoFormProps = {
-  profile: AdminProfile;
-  onChange: <K extends keyof AdminProfile>(key: K, value: AdminProfile[K]) => void;
+  profile: ProfileInfoFormProfile;
+  onChange: (key: keyof ProfileInfoFormProfile, value: string) => void;
+  roleLabel?: string;
+  organizationName?: string;
+  title?: string;
+  description?: string;
 };
 
-function ProfileInfoForm({ profile, onChange }: ProfileInfoFormProps) {
+function ProfileInfoForm({
+  profile,
+  onChange,
+  roleLabel = PLATFORM_ADMIN_ROLE_LABEL,
+  organizationName,
+  title = "Personal Details",
+  description = "Update how your name appears across the admin console.",
+}: ProfileInfoFormProps) {
   return (
     <article className="flex h-full w-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Personal Details</h2>
-        <p className="mt-1 text-sm text-muted">Update how your name appears across the admin console.</p>
+        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+        <p className="mt-1 text-sm text-muted">{description}</p>
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-background p-4">
@@ -53,8 +66,21 @@ function ProfileInfoForm({ profile, onChange }: ProfileInfoFormProps) {
 
         <div className="space-y-2 md:col-span-2">
           <Label>Role</Label>
-          <Input size="large" value={PLATFORM_ADMIN_ROLE_LABEL} readOnly disabled className="rounded-xl! bg-background! [&_input]:text-muted!" />
+          <Input size="large" value={roleLabel} readOnly disabled className="rounded-xl! bg-background! [&_input]:text-muted!" />
         </div>
+
+        {organizationName ? (
+          <div className="space-y-2 md:col-span-2">
+            <Label>Organization</Label>
+            <Input
+              size="large"
+              value={organizationName}
+              readOnly
+              disabled
+              className="rounded-xl! bg-background! [&_input]:text-muted!"
+            />
+          </div>
+        ) : null}
       </div>
     </article>
   );

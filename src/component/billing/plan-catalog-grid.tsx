@@ -1,11 +1,16 @@
-import { Spin } from "antd";
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PricingCard from "../common/pricing-card";
 import AnimateOnScroll from "../common/animate-on-scroll";
+import { PricingCardsGridSkeleton } from "../skeletons";
 import { Paragraph } from "../ui/typography";
-import { useBillingCatalog, useCreateCheckout } from "../../hooks/use-billing";
+import { useBillingCatalog, useCreateCheckout, useSelectPlan } from "../../hooks/use-billing";
+import { getMe } from "../../api-services/auth.service";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
+import { saveStoredUser } from "../../lib/auth-session";
 import { mapCatalogToPricingPlans } from "../../lib/pricing-catalog";
+import { useAppContext } from "../../context/app-context";
+import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
 import type { CatalogCtaType } from "../../types/billing.types";
 
 type PlanCatalogGridProps = {
@@ -21,6 +26,9 @@ function PlanCatalogGrid({
 }: PlanCatalogGridProps) {
   const { data, isLoading, isError } = useBillingCatalog();
   const { mutateAsync: startCheckout } = useCreateCheckout();
+  const { mutateAsync: activatePlan } = useSelectPlan();
+  const app = useAppContext();
+  const navigate = useNavigate();
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
 
   const plans = useMemo(() => mapCatalogToPricingPlans(data?.products ?? []), [data?.products]);
@@ -39,21 +47,32 @@ function PlanCatalogGrid({
     setPendingPriceId(priceId);
 
     try {
+      if (ctaType === "register") {
+        const result = await activatePlan({ priceId });
+        const freshUser = await getMe();
+        saveStoredUser(freshUser);
+        app?.setUser(freshUser);
+        showApiSuccessToast(result.message);
+
+        if (!freshUser.requiresPlanSelection) {
+          navigate(WORKSPACE_ROUTES.DASHBOARD, { replace: true });
+        }
+
+        return;
+      }
+
       const result = await startCheckout({ priceId });
       showApiSuccessToast(result.message);
       window.location.assign(result.url);
     } catch (error) {
       showApiErrorToast(error);
+    } finally {
       setPendingPriceId(null);
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Spin size="large" />
-      </div>
-    );
+    return <PricingCardsGridSkeleton count={3} />;
   }
 
   if (isError || plans.length === 0) {

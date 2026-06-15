@@ -1,5 +1,5 @@
 import { ADMIN_ROUTES } from "../router/admin-routes";
-import { UN_AUTH_ROUTES } from "../router/public-routes";
+import { WORKSPACE_ROUTES } from "../router/workspace-routes";
 import type { AuthUser } from "../types/auth.types";
 
 export function isPlatformAdminUser(user: AuthUser) {
@@ -12,6 +12,8 @@ export function canManageBilling(user: AuthUser) {
 
 export const PLAN_ROUTES = {
   CHOOSE_PLAN: "/choose-plan",
+  CHECKOUT_SUCCESS: "/choose-plan/checkout/success",
+  CHECKOUT_CANCEL: "/choose-plan/checkout/cancel",
 } as const;
 
 export function getPostAuthRedirectPath(user: AuthUser) {
@@ -23,7 +25,7 @@ export function getPostAuthRedirectPath(user: AuthUser) {
     return PLAN_ROUTES.CHOOSE_PLAN;
   }
 
-  return UN_AUTH_ROUTES.HOME;
+  return WORKSPACE_ROUTES.DASHBOARD;
 }
 
 export function getAuthenticatedHeaderAction(user: AuthUser) {
@@ -35,7 +37,7 @@ export function getAuthenticatedHeaderAction(user: AuthUser) {
   }
 
   return {
-    label: "Home",
-    path: UN_AUTH_ROUTES.HOME,
+    label: "Dashboard",
+    path: WORKSPACE_ROUTES.DASHBOARD,
   };
 }

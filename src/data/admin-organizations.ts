@@ -13,7 +13,8 @@ export type OrganizationPlan = "ENTERPRISE" | "BUSINESS" | "PRO" | "FREE";
 export type OrganizationStatus = "active" | "trial" | "suspended";
 
 export type OrganizationPlanInfo = {
-  name: OrganizationPlan;
+  code: OrganizationPlan;
+  name: string;
   status: SubscriptionStatus;
   createdAt: string;
   expiresAt: string | null;
@@ -103,7 +104,7 @@ export const ORGANIZATION_PLAN_FILTER_OPTIONS: { value: OrganizationPlan; label:
   { value: "ENTERPRISE", label: "Enterprise" },
   { value: "BUSINESS", label: "Business" },
   { value: "PRO", label: "Pro" },
-  { value: "FREE", label: "Free" },
+  { value: "FREE", label: "Starter" },
 ];
 
 export const ORGANIZATION_CREATED_FILTER_OPTIONS = [

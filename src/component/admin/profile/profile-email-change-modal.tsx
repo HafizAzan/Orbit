@@ -1,13 +1,17 @@
 import { MailOutlined, SafetyOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Steps } from "antd";
 import React, { useEffect, useState } from "react";
-import { EMAIL_CHANGE_STEPS, type AdminProfile } from "../../../data/admin-profile";
+import { EMAIL_CHANGE_STEPS } from "../../../data/admin-profile";
 import Modal from "../../ui/modal";
 import { Label } from "../../ui/typography";
 
+type ProfileEmailChangeProfile = {
+  email: string;
+};
+
 type ProfileEmailChangeModalProps = {
   open: boolean;
-  profile: AdminProfile;
+  profile: ProfileEmailChangeProfile;
   loading?: boolean;
   onClose: () => void;
   onInitiate: (newEmail: string, currentPassword: string) => Promise<boolean>;

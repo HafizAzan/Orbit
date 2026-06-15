@@ -90,6 +90,10 @@ export type RefundPaymentRequest = {
   invoiceId?: string;
 };
 
+export type ConfirmCheckoutRequest = {
+  sessionId: string;
+};
+
 export type BillingMessageResponse = {
   message: string;
 };

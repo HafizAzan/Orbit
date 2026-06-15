@@ -1,11 +1,12 @@
 import { DownloadOutlined } from "@ant-design/icons";
-import { Button, Spin } from "antd";
+import { Button } from "antd";
 import React, { useCallback, useState } from "react";
 import PlanDistributionCard from "../../component/admin/subscriptions/plan-distribution-card";
 import RevenueOverviewChart from "../../component/admin/subscriptions/revenue-overview-chart";
 import SubscriptionEditBillingModal from "../../component/admin/subscriptions/subscription-edit-billing-modal";
 import SubscriptionStatCard from "../../component/admin/subscriptions/subscription-stat-card";
 import SubscriptionsTable from "../../component/admin/subscriptions/subscriptions-table";
+import { AdminSubscriptionsPageSkeleton } from "../../component/skeletons";
 import { Paragraph, Title } from "../../component/ui/typography";
 import { SUBSCRIPTION_REVENUE_DATA, type SubscriptionRecord } from "../../data/admin-subscriptions";
 import {
@@ -36,11 +37,7 @@ function AdminSubscriptions() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[320px] items-center justify-center">
-        <Spin size="large" />
-      </div>
-    );
+    return <AdminSubscriptionsPageSkeleton />;
   }
 
   return (

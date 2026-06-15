@@ -22,6 +22,8 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     CATALOG: "/billing/catalog",
     SUBSCRIPTION: "/billing/subscription",
     CHECKOUT: "/billing/checkout",
+    CHECKOUT_CONFIRM: "/billing/checkout/confirm",
+    SELECT_PLAN: "/billing/select-plan",
     CANCEL: "/billing/cancel",
     CHANGE_PLAN: "/billing/change-plan",
     REFUND: "/billing/refund",
