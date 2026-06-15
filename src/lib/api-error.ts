@@ -1,3 +1,5 @@
+import { toast } from "./toast";
+
 export class ApiRequestError extends Error {
   statusCode?: number;
   code?: string;
@@ -26,7 +28,7 @@ export function parseApiError(data: unknown): ApiRequestError {
   };
   const rawMessage = error?.message;
 
-  let message = "Request failed";
+  let message = "";
   let code = error.code;
   let email = error.email;
   let expiresAt = error.expiresAt;
@@ -70,3 +72,38 @@ export function assertApiSuccess<T>(data: unknown): T {
 export const AUTH_ERROR_CODES = {
   PENDING_EMAIL_VERIFICATION: "PENDING_EMAIL_VERIFICATION",
 } as const;
+
+export function getApiErrorMessage(error: unknown): string | null {
+  if (error instanceof ApiRequestError || error instanceof Error) {
+    const message = error.message.trim();
+    return message || null;
+  }
+
+  return null;
+}
+
+export function showApiErrorToast(error: unknown) {
+  const message = getApiErrorMessage(error);
+  if (message) {
+    toast.error(message);
+  }
+}
+
+export function showApiInfoToast(message: string | null | undefined) {
+  const normalized = message?.trim();
+  if (normalized) {
+    toast.info(normalized);
+  }
+}
+
+export function showApiSuccessToast(message: string | null | undefined, devDetail?: string | null) {
+  const normalized = message?.trim();
+  if (!normalized) return;
+
+  if (import.meta.env.DEV && devDetail?.trim()) {
+    toast.success(`${normalized} ${devDetail.trim()}`);
+    return;
+  }
+
+  toast.success(normalized);
+}

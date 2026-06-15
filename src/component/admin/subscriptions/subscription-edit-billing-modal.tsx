@@ -12,9 +12,9 @@ import {
   type SubscriptionRecord,
   type SubscriptionStatus,
 } from "../../../data/admin-subscriptions";
-import { delay, formatCurrency, getInitial } from "../../../lib/helper";
-import { updateSubscriptionBilling } from "../../../lib/subscription";
-import { toast } from "../../../lib/toast";
+import { useUpdateSubscriptionBilling } from "../../../hooks/use-admin-subscriptions";
+import { showApiErrorToast } from "../../../lib/api-error";
+import { formatCurrency, getInitial } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import Modal from "../../ui/modal";
 import { Label, Paragraph, Text, Title } from "../../ui/typography";
@@ -23,7 +23,6 @@ type SubscriptionEditBillingModalProps = {
   open: boolean;
   record: SubscriptionRecord | null;
   onClose: () => void;
-  onSave: (subscription: SubscriptionRecord) => void;
 };
 
 type SubscriptionBillingFormValues = {
@@ -57,9 +56,10 @@ function FormSection({ title, description, children }: FormSectionProps) {
   );
 }
 
-function SubscriptionEditBillingModal({ open, record, onClose, onSave }: SubscriptionEditBillingModalProps) {
+function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEditBillingModalProps) {
   const [form] = Form.useForm<SubscriptionBillingFormValues>();
   const [submitting, setSubmitting] = useState(false);
+  const { mutateAsync: updateBilling } = useUpdateSubscriptionBilling();
   const selectedPlan = Form.useWatch("plan", form);
   const selectedBillingCycle = Form.useWatch("billingCycle", form);
   const selectedStatus = Form.useWatch("status", form);
@@ -88,13 +88,20 @@ function SubscriptionEditBillingModal({ open, record, onClose, onSave }: Subscri
     setSubmitting(true);
 
     try {
-      await delay(500);
-      const subscription = updateSubscriptionBilling(record, values);
-      onSave(subscription);
-      toast.success(`Billing updated for ${subscription.organizationName}`);
+      await updateBilling({
+        id: record.id,
+        data: {
+          contactEmail: values.contactEmail,
+          plan: values.plan,
+          billingCycle: values.billingCycle,
+          renewalDate: values.renewalDate,
+          amount: values.amount,
+          status: values.status,
+        },
+      });
       onClose();
-    } catch {
-      toast.error("Failed to update billing. Please try again.");
+    } catch (error) {
+      showApiErrorToast(error);
     } finally {
       setSubmitting(false);
     }

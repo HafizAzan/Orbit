@@ -26,10 +26,16 @@ function OrganizationViewModal({ record, onClose }: OrganizationViewModalProps) 
           <RecordDetailField label="Owner" value={record.ownerName} />
           <RecordDetailField label="Owner email" value={record.ownerEmail} />
           <RecordDetailField label="Plan">
-            <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide", PLAN_STYLES[record.plan])}>
-              {record.plan}
+            <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide", PLAN_STYLES[record.plan.name])}>
+              {record.plan.name}
             </span>
           </RecordDetailField>
+          <RecordDetailField label="Plan status" value={record.plan.status} />
+          <RecordDetailField label="Plan started" value={formatDate(record.plan.createdAt)} />
+          <RecordDetailField
+            label="Plan expires"
+            value={record.plan.expiresAt ? formatDate(record.plan.expiresAt) : "—"}
+          />
           <RecordDetailField label="Status">
             <span className="inline-flex items-center gap-2">
               <span className={cn("h-2 w-2 rounded-full", statusStyle.dot)} />

@@ -14,6 +14,7 @@ export type BillingCycle = "Annual" | "Monthly";
 
 export type SubscriptionRecord = {
   id: string;
+  organizationId: string;
   organizationName: string;
   contactEmail: string;
   plan: OrganizationPlan;
@@ -21,6 +22,12 @@ export type SubscriptionRecord = {
   renewalDate: string;
   amount: number;
   status: SubscriptionStatus;
+  currency: string;
+  startedAt: string;
+  expiresAt: string | null;
+  cancelledAt: string | null;
+  trialEndsAt: string | null;
+  createdAt: string;
 };
 
 export type SubscriptionStat = {
@@ -134,128 +141,7 @@ export const PLAN_DISTRIBUTION: PlanDistributionItem[] = [
 
 export const SUBSCRIPTIONS_PAGE_SIZE = 25;
 
-export const SUBSCRIPTIONS_DATA: SubscriptionRecord[] = [
-  {
-    id: "1",
-    organizationName: "Acme Corp",
-    contactEmail: "billing@acme.com",
-    plan: "ENTERPRISE",
-    billingCycle: "Annual",
-    renewalDate: "2024-10-12",
-    amount: 12000,
-    status: "active",
-  },
-  {
-    id: "2",
-    organizationName: "Globex Inc",
-    contactEmail: "finance@globex.io",
-    plan: "BUSINESS",
-    billingCycle: "Monthly",
-    renewalDate: "2024-11-05",
-    amount: 899,
-    status: "active",
-  },
-  {
-    id: "3",
-    organizationName: "Initech",
-    contactEmail: "accounts@initech.net",
-    plan: "PRO",
-    billingCycle: "Monthly",
-    renewalDate: "2024-09-18",
-    amount: 299,
-    status: "trial",
-  },
-  {
-    id: "4",
-    organizationName: "Umbrella Co",
-    contactEmail: "pay@umbrella.co",
-    plan: "ENTERPRISE",
-    billingCycle: "Annual",
-    renewalDate: "2025-01-22",
-    amount: 24000,
-    status: "active",
-  },
-  {
-    id: "5",
-    organizationName: "Stark Industries",
-    contactEmail: "billing@stark.com",
-    plan: "ENTERPRISE",
-    billingCycle: "Annual",
-    renewalDate: "2024-08-15",
-    amount: 36000,
-    status: "active",
-  },
-  {
-    id: "6",
-    organizationName: "Wayne Enterprises",
-    contactEmail: "subs@wayne.com",
-    plan: "BUSINESS",
-    billingCycle: "Annual",
-    renewalDate: "2024-07-03",
-    amount: 9600,
-    status: "active",
-  },
-  {
-    id: "7",
-    organizationName: "Cyberdyne Systems",
-    contactEmail: "billing@cyberdyne.ai",
-    plan: "PRO",
-    billingCycle: "Monthly",
-    renewalDate: "2024-03-01",
-    amount: 299,
-    status: "expired",
-  },
-  {
-    id: "8",
-    organizationName: "Oscorp",
-    contactEmail: "finance@oscorp.com",
-    plan: "BUSINESS",
-    billingCycle: "Monthly",
-    renewalDate: "2024-06-10",
-    amount: 899,
-    status: "trial",
-  },
-  {
-    id: "9",
-    organizationName: "Pied Piper",
-    contactEmail: "hello@piedpiper.com",
-    plan: "FREE",
-    billingCycle: "Monthly",
-    renewalDate: "2024-04-01",
-    amount: 0,
-    status: "trial",
-  },
-  {
-    id: "10",
-    organizationName: "Hooli",
-    contactEmail: "enterprise@hooli.com",
-    plan: "ENTERPRISE",
-    billingCycle: "Annual",
-    renewalDate: "2025-02-20",
-    amount: 48000,
-    status: "active",
-  },
-  {
-    id: "11",
-    organizationName: "Massive Dynamic",
-    contactEmail: "ap@massive.com",
-    plan: "PRO",
-    billingCycle: "Annual",
-    renewalDate: "2023-12-15",
-    amount: 3588,
-    status: "expired",
-  },
-  {
-    id: "12",
-    organizationName: "Soylent Corp",
-    contactEmail: "billing@soylent.io",
-    plan: "BUSINESS",
-    billingCycle: "Monthly",
-    renewalDate: "2024-01-30",
-    amount: 899,
-    status: "cancelled",
-  },
-];
+export const SUBSCRIPTIONS_DATA: SubscriptionRecord[] = [];
 
 export const SUBSCRIPTION_STAT_ICONS: Record<
   SubscriptionStat["icon"],

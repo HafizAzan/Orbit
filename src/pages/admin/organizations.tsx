@@ -1,16 +1,27 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import React, { useCallback, useState } from "react";
 import OrganizationCreateModal from "../../component/admin/organizations/organization-create-modal";
 import OrgStatCard from "../../component/admin/organizations/org-stat-card";
 import OrganizationsTable from "../../component/admin/organizations/organizations-table";
 import { Paragraph, Title } from "../../component/ui/typography";
-import { ORGANIZATION_STATS, ORGANIZATIONS_DATA, type OrganizationRecord } from "../../data/admin-organizations";
+import type { OrganizationRecord } from "../../data/admin-organizations";
+import {
+  useDeleteOrganization,
+  useOrganizationStats,
+  useOrganizations,
+} from "../../hooks/use-admin-organizations";
+import { mapOrganizationStats } from "../../lib/admin-billing-mappers";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 
 function AdminOrganizations() {
-  const [organizations, setOrganizations] = useState(ORGANIZATIONS_DATA);
+  const { data: organizations = [], isLoading } = useOrganizations();
+  const { data: stats } = useOrganizationStats();
+  const { mutateAsync: deleteOrganization } = useDeleteOrganization();
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [editingOrganization, setEditingOrganization] = useState<OrganizationRecord | null>(null);
+
+  const organizationStats = mapOrganizationStats(stats);
 
   const handleOpenCreate = useCallback(() => {
     setEditingOrganization(null);
@@ -27,19 +38,32 @@ function AdminOrganizations() {
     setEditingOrganization(null);
   }, []);
 
-  const handleOrganizationCreate = useCallback((organization: OrganizationRecord) => {
-    setOrganizations((current) => [organization, ...current]);
-  }, []);
-
-  const handleOrganizationUpdate = useCallback((organization: OrganizationRecord) => {
-    setOrganizations((current) => current.map((item) => (item.id === organization.id ? organization : item)));
-  }, []);
+  const handleDelete = useCallback(
+    async (record: OrganizationRecord) => {
+      try {
+        const result = await deleteOrganization(record.id);
+        showApiSuccessToast(result.message);
+      } catch (error) {
+        showApiErrorToast(error);
+        throw error;
+      }
+    },
+    [deleteOrganization],
+  );
 
   const createButton = (
     <Button type="primary" icon={<PlusOutlined />} size="large" className="font-semibold!" onClick={handleOpenCreate}>
       Create Organization
     </Button>
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[320px] items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-8xl">
@@ -57,20 +81,22 @@ function AdminOrganizations() {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {ORGANIZATION_STATS.map((stat) => (
+        {organizationStats.map((stat) => (
           <OrgStatCard key={stat.id} stat={stat} />
         ))}
       </div>
 
-      <OrganizationsTable data={organizations} emptyAction={createButton} onEdit={handleOpenEdit} />
+      <OrganizationsTable
+        data={organizations}
+        emptyAction={createButton}
+        onEdit={handleOpenEdit}
+        onDelete={handleDelete}
+      />
 
       <OrganizationCreateModal
         open={formModalOpen}
         record={editingOrganization}
-        existingOrganizations={organizations}
         onClose={handleCloseFormModal}
-        onCreate={handleOrganizationCreate}
-        onUpdate={handleOrganizationUpdate}
       />
     </div>
   );

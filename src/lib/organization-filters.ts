@@ -85,7 +85,7 @@ export function matchesOrganizationFilters(organization: OrganizationRecord, fil
     return false;
   }
 
-  if (filters.plans.length > 0 && !filters.plans.includes(organization.plan)) {
+  if (filters.plans.length > 0 && !filters.plans.includes(organization.plan.name)) {
     return false;
   }
 

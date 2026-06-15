@@ -57,18 +57,20 @@ function createOrganizationTableColumns({ onView, onEdit, onDelete }: Organizati
     },
     {
       title: "Plan",
-      dataIndex: "plan",
       key: "plan",
       responsive: ["lg"],
-      render: (plan: OrganizationRecord["plan"]) => (
-        <span
-          className={cn(
-            "inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
-            PLAN_STYLES[plan],
-          )}
-        >
-          {plan}
-        </span>
+      render: (_, record) => (
+        <div className="min-w-0">
+          <span
+            className={cn(
+              "inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
+              PLAN_STYLES[record.plan.name],
+            )}
+          >
+            {record.plan.name}
+          </span>
+          <p className="mt-1 text-xs capitalize text-muted">{record.plan.status}</p>
+        </div>
       ),
     },
     {

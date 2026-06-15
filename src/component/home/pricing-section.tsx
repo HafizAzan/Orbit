@@ -1,10 +1,30 @@
-import React from "react";
-import PricingCard from "../common/pricing-card";
+import React, { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AnimateOnScroll from "../common/animate-on-scroll";
-import PRICING_PLANS from "../../data/pricing-plans";
 import { Paragraph, Title } from "../ui/typography";
+import { useAppContext } from "../../context/app-context";
+import PlanCatalogGrid from "../billing/plan-catalog-grid";
+import { UN_AUTH_ROUTES } from "../../router/public-routes";
 
 function PricingSection() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const app = useAppContext();
+
+  useEffect(() => {
+    const checkoutState = searchParams.get("checkout");
+
+    if (checkoutState) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete("checkout");
+      setSearchParams(nextParams, { replace: true });
+
+      if (checkoutState === "cancel") {
+        document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [searchParams, setSearchParams]);
+
   return (
     <section id="pricing" className="bg-background px-4 py-14 sm:px-6 nav:py-20 lg:px-10 lg:py-24">
       <div className="mx-auto max-w-7xl">
@@ -17,24 +37,19 @@ function PricingSection() {
           </Paragraph>
         </AnimateOnScroll>
 
-        <div className="grid grid-cols-1 gap-6 nav:grid-cols-3 nav:items-center nav:gap-6 nav:py-4">
-          {PRICING_PLANS.map((plan, index) => (
-            <AnimateOnScroll key={plan.id} variant="fade-up" delay={index * 120}>
-              <PricingCard
-                name={plan.name}
-                description={plan.description}
-                price={plan.price}
-                priceSuffix={plan.priceSuffix}
-                features={plan.features}
-                ctaLabel={plan.ctaLabel}
-                ctaHref={plan.ctaHref}
-                highlighted={plan.highlighted}
-                badge={plan.badge}
-                className="h-full"
-              />
-            </AnimateOnScroll>
-          ))}
-        </div>
+        <PlanCatalogGrid
+          mode="public"
+          onContact={() => navigate("/contact")}
+          onRequireAuth={(ctaType) => {
+            if (app?.isAuthenticated) {
+              return;
+            }
+
+            navigate(ctaType === "register" ? UN_AUTH_ROUTES.REGISTER : UN_AUTH_ROUTES.LOGIN, {
+              state: { from: "/#pricing" },
+            });
+          }}
+        />
       </div>
     </section>
   );

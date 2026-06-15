@@ -4,11 +4,10 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
 import { useLogin } from "../../hooks/user-authentication";
-import { AUTH_ERROR_CODES, ApiRequestError } from "../../lib/api-error";
+import { AUTH_ERROR_CODES, ApiRequestError, showApiErrorToast, showApiInfoToast, showApiSuccessToast } from "../../lib/api-error";
 import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { saveAuthSession } from "../../lib/auth-session";
 import { saveOtpSession } from "../../lib/otp-session";
-import { toast } from "../../lib/toast";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import type { LoginFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
@@ -30,7 +29,7 @@ function LoginForm() {
 
       saveAuthSession(result.accessToken, result.user);
       app?.setUser(result.user);
-      toast.success(result.message);
+      showApiSuccessToast(result.message);
       navigate(getPostAuthRedirectPath(result.user));
     } catch (error) {
       if (
@@ -49,7 +48,7 @@ function LoginForm() {
           });
         }
 
-        toast.info(error.message);
+        showApiInfoToast(error.message);
         navigate(
           `${UN_AUTH_ROUTES.VERIFY_OTP}?email=${encodeURIComponent(normalizedEmail)}&flow=register`,
           {
@@ -63,7 +62,7 @@ function LoginForm() {
         return;
       }
 
-      toast.error(error instanceof Error ? error.message : "Unable to sign in. Please try again.");
+      showApiErrorToast(error);
     }
   };
 

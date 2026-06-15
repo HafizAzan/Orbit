@@ -2,7 +2,7 @@ import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@
 import { Badge, Button, Input } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createOrganizationTableColumns from "../../../columns/organization-table-columns";
-import { ORGANIZATIONS_DATA, ORGANIZATIONS_PAGE_SIZE, type OrganizationRecord } from "../../../data/admin-organizations";
+import { ORGANIZATIONS_PAGE_SIZE, type OrganizationRecord } from "../../../data/admin-organizations";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
 import useOrganizationFilters from "../../../hooks/use-organization-filters";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
@@ -19,9 +19,10 @@ type OrganizationsTableProps = {
   data?: OrganizationRecord[];
   emptyAction?: React.ReactNode;
   onEdit?: (record: OrganizationRecord) => void;
+  onDelete?: (record: OrganizationRecord) => Promise<void>;
 };
 
-function OrganizationsTable({ data = ORGANIZATIONS_DATA, emptyAction, onEdit }: OrganizationsTableProps) {
+function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete }: OrganizationsTableProps) {
   const [rows, setRows] = useState(data);
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useOrganizationFilters();
@@ -85,14 +86,22 @@ function OrganizationsTable({ data = ORGANIZATIONS_DATA, emptyAction, onEdit }: 
     setBulkDeleteOpen(false);
   };
 
-  const handleSingleDeleteConfirm = useCallback(() => {
+  const handleSingleDeleteConfirm = useCallback(async () => {
     if (!pendingDelete) return;
 
-    setRows((current) => current.filter((row) => row.id !== pendingDelete.id));
-    setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
-    toast.success(`${pendingDelete.name} deleted successfully`);
-    setPendingDelete(null);
-  }, [pendingDelete]);
+    try {
+      if (onDelete) {
+        await onDelete(pendingDelete);
+      } else {
+        setRows((current) => current.filter((row) => row.id !== pendingDelete.id));
+      }
+
+      setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
+      setPendingDelete(null);
+    } catch {
+      // Error toast handled by parent.
+    }
+  }, [pendingDelete, onDelete]);
 
   const handleOpenFilters = () => {
     setDraftFilters(filters);

@@ -8,8 +8,13 @@ import AuthLayout from "./layout/auth-layout/layout";
 import AdminLayout from "./layout/admin-layout/layout";
 import Layout from "./layout/public-layout/layout";
 import { ADMIN_ROUTES_LIST, type AdminRoute } from "./router/admin-routes";
+import RequireAuth from "./router/guards/require-auth";
+import RequirePlanSelectionRedirect from "./router/guards/require-plan-selection-redirect";
 import RequirePlatformAdmin from "./router/guards/require-platform-admin";
+import RequireGuest from "./router/guards/require-guest";
+import { PLAN_ROUTES } from "./lib/auth-routing";
 import { LIST, type Route } from "./router/public-routes";
+import ChoosePlan from "./pages/choose-plan";
 
 function App() {
   return (
@@ -26,16 +31,24 @@ function App() {
               </ChildRoute>
             </ChildRoute>
 
-            <ChildRoute element={<AuthLayout />}>
-              {LIST.AUTH_ROUTES_LIST.map((route: Route) => (
-                <ChildRoute key={route.path} path={route.path} element={<route.component />} />
-              ))}
+            <ChildRoute element={<RequireGuest />}>
+              <ChildRoute element={<AuthLayout />}>
+                {LIST.AUTH_ROUTES_LIST.map((route: Route) => (
+                  <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                ))}
+              </ChildRoute>
             </ChildRoute>
 
             <ChildRoute element={<Layout />}>
-              {LIST.PUBLIC_ROUTES_LIST.map((route: Route) => (
-                <ChildRoute key={route.path} path={route.path} element={<route.component />} />
-              ))}
+              <ChildRoute element={<RequireAuth />}>
+                <ChildRoute path={PLAN_ROUTES.CHOOSE_PLAN} element={<ChoosePlan />} />
+              </ChildRoute>
+
+              <ChildRoute element={<RequirePlanSelectionRedirect />}>
+                {LIST.PUBLIC_ROUTES_LIST.map((route: Route) => (
+                  <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                ))}
+              </ChildRoute>
             </ChildRoute>
           </Routes>
         </BrowserRouter>

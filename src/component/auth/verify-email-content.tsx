@@ -2,8 +2,10 @@ import { ArrowLeftOutlined, CheckOutlined, GlobalOutlined, LockOutlined, MailOut
 import { Button, Divider } from "antd";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useForgotPassword } from "../../hooks/user-authentication";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
+import { getWebmailProvider, openWebmailInbox } from "../../lib/webmail";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
-import { toast } from "../../lib/toast";
 import AnimateOnScroll from "../common/animate-on-scroll";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
@@ -16,13 +18,24 @@ type VerifyEmailLocationState = {
 function VerifyEmailContent() {
   const location = useLocation();
   const { email } = (location.state as VerifyEmailLocationState | null) ?? {};
+  const { mutateAsync: forgotPassword, isPending } = useForgotPassword();
+  const webmail = getWebmailProvider(email);
 
   const handleOpenEmailApp = () => {
-    window.location.href = "mailto:";
+    openWebmailInbox(email);
   };
 
-  const handleResendLink = () => {
-    toast.success(email ? `Reset link resent to ${email}` : "Reset link resent to your email");
+  const handleResendLink = async () => {
+    if (!email) {
+      return;
+    }
+
+    try {
+      const result = await forgotPassword({ email });
+      showApiSuccessToast(result.message);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
   };
 
   return (
@@ -53,10 +66,17 @@ function VerifyEmailContent() {
             className="h-11! font-semibold!"
             onClick={handleOpenEmailApp}
           >
-            Open email app
+            {webmail.label}
           </Button>
 
-          <Button block size="large" className="h-11! font-medium!" onClick={handleResendLink}>
+          <Button
+            block
+            size="large"
+            className="h-11! font-medium!"
+            loading={isPending}
+            disabled={!email}
+            onClick={handleResendLink}
+          >
             Resend link
           </Button>
         </div>

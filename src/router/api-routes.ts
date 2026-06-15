@@ -9,6 +9,23 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     LOGOUT: "/auth/logout",
     FORGOT_PASSWORD: "/auth/forgot-password",
     RESET_PASSWORD: "/auth/reset-password",
+    RESET_PASSWORD_VALIDATE: "/auth/reset-password/validate",
+  },
+  ADMIN: {
+    ORGANIZATIONS: "/admin/organizations",
+    ORGANIZATION_STATS: "/admin/organizations/stats",
+    SUBSCRIPTIONS: "/admin/subscriptions",
+    SUBSCRIPTION_STATS: "/admin/subscriptions/stats",
+    SUBSCRIPTION_PLAN_DISTRIBUTION: "/admin/subscriptions/plan-distribution",
+  },
+  BILLING: {
+    CATALOG: "/billing/catalog",
+    SUBSCRIPTION: "/billing/subscription",
+    CHECKOUT: "/billing/checkout",
+    CANCEL: "/billing/cancel",
+    CHANGE_PLAN: "/billing/change-plan",
+    REFUND: "/billing/refund",
+    INVOICES: "/billing/invoices",
   },
 };
 

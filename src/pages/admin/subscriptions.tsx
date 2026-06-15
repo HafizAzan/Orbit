@@ -1,5 +1,5 @@
 import { DownloadOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import React, { useCallback, useState } from "react";
 import PlanDistributionCard from "../../component/admin/subscriptions/plan-distribution-card";
 import RevenueOverviewChart from "../../component/admin/subscriptions/revenue-overview-chart";
@@ -7,18 +7,23 @@ import SubscriptionEditBillingModal from "../../component/admin/subscriptions/su
 import SubscriptionStatCard from "../../component/admin/subscriptions/subscription-stat-card";
 import SubscriptionsTable from "../../component/admin/subscriptions/subscriptions-table";
 import { Paragraph, Title } from "../../component/ui/typography";
+import { SUBSCRIPTION_REVENUE_DATA, type SubscriptionRecord } from "../../data/admin-subscriptions";
 import {
-  PLAN_DISTRIBUTION,
-  SUBSCRIPTION_REVENUE_DATA,
-  SUBSCRIPTION_STATS,
-  SUBSCRIPTIONS_DATA,
-  type SubscriptionRecord,
-} from "../../data/admin-subscriptions";
+  usePlanDistribution,
+  useSubscriptionStats,
+  useSubscriptions,
+} from "../../hooks/use-admin-subscriptions";
+import { mapPlanDistribution, mapSubscriptionStats } from "../../lib/admin-billing-mappers";
 
 function AdminSubscriptions() {
-  const [subscriptions, setSubscriptions] = useState(SUBSCRIPTIONS_DATA);
+  const { data: subscriptions = [], isLoading } = useSubscriptions();
+  const { data: stats } = useSubscriptionStats();
+  const { data: planDistribution = [] } = usePlanDistribution();
   const [editBillingOpen, setEditBillingOpen] = useState(false);
   const [editingSubscription, setEditingSubscription] = useState<SubscriptionRecord | null>(null);
+
+  const subscriptionStats = mapSubscriptionStats(stats);
+  const planDistributionItems = mapPlanDistribution(planDistribution);
 
   const handleOpenEditBilling = useCallback((record: SubscriptionRecord) => {
     setEditingSubscription(record);
@@ -30,9 +35,13 @@ function AdminSubscriptions() {
     setEditingSubscription(null);
   }, []);
 
-  const handleSaveBilling = useCallback((subscription: SubscriptionRecord) => {
-    setSubscriptions((current) => current.map((item) => (item.id === subscription.id ? subscription : item)));
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[320px] items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-8xl">
@@ -52,7 +61,7 @@ function AdminSubscriptions() {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {SUBSCRIPTION_STATS.map((stat) => (
+        {subscriptionStats.map((stat) => (
           <SubscriptionStatCard key={stat.id} stat={stat} />
         ))}
       </div>
@@ -61,7 +70,7 @@ function AdminSubscriptions() {
         <div className="xl:col-span-2">
           <RevenueOverviewChart data={SUBSCRIPTION_REVENUE_DATA} />
         </div>
-        <PlanDistributionCard items={PLAN_DISTRIBUTION} />
+        <PlanDistributionCard items={planDistributionItems} />
       </div>
 
       <SubscriptionsTable data={subscriptions} onEditBilling={handleOpenEditBilling} />
@@ -70,7 +79,6 @@ function AdminSubscriptions() {
         open={editBillingOpen}
         record={editingSubscription}
         onClose={handleCloseEditBilling}
-        onSave={handleSaveBilling}
       />
     </div>
   );

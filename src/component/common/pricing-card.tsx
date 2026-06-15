@@ -34,7 +34,7 @@ function PricingCard({
   ...props
 }: PricingCardProps) {
   const ctaClassName = cn(
-    "mt-8 block w-full rounded-xl px-5 py-3.5 text-center text-sm font-semibold transition-opacity",
+    "block w-full rounded-xl px-5 py-3.5 text-center text-sm font-semibold transition-opacity",
     highlighted
       ? "bg-primary text-white hover:opacity-90"
       : "border border-border bg-card text-foreground hover:border-primary hover:text-primary",
@@ -53,7 +53,7 @@ function PricingCard({
   return (
     <article
       className={cn(
-        "relative flex h-full flex-col rounded-2xl border bg-card p-6 shadow-sm nav:p-8",
+        "relative flex h-full min-h-0 flex-col rounded-2xl border bg-card p-6 shadow-sm nav:p-8",
         highlighted
           ? "z-10 border-primary shadow-lg nav:scale-105 nav:px-9 nav:py-10 nav:shadow-xl"
           : "border-border nav:scale-[0.98]",
@@ -81,9 +81,9 @@ function PricingCard({
         {priceSuffix ? <span className="pb-1 text-sm text-muted">{priceSuffix}</span> : null}
       </div>
 
-      <ul className="mt-6 flex flex-1 flex-col gap-3">
-        {features.map((feature) => (
-          <li key={feature} className="flex items-start gap-2.5">
+      <ul className="mt-6 flex min-h-52 max-h-72 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgb(148_163_184)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300/80">
+        {features.map((feature, index) => (
+          <li key={`${feature}-${index}`} className="flex items-start gap-2.5">
             <CheckOutlined className="mt-0.5 shrink-0 text-sm text-primary" />
             <Text as="span" size="sm" color="muted">
               {feature}
@@ -92,7 +92,7 @@ function PricingCard({
         ))}
       </ul>
 
-      {footer ?? ctaContent}
+      <div className="mt-8 shrink-0">{footer ?? ctaContent}</div>
     </article>
   );
 }

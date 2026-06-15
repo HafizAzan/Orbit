@@ -1,25 +1,84 @@
 import { Button, Form, Input } from "antd";
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useResetPassword, useValidateResetToken } from "../../hooks/user-authentication";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
-import { toast } from "../../lib/toast";
+import type { ResetPasswordFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Title } from "../ui/typography";
 
-type ResetPasswordFormValues = {
-  password: string;
-  confirmPassword: string;
-};
-
 function ResetPasswordForm() {
   const [form] = Form.useForm<ResetPasswordFormValues>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token")?.trim() ?? "";
 
-  const handleFinish = () => {
-    toast.success("Password updated successfully. Please log in.");
-    navigate(UN_AUTH_ROUTES.LOGIN);
+  const { data: tokenValidation, isLoading: isValidating, isError: isTokenInvalid, error: tokenError } =
+    useValidateResetToken(token);
+  const { mutateAsync: resetPassword, isPending } = useResetPassword();
+
+  useEffect(() => {
+    if (!token) {
+      navigate(UN_AUTH_ROUTES.FORGOT_PASSWORD, { replace: true });
+    }
+  }, [token, navigate]);
+
+  const handleFinish = async (values: ResetPasswordFormValues) => {
+    if (!token) return;
+
+    try {
+      const result = await resetPassword({
+        token,
+        password: values.password,
+      });
+
+      showApiSuccessToast(result.message);
+      navigate(UN_AUTH_ROUTES.LOGIN);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
   };
+
+  if (!token) {
+    return null;
+  }
+
+  if (isValidating) {
+    return (
+      <AuthFormLayout>
+        <AuthFormCard>
+          <Paragraph size="sm" className="text-center text-muted">
+            Validating your reset link...
+          </Paragraph>
+        </AuthFormCard>
+      </AuthFormLayout>
+    );
+  }
+
+  if (isTokenInvalid) {
+    return (
+      <AuthFormLayout>
+        <AuthFormCard>
+          <Title level={2} className="text-3xl text-foreground">
+            Reset link expired
+          </Title>
+          {tokenError?.message ? (
+            <Paragraph size="sm" className="mt-2 text-muted">
+              {tokenError.message}
+            </Paragraph>
+          ) : null}
+          <Link
+            to={UN_AUTH_ROUTES.FORGOT_PASSWORD}
+            className="mt-8 inline-flex font-semibold text-primary hover:opacity-80"
+          >
+            Request a new reset link
+          </Link>
+        </AuthFormCard>
+      </AuthFormLayout>
+    );
+  }
 
   return (
     <AuthFormLayout>
@@ -28,7 +87,9 @@ function ResetPasswordForm() {
           Reset your password
         </Title>
         <Paragraph size="sm" className="mt-2 text-muted">
-          Create a new password for your account. It must be at least 8 characters long.
+          Create a new password for{" "}
+          <span className="font-medium text-foreground">{tokenValidation?.email}</span>. It must be at
+          least 8 characters long.
         </Paragraph>
 
         <Form
@@ -69,7 +130,14 @@ function ResetPasswordForm() {
             <Input.Password placeholder="••••••••" size="large" className="rounded-lg!" />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block size="large" className="h-11! font-semibold!">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            size="large"
+            loading={isPending}
+            className="h-11! font-semibold!"
+          >
             Reset password
           </Button>
         </Form>

@@ -7,8 +7,9 @@ import { ConfirmModal } from "../../component/ui/modal";
 import ADMIN_NAV_ITEMS from "../../data/admin-nav-items";
 import { useAdminActivity } from "../../context/admin-activity-context";
 import { useAppContext } from "../../context/app-context";
+import { useLogout } from "../../hooks/user-authentication";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { clearAuthSession } from "../../lib/auth-session";
-import { toast } from "../../lib/toast";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import { cn } from "../../lib/utils";
 
@@ -22,14 +23,24 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
   const app = useAppContext();
   const { flaggedCount } = useAdminActivity();
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const { mutateAsync: logout } = useLogout();
 
-  const handleLogoutConfirm = () => {
-    clearAuthSession();
-    app?.setUser(null);
-    toast.success("Logged out successfully");
-    setLogoutOpen(false);
-    onNavigate?.();
-    navigate(UN_AUTH_ROUTES.LOGIN);
+  const handleLogoutConfirm = async () => {
+    let logoutMessage: string | null = null;
+
+    try {
+      const result = await logout();
+      logoutMessage = result.message;
+    } catch (error) {
+      showApiErrorToast(error);
+    } finally {
+      clearAuthSession();
+      app?.setUser(null);
+      showApiSuccessToast(logoutMessage);
+      setLogoutOpen(false);
+      onNavigate?.();
+      navigate(UN_AUTH_ROUTES.LOGIN);
+    }
   };
 
   const handleNavClick = () => {

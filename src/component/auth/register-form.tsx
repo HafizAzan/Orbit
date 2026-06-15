@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSendRegisterOtp } from "../../hooks/user-authentication";
 import { generateOrganizationSlug } from "../../lib/organization";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { saveOtpSession } from "../../lib/otp-session";
-import { toast } from "../../lib/toast";
 import { cn } from "../../lib/utils";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import type { RegisterFormValues } from "../../types/auth.types";
@@ -57,11 +57,7 @@ function RegisterForm() {
         expiresAt: result.expiresAt,
       });
 
-      toast.success(
-        import.meta.env.DEV && result.devOtp
-          ? `${result.message}. Demo code: ${result.devOtp}`
-          : result.message,
-      );
+      showApiSuccessToast(result.message);
 
       const verifyUrl = `${UN_AUTH_ROUTES.VERIFY_OTP}?email=${encodeURIComponent(normalizedEmail)}&flow=register`;
       navigate(verifyUrl, {
@@ -72,7 +68,7 @@ function RegisterForm() {
         },
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Registration failed");
+      showApiErrorToast(error);
     }
   };
 

@@ -6,9 +6,21 @@ export function isPlatformAdminUser(user: AuthUser) {
   return user.role === "super_admin" || user.isPlatformAdmin;
 }
 
+export function canManageBilling(user: AuthUser) {
+  return user.role === "owner" || user.role === "admin" || user.isPlatformAdmin;
+}
+
+export const PLAN_ROUTES = {
+  CHOOSE_PLAN: "/choose-plan",
+} as const;
+
 export function getPostAuthRedirectPath(user: AuthUser) {
   if (isPlatformAdminUser(user)) {
     return ADMIN_ROUTES.DASHBOARD;
+  }
+
+  if (user.requiresPlanSelection) {
+    return PLAN_ROUTES.CHOOSE_PLAN;
   }
 
   return UN_AUTH_ROUTES.HOME;

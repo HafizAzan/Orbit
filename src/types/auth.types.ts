@@ -5,6 +5,43 @@ export type EmailVerificationStatus = "pending" | "verified";
 export type AccountStatus = "pending" | "active" | "suspended";
 export type AuthFlow = "login" | "register";
 
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ForgotPasswordResponse = {
+  message: string;
+  email: string;
+};
+
+export type ValidateResetTokenResponse = {
+  email: string;
+  expiresAt: string;
+  isValid: boolean;
+};
+
+export type ResetPasswordRequest = {
+  token: string;
+  password: string;
+};
+
+export type ResetPasswordResponse = {
+  message: string;
+};
+
+export type LogoutResponse = {
+  message: string;
+};
+
+export type ForgotPasswordFormValues = {
+  email: string;
+};
+
+export type ResetPasswordFormValues = {
+  password: string;
+  confirmPassword: string;
+};
+
 export type LoginRequest = {
   email: string;
   password: string;
@@ -39,7 +76,6 @@ export type RegisterSendOtpResponse = {
   message: string;
   email: string;
   expiresAt: string;
-  devOtp?: string;
 };
 
 export type RegisterPendingResponse = {
@@ -52,7 +88,6 @@ export type ResendRegisterOtpResponse = {
   message: string;
   email: string;
   expiresAt: string;
-  devOtp?: string;
 };
 
 export type AuthOrganization = {
@@ -69,6 +104,7 @@ export type AuthUser = {
   emailVerificationStatus: EmailVerificationStatus;
   accountStatus: AccountStatus;
   organization: AuthOrganization | null;
+  requiresPlanSelection: boolean;
 };
 
 export type AuthSessionResponse = {

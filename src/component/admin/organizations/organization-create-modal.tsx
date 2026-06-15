@@ -10,14 +10,10 @@ import {
   type OrganizationRecord,
   type OrganizationStatus,
 } from "../../../data/admin-organizations";
-import { delay, formatDate } from "../../../lib/helper";
-import {
-  createOrganizationRecord,
-  ensureUniqueOrganizationSlug,
-  generateOrganizationSlug,
-  updateOrganizationRecord,
-} from "../../../lib/organization";
-import { toast } from "../../../lib/toast";
+import { useCreateOrganization, useUpdateOrganization } from "../../../hooks/use-admin-organizations";
+import { showApiErrorToast } from "../../../lib/api-error";
+import { formatDate } from "../../../lib/helper";
+import { generateOrganizationSlug } from "../../../lib/organization";
 import { cn } from "../../../lib/utils";
 import Modal from "../../ui/modal";
 import { Label, Paragraph, Text, Title } from "../../ui/typography";
@@ -25,10 +21,7 @@ import { Label, Paragraph, Text, Title } from "../../ui/typography";
 type OrganizationCreateModalProps = {
   open: boolean;
   record?: OrganizationRecord | null;
-  existingOrganizations: OrganizationRecord[];
   onClose: () => void;
-  onCreate: (organization: OrganizationRecord) => void;
-  onUpdate: (organization: OrganizationRecord) => void;
 };
 
 type OrganizationCreateFormValues = {
@@ -69,29 +62,21 @@ function FormSection({ title, description, children }: FormSectionProps) {
   );
 }
 
-function OrganizationCreateModal({
-  open,
-  record = null,
-  existingOrganizations,
-  onClose,
-  onCreate,
-  onUpdate,
-}: OrganizationCreateModalProps) {
+function OrganizationCreateModal({ open, record = null, onClose }: OrganizationCreateModalProps) {
   const isEditMode = record !== null;
   const [form] = Form.useForm<OrganizationCreateFormValues>();
   const [submitting, setSubmitting] = useState(false);
+  const { mutateAsync: createOrganization } = useCreateOrganization();
+  const { mutateAsync: updateOrganization } = useUpdateOrganization();
+
   const organizationName = Form.useWatch("name", form) ?? "";
   const selectedPlan = Form.useWatch("plan", form) ?? DEFAULT_FORM_VALUES.plan;
   const selectedStatus = Form.useWatch("status", form) ?? DEFAULT_FORM_VALUES.status;
 
   const previewSlug = useMemo(() => {
-    const baseSlug = generateOrganizationSlug(organizationName);
-    const existingSlugs = existingOrganizations
-      .filter((organization) => organization.id !== record?.id)
-      .map((organization) => organization.slug);
-
-    return ensureUniqueOrganizationSlug(baseSlug, existingSlugs);
-  }, [organizationName, existingOrganizations, record?.id]);
+    if (!organizationName.trim()) return "your-workspace";
+    return generateOrganizationSlug(organizationName);
+  }, [organizationName]);
 
   const usersCount = isEditMode ? record.users : 0;
   const projectsCount = isEditMode ? record.projects : 0;
@@ -109,7 +94,7 @@ function OrganizationCreateModal({
         name: record.name,
         ownerName: record.ownerName,
         ownerEmail: record.ownerEmail,
-        plan: record.plan,
+        plan: record.plan.name,
         status: record.status,
       });
     } else {
@@ -121,21 +106,29 @@ function OrganizationCreateModal({
     setSubmitting(true);
 
     try {
-      await delay(500);
-
       if (isEditMode && record) {
-        const organization = updateOrganizationRecord(record, values, existingOrganizations);
-        onUpdate(organization);
-        toast.success(`${organization.name} updated successfully`);
+        await updateOrganization({
+          id: record.id,
+          data: {
+            name: values.name,
+            status: values.status,
+            plan: values.plan,
+            billingEmail: values.ownerEmail,
+          },
+        });
       } else {
-        const organization = createOrganizationRecord(values, existingOrganizations);
-        onCreate(organization);
-        toast.success(`${organization.name} created successfully`);
+        await createOrganization({
+          name: values.name,
+          ownerName: values.ownerName,
+          ownerEmail: values.ownerEmail,
+          plan: values.plan,
+          status: values.status,
+        });
       }
 
       onClose();
-    } catch {
-      toast.error(`Failed to ${isEditMode ? "update" : "create"} organization. Please try again.`);
+    } catch (error) {
+      showApiErrorToast(error);
     } finally {
       setSubmitting(false);
     }
@@ -205,7 +198,7 @@ function OrganizationCreateModal({
         <FormSection title="Owner" description={isEditMode ? "The primary admin for this workspace." : "The primary admin who will receive the invite."}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Form.Item name="ownerName" label={<Label>Owner name</Label>} rules={[{ required: true, message: "Please enter the owner name" }]}>
-              <Input size="large" placeholder="John Doe" autoComplete="name" className="rounded-xl! border-border! bg-card!" />
+              <Input size="large" placeholder="John Doe" autoComplete="name" className="rounded-xl! border-border! bg-card!" disabled={isEditMode} />
             </Form.Item>
 
             <Form.Item

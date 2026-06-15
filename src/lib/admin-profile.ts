@@ -1,9 +1,35 @@
 import { DEFAULT_ADMIN_PROFILE, type AdminProfile } from "../data/admin-profile";
-import { sendOtp, verifyOtp } from "./auth";
-import { delay, normalizeEmail } from "./helper";
+import { delay, generateOtpCode, normalizeEmail } from "./helper";
 
 /** Mock credential for local development until API is wired. */
 const MOCK_CURRENT_PASSWORD = "Admin@123";
+const OTP_TTL_MS = 10 * 60 * 1000;
+const adminEmailOtpStore = new Map<string, { code: string; expiresAt: number }>();
+
+async function sendAdminEmailOtp(email: string) {
+  await delay(300);
+  adminEmailOtpStore.set(email, {
+    code: generateOtpCode(),
+    expiresAt: Date.now() + OTP_TTL_MS,
+  });
+}
+
+async function verifyAdminEmailOtp(email: string, otp: string) {
+  await delay(300);
+  const entry = adminEmailOtpStore.get(email);
+
+  if (!entry || entry.expiresAt < Date.now()) {
+    adminEmailOtpStore.delete(email);
+    return false;
+  }
+
+  const isValid = entry.code === otp.trim();
+  if (isValid) {
+    adminEmailOtpStore.delete(email);
+  }
+
+  return isValid;
+}
 
 export type ChangeAdminPasswordInput = {
   currentPassword: string;
@@ -54,14 +80,14 @@ export async function initiateAdminEmailChange(input: InitiateEmailChangeInput, 
     throw new Error("New email must be different from your current email");
   }
 
-  await sendOtp(normalizedNewEmail);
+  await sendAdminEmailOtp(normalizedNewEmail);
 }
 
 export async function completeAdminEmailChange(input: CompleteEmailChangeInput) {
   await delay(500);
 
   const normalizedNewEmail = normalizeEmail(input.newEmail);
-  const isValid = await verifyOtp(normalizedNewEmail, input.otp);
+  const isValid = await verifyAdminEmailOtp(normalizedNewEmail, input.otp);
 
   if (!isValid) {
     throw new Error("Invalid or expired OTP. Please try again.");

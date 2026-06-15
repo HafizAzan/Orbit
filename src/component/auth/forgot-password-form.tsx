@@ -2,21 +2,32 @@ import { ArrowLeftOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input } from "antd";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForgotPassword } from "../../hooks/user-authentication";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
+import type { ForgotPasswordFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Title } from "../ui/typography";
 
-type ForgotPasswordFormValues = {
-  email: string;
-};
-
 function ForgotPasswordForm() {
   const [form] = Form.useForm<ForgotPasswordFormValues>();
   const navigate = useNavigate();
+  const { mutateAsync: forgotPassword, isPending } = useForgotPassword();
 
-  const handleFinish = (values: ForgotPasswordFormValues) => {
-    navigate(UN_AUTH_ROUTES.VERIFY_EMAIL, { state: { email: values.email } });
+  const handleFinish = async (values: ForgotPasswordFormValues) => {
+    try {
+      const normalizedEmail = values.email.trim().toLowerCase();
+      const result = await forgotPassword({ email: normalizedEmail });
+
+      showApiSuccessToast(result.message);
+
+      navigate(UN_AUTH_ROUTES.VERIFY_EMAIL, {
+        state: { email: normalizedEmail },
+      });
+    } catch (error) {
+      showApiErrorToast(error);
+    }
   };
 
   return (
@@ -52,7 +63,14 @@ function ForgotPasswordForm() {
             />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block size="large" className="h-11! font-semibold!">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            size="large"
+            loading={isPending}
+            className="h-11! font-semibold!"
+          >
             Send reset link
           </Button>
         </Form>
