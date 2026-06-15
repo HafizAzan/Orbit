@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import NAV_ITEMS from "../../../data/nav-items";
-import { cn, isSectionActive, scrollToSection } from "../../../lib/utils";
+import { useAppContext } from "../../../context/app-context";
+import { getAuthenticatedHeaderAction } from "../../../lib/auth-routing";
+import { getHomeSectionHref, navigateToHomeSection } from "../../../lib/home-navigation";
+import { cn, isSectionActive } from "../../../lib/utils";
 import { UN_AUTH_ROUTES } from "../../../router/public-routes";
 
 type MobileMenuProps = {
@@ -13,7 +16,12 @@ type MobileMenuProps = {
 };
 
 function MobileMenu({ open, headerHeight, activeSectionId, onClose }: MobileMenuProps) {
+  const navigate = useNavigate();
   const { pathname, hash } = useLocation();
+  const app = useAppContext();
+
+  const authAction =
+    app?.isAuthenticated && app.user ? getAuthenticatedHeaderAction(app.user) : null;
 
   useEffect(() => {
     if (!open) return;
@@ -33,7 +41,11 @@ function MobileMenu({ open, headerHeight, activeSectionId, onClose }: MobileMenu
 
   const handleSectionClick = (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     event.preventDefault();
-    scrollToSection(sectionId, headerHeight);
+    navigateToHomeSection(sectionId, {
+      pathname,
+      navigate,
+      headerOffset: headerHeight,
+    });
     onClose();
   };
 
@@ -67,7 +79,7 @@ function MobileMenu({ open, headerHeight, activeSectionId, onClose }: MobileMenu
             return (
               <li key={item.sectionId}>
                 <a
-                  href={`#${item.sectionId}`}
+                  href={getHomeSectionHref(item.sectionId)}
                   onClick={(event) => handleSectionClick(event, item.sectionId)}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-2 py-3 text-[15px] font-medium transition-colors",
@@ -83,20 +95,32 @@ function MobileMenu({ open, headerHeight, activeSectionId, onClose }: MobileMenu
         </ul>
 
         <div className="flex flex-col gap-4 border-t border-border px-6 py-6">
-          <Link
-            to={UN_AUTH_ROUTES.LOGIN}
-            onClick={onClose}
-            className="text-center text-[15px] font-medium text-foreground transition-colors hover:text-primary"
-          >
-            Sign In
-          </Link>
-          <Link
-            to={UN_AUTH_ROUTES.REGISTER}
-            onClick={onClose}
-            className="block rounded-lg bg-primary px-5 py-3 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            Get Started
-          </Link>
+          {authAction ? (
+            <Link
+              to={authAction.path}
+              onClick={onClose}
+              className="block rounded-lg bg-primary px-5 py-3 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              {authAction.label}
+            </Link>
+          ) : (
+            <>
+              <Link
+                to={UN_AUTH_ROUTES.LOGIN}
+                onClick={onClose}
+                className="text-center text-[15px] font-medium text-foreground transition-colors hover:text-primary"
+              >
+                Sign In
+              </Link>
+              <Link
+                to={UN_AUTH_ROUTES.REGISTER}
+                onClick={onClose}
+                className="block rounded-lg bg-primary px-5 py-3 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>,

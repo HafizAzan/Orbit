@@ -1,44 +1,65 @@
-import { ArrowLeftOutlined, MailOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, ClockCircleOutlined, MailOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input } from "antd";
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
+import { useOtpCountdown } from "../../hooks/use-otp-countdown";
+import {
+  useRegisterPending,
+  useResendRegisterOtp,
+  useVerifyRegister,
+} from "../../hooks/user-authentication";
 import {
   loginAccount,
-  registerAccount,
   sendOtp,
   verifyOtp,
   type AuthFlow,
-  type RegisterAccountInput,
 } from "../../lib/auth";
+import { getPostAuthRedirectPath } from "../../lib/auth-routing";
+import { saveAuthSession } from "../../lib/auth-session";
+import { clearOtpSession, getOtpSession, saveOtpSession } from "../../lib/otp-session";
 import { toast } from "../../lib/toast";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
+import type { VerifyOtpLocationState } from "../../types/auth.types";
 import AnimateOnScroll from "../common/animate-on-scroll";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
-import { Label, Paragraph, Title } from "../ui/typography";
+import { Label, Paragraph, Text, Title } from "../ui/typography";
 
 type VerifyOtpFormValues = {
   otp: string;
-};
-
-export type VerifyOtpLocationState = {
-  email: string;
-  flow: AuthFlow;
-  registerData?: RegisterAccountInput;
 };
 
 function VerifyOtpForm() {
   const [form] = Form.useForm<VerifyOtpFormValues>();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const app = useAppContext();
-  const [isResending, setIsResending] = useState(false);
 
   const state = (location.state as VerifyOtpLocationState | null) ?? null;
-  const email = state?.email;
-  const flow = state?.flow;
-  const registerData = state?.registerData;
+  const emailFromQuery = searchParams.get("email")?.trim().toLowerCase() ?? "";
+  const flowFromQuery = searchParams.get("flow") as AuthFlow | null;
+  const email = emailFromQuery || state?.email?.trim().toLowerCase() || "";
+  const flow = flowFromQuery || state?.flow;
+  const isRegisterFlow = flow === "register";
+
+  const session = email ? getOtpSession(email) : null;
+  const [expiresAt, setExpiresAt] = useState<string | null>(
+    state?.expiresAt ?? session?.expiresAt ?? null,
+  );
+
+  const {
+    data: pendingRegistration,
+    isLoading: isPendingLoading,
+    isError: isPendingError,
+    error: pendingError,
+    refetch: refetchPending,
+  } = useRegisterPending(email, isRegisterFlow);
+
+  const { mutateAsync: verifyRegister, isPending: isVerifying } = useVerifyRegister();
+  const { mutateAsync: resendRegisterOtp, isPending: isResendingRegister } = useResendRegisterOtp();
+  const [isResendingLogin, setIsResendingLogin] = useState(false);
 
   useEffect(() => {
     if (!email || !flow) {
@@ -46,28 +67,74 @@ function VerifyOtpForm() {
     }
   }, [email, flow, navigate]);
 
+  useEffect(() => {
+    if (pendingRegistration?.expiresAt) {
+      setExpiresAt(pendingRegistration.expiresAt);
+      saveOtpSession({
+        email: pendingRegistration.email,
+        flow: "register",
+        expiresAt: pendingRegistration.expiresAt,
+      });
+    }
+  }, [pendingRegistration]);
+
+  const { formattedTime, isExpired } = useOtpCountdown(expiresAt);
+
+  const pendingExpiredMessage = useMemo(() => {
+    if (!isPendingError || !pendingError) return null;
+    return pendingError.message;
+  }, [isPendingError, pendingError]);
+
   if (!email || !flow) {
     return null;
   }
 
   const handleResend = async () => {
     try {
-      setIsResending(true);
+      if (isRegisterFlow) {
+        const result = await resendRegisterOtp(email);
+        setExpiresAt(result.expiresAt);
+        saveOtpSession({ email, flow: "register", expiresAt: result.expiresAt });
+        toast.success(
+          import.meta.env.DEV && result.devOtp
+            ? `${result.message}. Demo code: ${result.devOtp}`
+            : result.message,
+        );
+        await refetchPending();
+        return;
+      }
+
+      setIsResendingLogin(true);
       const code = await sendOtp(email);
       toast.success(
         import.meta.env.DEV
           ? `A new verification code was sent to ${email}. Demo code: ${code}`
           : `A new verification code was sent to ${email}`,
       );
-    } catch {
-      toast.error("Unable to resend the code. Please try again.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to resend the code. Please try again.");
     } finally {
-      setIsResending(false);
+      setIsResendingLogin(false);
     }
   };
 
   const handleFinish = async (values: VerifyOtpFormValues) => {
     try {
+      if (isRegisterFlow) {
+        if (isExpired) {
+          toast.error("Verification code has expired. Please resend a new code.");
+          return;
+        }
+
+        const result = await verifyRegister({ email, otp: values.otp });
+        clearOtpSession(email);
+        saveAuthSession(result.accessToken, result.user);
+        app?.setUser(result.user);
+        toast.success(result.message);
+        navigate(getPostAuthRedirectPath(result.user));
+        return;
+      }
+
       app?.setIsLoading(true);
 
       const isValid = await verifyOtp(email, values.otp);
@@ -76,29 +143,30 @@ function VerifyOtpForm() {
         return;
       }
 
-      if (flow === "register") {
-        if (!registerData) {
-          toast.error("Registration details are missing. Please sign up again.");
-          navigate(UN_AUTH_ROUTES.REGISTER, { replace: true });
-          return;
-        }
-
-        const user = await registerAccount(registerData);
-        app?.setUser(user);
-        toast.success(`${user.organization.name} created successfully. You are now the organization owner.`);
-      } else {
-        const user = await loginAccount(email);
-        app?.setUser(user);
-        toast.success(`Welcome back! Signed in as ${user.email}`);
-      }
-
-      navigate(UN_AUTH_ROUTES.HOME);
-    } catch {
-      toast.error("Unable to verify your code. Please try again.");
+      const mockUser = await loginAccount(email);
+      const sessionUser = {
+        id: mockUser.id,
+        name: mockUser.name,
+        email: mockUser.email,
+        role: mockUser.role,
+        isPlatformAdmin: false,
+        emailVerificationStatus: "verified" as const,
+        accountStatus: "active" as const,
+        organization: mockUser.organization,
+      };
+      app?.setUser(sessionUser);
+      toast.success(`Welcome back! Signed in as ${mockUser.email}`);
+      navigate(getPostAuthRedirectPath(sessionUser));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to verify your code. Please try again.");
     } finally {
       app?.setIsLoading(false);
     }
   };
+
+  const isResending = isRegisterFlow ? isResendingRegister : isResendingLogin;
+  const isSubmitting = isRegisterFlow ? isVerifying : app?.isLoading;
+  const showExpiredState = isRegisterFlow && (isExpired || Boolean(pendingExpiredMessage));
 
   return (
     <AuthFormLayout centeredLogo>
@@ -118,6 +186,25 @@ function VerifyOtpForm() {
           <span className="font-medium text-foreground">{email}</span>. Enter it below to{" "}
           {flow === "register" ? "complete your signup" : "sign in"}.
         </Paragraph>
+
+        {isRegisterFlow && expiresAt ? (
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm">
+            <ClockCircleOutlined className={isExpired ? "text-danger" : "text-primary"} />
+            <Text size="sm" className={isExpired ? "text-danger font-medium" : "text-muted"}>
+              {isPendingLoading
+                ? "Checking code expiry..."
+                : isExpired
+                  ? "Code expired"
+                  : `Code expires in ${formattedTime}`}
+            </Text>
+          </div>
+        ) : null}
+
+        {showExpiredState ? (
+          <Paragraph size="sm" className="mt-3 text-center text-danger">
+            {pendingExpiredMessage ?? "Your verification code has expired. Resend a new code to continue."}
+          </Paragraph>
+        ) : null}
 
         <Form
           form={form}
@@ -141,6 +228,7 @@ function VerifyOtpForm() {
               size="large"
               className="justify-center!"
               formatter={(value) => value.replace(/\D/g, "")}
+              disabled={showExpiredState}
             />
           </Form.Item>
 
@@ -149,7 +237,8 @@ function VerifyOtpForm() {
             htmlType="submit"
             block
             size="large"
-            loading={app?.isLoading}
+            loading={isSubmitting}
+            disabled={showExpiredState}
             className="h-11! font-semibold!"
           >
             Verify &amp; continue

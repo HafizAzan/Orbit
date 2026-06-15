@@ -1,7 +1,8 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import NAV_ITEMS from "../../../data/nav-items";
-import { cn, isSectionActive, scrollToSection } from "../../../lib/utils";
+import { getHomeSectionHref, navigateToHomeSection } from "../../../lib/home-navigation";
+import { cn, isSectionActive } from "../../../lib/utils";
 
 type NavLinksProps = {
   className?: string;
@@ -18,11 +19,12 @@ function getNavLinkClass(isActive: boolean) {
 }
 
 function NavLinks({ className, onNavigate, headerOffset = 0, activeSectionId }: NavLinksProps) {
+  const navigate = useNavigate();
   const { pathname, hash } = useLocation();
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     event.preventDefault();
-    scrollToSection(sectionId, headerOffset);
+    navigateToHomeSection(sectionId, { pathname, navigate, headerOffset });
     onNavigate?.();
   };
 
@@ -31,7 +33,7 @@ function NavLinks({ className, onNavigate, headerOffset = 0, activeSectionId }: 
       {NAV_ITEMS.map((item) => (
         <li key={item.sectionId}>
           <a
-            href={`#${item.sectionId}`}
+            href={getHomeSectionHref(item.sectionId)}
             onClick={(event) => handleClick(event, item.sectionId)}
             className={getNavLinkClass(isSectionActive(item.sectionId, pathname, hash, "/", activeSectionId))}
           >

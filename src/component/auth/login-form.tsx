@@ -2,41 +2,68 @@ import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Divider, Form, Input } from "antd";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { sendOtp } from "../../lib/auth";
+import { useAppContext } from "../../context/app-context";
+import { useLogin } from "../../hooks/user-authentication";
+import { AUTH_ERROR_CODES, ApiRequestError } from "../../lib/api-error";
+import { getPostAuthRedirectPath } from "../../lib/auth-routing";
+import { saveAuthSession } from "../../lib/auth-session";
+import { saveOtpSession } from "../../lib/otp-session";
 import { toast } from "../../lib/toast";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
-import { useAppContext } from "../../context/app-context";
+import type { LoginFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Text, Title } from "../ui/typography";
-
-type LoginFormValues = {
-  email: string;
-  password: string;
-  remember: boolean;
-};
 
 function LoginForm() {
   const [form] = Form.useForm<LoginFormValues>();
   const navigate = useNavigate();
   const app = useAppContext();
+  const { mutateAsync: login, isPending } = useLogin();
 
   const handleFinish = async (values: LoginFormValues) => {
     try {
-      app?.setIsLoading(true);
-      const code = await sendOtp(values.email);
-      toast.success(
-        import.meta.env.DEV
-          ? `Verification code sent to ${values.email}. Demo code: ${code}`
-          : `Verification code sent to ${values.email}`,
-      );
-      navigate(UN_AUTH_ROUTES.VERIFY_OTP, {
-        state: { email: values.email, flow: "login" },
+      const result = await login({
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
       });
-    } catch {
-      toast.error("Unable to send verification code. Please try again.");
-    } finally {
-      app?.setIsLoading(false);
+
+      saveAuthSession(result.accessToken, result.user);
+      app?.setUser(result.user);
+      toast.success(result.message);
+      navigate(getPostAuthRedirectPath(result.user));
+    } catch (error) {
+      if (
+        error instanceof ApiRequestError &&
+        error.code === AUTH_ERROR_CODES.PENDING_EMAIL_VERIFICATION &&
+        error.email
+      ) {
+        const normalizedEmail = error.email.trim().toLowerCase();
+        const expiresAt = error.expiresAt ?? null;
+
+        if (expiresAt) {
+          saveOtpSession({
+            email: normalizedEmail,
+            flow: "register",
+            expiresAt,
+          });
+        }
+
+        toast.info(error.message);
+        navigate(
+          `${UN_AUTH_ROUTES.VERIFY_OTP}?email=${encodeURIComponent(normalizedEmail)}&flow=register`,
+          {
+            state: {
+              email: normalizedEmail,
+              flow: "register",
+              expiresAt: expiresAt ?? undefined,
+            },
+          },
+        );
+        return;
+      }
+
+      toast.error(error instanceof Error ? error.message : "Unable to sign in. Please try again.");
     }
   };
 
@@ -99,7 +126,7 @@ function LoginForm() {
             htmlType="submit"
             block
             size="large"
-            loading={app?.isLoading}
+            loading={isPending}
             className="h-11! font-semibold!"
           >
             Log in

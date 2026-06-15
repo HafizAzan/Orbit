@@ -1,53 +1,78 @@
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input } from "antd";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppContext } from "../../context/app-context";
-import { sendOtp } from "../../lib/auth";
+import { useSendRegisterOtp } from "../../hooks/user-authentication";
+import { generateOrganizationSlug } from "../../lib/organization";
+import { saveOtpSession } from "../../lib/otp-session";
 import { toast } from "../../lib/toast";
+import { cn } from "../../lib/utils";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
+import type { RegisterFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
-import { Label, Paragraph, Title } from "../ui/typography";
+import { Label, Paragraph, Text, Title } from "../ui/typography";
 
-type RegisterFormValues = {
-  fullName: string;
-  organizationName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
+const WORKSPACE_DOMAIN = "flowsync.io";
 
 function RegisterForm() {
   const [form] = Form.useForm<RegisterFormValues>();
   const navigate = useNavigate();
-  const app = useAppContext();
+  const [slugTouched, setSlugTouched] = useState(false);
+  const organizationName = Form.useWatch("organizationName", form) ?? "";
+  const { mutateAsync: sendRegisterOtp, isPending: isSendingOtp } = useSendRegisterOtp();
+
+  const previewSlug = useMemo(() => {
+    if (!organizationName.trim()) {
+      return "your-workspace";
+    }
+
+    return generateOrganizationSlug(organizationName);
+  }, [organizationName]);
+
+  useEffect(() => {
+    if (!slugTouched && organizationName.trim()) {
+      form.setFieldValue("organizationSlug", generateOrganizationSlug(organizationName));
+    }
+  }, [organizationName, slugTouched, form]);
 
   const handleFinish = async (values: RegisterFormValues) => {
     try {
-      app?.setIsLoading(true);
-      const code = await sendOtp(values.email);
+      const normalizedEmail = values.email.trim().toLowerCase();
+
+      const result = await sendRegisterOtp({
+        fullName: values.fullName,
+        organizationName: values.organizationName,
+        organizationSlug: values.organizationSlug,
+        email: normalizedEmail,
+        password: values.password,
+        authProvider: "email",
+        signupSource: "direct",
+        kindOfUser: "owner",
+      });
+
+      saveOtpSession({
+        email: normalizedEmail,
+        flow: "register",
+        expiresAt: result.expiresAt,
+      });
+
       toast.success(
-        import.meta.env.DEV
-          ? `Verification code sent to ${values.email}. Demo code: ${code}`
-          : `Verification code sent to ${values.email}`,
+        import.meta.env.DEV && result.devOtp
+          ? `${result.message}. Demo code: ${result.devOtp}`
+          : result.message,
       );
-      navigate(UN_AUTH_ROUTES.VERIFY_OTP, {
+
+      const verifyUrl = `${UN_AUTH_ROUTES.VERIFY_OTP}?email=${encodeURIComponent(normalizedEmail)}&flow=register`;
+      navigate(verifyUrl, {
         state: {
-          email: values.email,
+          email: normalizedEmail,
           flow: "register",
-          registerData: {
-            fullName: values.fullName,
-            organizationName: values.organizationName,
-            email: values.email,
-            password: values.password,
-          },
+          expiresAt: result.expiresAt,
         },
       });
-    } catch {
-      toast.error("Unable to send verification code. Please try again.");
-    } finally {
-      app?.setIsLoading(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Registration failed");
     }
   };
 
@@ -74,8 +99,69 @@ function RegisterForm() {
               { min: 2, message: "Organization name must be at least 2 characters" },
             ]}
           >
-            <Input placeholder="Acme Inc." size="large" className="rounded-lg!" />
+            <Input placeholder="Acme Corp" size="large" className="rounded-lg!" />
           </Form.Item>
+
+          <Form.Item
+            name="organizationSlug"
+            label={<Label>Workspace slug</Label>}
+            rules={[
+              { required: true, message: "Please enter a workspace slug" },
+              { min: 2, message: "Slug must be at least 2 characters" },
+              {
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                message: "Use lowercase letters, numbers, and hyphens only",
+              },
+            ]}
+          >
+            {slugTouched ? (
+              <Input
+                placeholder="your-workspace"
+                size="large"
+                className="rounded-lg! font-mono"
+                addonAfter={`.${WORKSPACE_DOMAIN}`}
+                onChange={() => setSlugTouched(true)}
+              />
+            ) : (
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-3 text-left transition-colors hover:border-primary/30"
+                onClick={() => setSlugTouched(true)}
+              >
+                <span className="min-w-0 flex-1 truncate font-mono text-sm">
+                  <span className={cn("font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>{previewSlug}</span>
+                  <span className="text-muted">.{WORKSPACE_DOMAIN}</span>
+                </span>
+                <span className="shrink-0 rounded-full bg-feature-sync px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
+                  Auto
+                </span>
+              </button>
+            )}
+          </Form.Item>
+
+          {!slugTouched ? (
+            <Text size="xs" color="muted" className="-mt-3 mb-1 block">
+              Generated from your organization name.{" "}
+              <button type="button" className="font-medium text-primary hover:opacity-80" onClick={() => setSlugTouched(true)}>
+                Customize
+              </button>
+            </Text>
+          ) : (
+            <Text size="xs" color="muted" className="-mt-3 mb-1 block">
+              <button
+                type="button"
+                className="font-medium text-primary hover:opacity-80"
+                onClick={() => {
+                  setSlugTouched(false);
+                  if (organizationName.trim()) {
+                    form.setFieldValue("organizationSlug", generateOrganizationSlug(organizationName));
+                  }
+                }}
+              >
+                Use auto-generated slug
+              </button>
+            </Text>
+          )}
 
           <Form.Item
             name="email"
@@ -121,14 +207,7 @@ function RegisterForm() {
             </Form.Item>
           </div>
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            size="large"
-            loading={app?.isLoading}
-            className="h-11! font-semibold!"
-          >
+          <Button type="primary" htmlType="submit" block size="large" loading={isSendingOtp} className="h-11! font-semibold!">
             Create Account
           </Button>
         </Form>

@@ -7,8 +7,8 @@ import { ConfirmModal } from "../../component/ui/modal";
 import ADMIN_NAV_ITEMS from "../../data/admin-nav-items";
 import { useAdminActivity } from "../../context/admin-activity-context";
 import { useAppContext } from "../../context/app-context";
+import { clearAuthSession } from "../../lib/auth-session";
 import { toast } from "../../lib/toast";
-import { ADMIN_ROUTES } from "../../router/admin-routes";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import { cn } from "../../lib/utils";
 
@@ -24,6 +24,7 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const handleLogoutConfirm = () => {
+    clearAuthSession();
     app?.setUser(null);
     toast.success("Logged out successfully");
     setLogoutOpen(false);
@@ -38,11 +39,7 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
   return (
     <div className={cn("flex h-full flex-col px-4 py-6", className)}>
       <div className="mb-8 px-2">
-        <Link
-          to={ADMIN_ROUTES.DASHBOARD}
-          onClick={handleNavClick}
-          className="inline-flex transition-opacity duration-300 hover:opacity-90"
-        >
+        <Link to={"/"} onClick={handleNavClick} className="inline-flex transition-opacity duration-300 hover:opacity-90">
           <Logo />
         </Link>
         <p className="mt-2 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase">Platform Admin</p>
@@ -61,17 +58,13 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-feature-sync text-primary"
-                    : "text-muted hover:bg-background hover:text-foreground",
+                  isActive ? "bg-feature-sync text-primary" : "text-muted hover:bg-background hover:text-foreground",
                 )
               }
             >
               <Icon className="text-base" />
               <span className="flex-1">{label}</span>
-              {badgeCount > 0 ? (
-                <Badge count={badgeCount} size="small" className="[&_.ant-badge-count]:bg-amber-500!" />
-              ) : null}
+              {badgeCount > 0 ? <Badge count={badgeCount} size="small" className="[&_.ant-badge-count]:bg-amber-500!" /> : null}
             </NavLink>
           );
         })}

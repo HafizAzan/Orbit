@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Logo from "../../../component/logo";
 import { NAV_SECTION_IDS } from "../../../data/nav-items";
 import useActiveSection from "../../../hooks/use-active-section";
+import useScrollToHomeHash from "../../../hooks/use-scroll-to-home-hash";
 import { UN_AUTH_ROUTES } from "../../../router/public-routes";
 import HeaderActions from "./header-actions";
 import MobileMenu from "./mobile-menu";
@@ -18,6 +19,8 @@ function Header() {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const openMenu = useCallback(() => setMenuOpen(true), []);
   const activeSectionId = useActiveSection(NAV_SECTION_IDS, headerHeight);
+
+  useScrollToHomeHash(headerHeight);
 
   useLayoutEffect(() => {
     const header = headerRef.current;

@@ -1,0 +1,97 @@
+export type AuthProvider = "email" | "google" | "github";
+export type SignupSource = "direct" | "invite";
+export type RegisterAs = "super_admin" | "owner" | "admin" | "manager" | "member";
+export type EmailVerificationStatus = "pending" | "verified";
+export type AccountStatus = "pending" | "active" | "suspended";
+export type AuthFlow = "login" | "register";
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginResponse = AuthSessionResponse;
+
+export type LoginFormValues = {
+  email: string;
+  password: string;
+  remember: boolean;
+};
+
+export type RegisterSendOtpRequest = {
+  fullName: string;
+  organizationName: string;
+  organizationSlug: string;
+  email: string;
+  password: string;
+  authProvider: AuthProvider;
+  signupSource: SignupSource;
+  kindOfUser: RegisterAs;
+  inviteToken?: string;
+};
+
+export type VerifyRegisterRequest = {
+  email: string;
+  otp: string;
+};
+
+export type RegisterSendOtpResponse = {
+  message: string;
+  email: string;
+  expiresAt: string;
+  devOtp?: string;
+};
+
+export type RegisterPendingResponse = {
+  email: string;
+  expiresAt: string;
+  isExpired: boolean;
+};
+
+export type ResendRegisterOtpResponse = {
+  message: string;
+  email: string;
+  expiresAt: string;
+  devOtp?: string;
+};
+
+export type AuthOrganization = {
+  id: string;
+  name: string;
+};
+
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: RegisterAs;
+  isPlatformAdmin: boolean;
+  emailVerificationStatus: EmailVerificationStatus;
+  accountStatus: AccountStatus;
+  organization: AuthOrganization | null;
+};
+
+export type AuthSessionResponse = {
+  message: string;
+  accessToken: string;
+  user: AuthUser;
+};
+
+export type VerifyRegisterResponse = AuthSessionResponse;
+
+export type RegisterFormValues = {
+  fullName: string;
+  organizationName: string;
+  organizationSlug: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export type VerifyOtpLocationState = {
+  email: string;
+  flow: AuthFlow;
+  expiresAt?: string;
+};
+
+export type RegisterSendOtpDefaults = Pick<RegisterSendOtpRequest, "authProvider" | "signupSource" | "kindOfUser">;
