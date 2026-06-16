@@ -1,10 +1,12 @@
 import { PlusOutlined } from "@ant-design/icons";
 import React from "react";
+import { getProjectCreatePath } from "../../../data/workspace-project-form";
+import WorkspaceNavLink from "../common/workspace-nav-link";
 
 function ProjectTemplateCard() {
   return (
-    <button
-      type="button"
+    <WorkspaceNavLink
+      to={getProjectCreatePath()}
       className="flex min-h-[320px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card/50 p-8 text-center transition-colors hover:border-primary/40 hover:bg-card"
     >
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
@@ -14,7 +16,7 @@ function ProjectTemplateCard() {
       <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">
         Quickly launch a new workspace with pre-built workflows.
       </p>
-    </button>
+    </WorkspaceNavLink>
   );
 }
 

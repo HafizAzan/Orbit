@@ -9,13 +9,18 @@ export type WorkspaceRoute = {
 export const WORKSPACE_ROUTES = {
   DASHBOARD: "/dashboard",
   PROJECTS: "/projects",
+  PROJECT_CREATE: "/projects/new",
+  PROJECT_EDIT: "/projects/:projectId/edit",
   PROJECT_DETAIL: "/projects/:projectId",
   PROJECT_BOARD: "/projects/:projectId/board",
   BOARDS: "/boards",
   TASKS: "/tasks",
+  TASK_CREATE: "/tasks/new",
+  TASK_EDIT: "/tasks/:taskId/edit",
   TEAMS: "/teams",
   CALENDAR: "/calendar",
   REPORTS: "/reports",
+  BILLING: "/billing",
   SETTINGS: "/settings",
   PROFILE: "/profile",
 } as const;
@@ -28,6 +33,7 @@ const WORKSPACE_ROUTE_KEYS = [
   "TEAMS",
   "CALENDAR",
   "REPORTS",
+  "BILLING",
   "SETTINGS",
   "PROFILE",
 ] as const;

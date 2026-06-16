@@ -1,10 +1,10 @@
 import {
   AppstoreOutlined,
   CalendarOutlined,
+  CreditCardOutlined,
   DashboardOutlined,
   ProjectOutlined,
   SettingOutlined,
-  TableOutlined,
   TeamOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
@@ -60,11 +60,11 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     roles: ["owner", "admin", "manager", "member"],
   },
   {
-    key: "reports",
-    label: "Reports",
-    path: WORKSPACE_ROUTES.REPORTS,
-    icon: TableOutlined,
-    roles: ["owner", "admin", "manager"],
+    key: "billing",
+    label: "Billing",
+    path: WORKSPACE_ROUTES.BILLING,
+    icon: CreditCardOutlined,
+    roles: ["owner"],
   },
 ];
 

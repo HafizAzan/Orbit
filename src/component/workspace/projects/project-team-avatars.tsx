@@ -6,14 +6,15 @@ import { cn } from "../../../lib/utils";
 type ProjectTeamAvatarsProps = {
   members: ProjectTeamMember[];
   maxVisible?: number;
+  className?: string;
 };
 
-function ProjectTeamAvatars({ members, maxVisible = 3 }: ProjectTeamAvatarsProps) {
+function ProjectTeamAvatars({ members, maxVisible = 3, className }: ProjectTeamAvatarsProps) {
   const visibleMembers = members.slice(0, maxVisible);
   const remainingCount = members.length - maxVisible;
 
   return (
-    <div className="flex items-center">
+    <div className={cn("flex items-center", className)}>
       {visibleMembers.map((member, index) => (
         <div
           key={member.id}

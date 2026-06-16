@@ -26,6 +26,7 @@ type AppSidebarContentProps = {
   homePath: string;
   className?: string;
   onNavigate?: () => void;
+  onNavItemClick?: (item: AppNavItem) => void;
 };
 
 function AppSidebarContent({
@@ -35,6 +36,7 @@ function AppSidebarContent({
   homePath,
   className,
   onNavigate,
+  onNavItemClick,
 }: AppSidebarContentProps) {
   const navigate = useNavigate();
   const app = useAppContext();
@@ -71,7 +73,10 @@ function AppSidebarContent({
         key={item.key}
         to={item.path}
         end={item.end ?? true}
-        onClick={handleNavClick}
+        onClick={() => {
+          onNavItemClick?.(item);
+          handleNavClick();
+        }}
         className={({ isActive }) =>
           cn(
             "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",

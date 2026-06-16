@@ -1,6 +1,18 @@
 import { CheckCircleOutlined, ProjectOutlined, TeamOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
+export type DashboardPeriodFilter = "today" | "this_week" | "this_month" | "last_6_months" | "this_year";
+
+export const DASHBOARD_PERIOD_FILTER_OPTIONS: { value: DashboardPeriodFilter; label: string }[] = [
+  { value: "today", label: "Today" },
+  { value: "this_week", label: "This Week" },
+  { value: "this_month", label: "This Month" },
+  { value: "last_6_months", label: "Last 6 Months" },
+  { value: "this_year", label: "This Year" },
+];
+
+export const DEFAULT_DASHBOARD_PERIOD_FILTER: DashboardPeriodFilter = "this_month";
+
 export type WorkspaceMetric = {
   id: string;
   label: string;

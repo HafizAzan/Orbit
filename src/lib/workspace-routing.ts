@@ -20,6 +20,10 @@ export function isWorkspaceUser(user: { role: RegisterAs; isPlatformAdmin: boole
   return user.role !== "super_admin" && !user.isPlatformAdmin;
 }
 
+export function isWorkspaceOwner(user: { role: RegisterAs }) {
+  return user.role === "owner";
+}
+
 export function getWorkspaceBrandSubtitle(organizationName?: string | null) {
   if (organizationName?.trim()) {
     return organizationName.trim();

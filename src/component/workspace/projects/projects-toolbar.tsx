@@ -4,7 +4,7 @@ import {
   TeamOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { Select } from "antd";
+import { Checkbox, Select } from "antd";
 import React from "react";
 import type { ProjectsViewMode } from "../../../data/workspace-projects";
 import {
@@ -14,15 +14,26 @@ import {
 } from "../../../data/workspace-projects";
 import { cn } from "../../../lib/utils";
 
+const TOOLBAR_CONTROL_CLASS =
+  "h-8 min-h-8 rounded-lg border border-border bg-background shadow-none";
+
+const TOOLBAR_SELECT_CLASS =
+  "[&_.ant-select-selector]:!h-8 [&_.ant-select-selector]:!min-h-8 [&_.ant-select-selector]:!items-center [&_.ant-select-selector]:!rounded-lg";
+
 type ProjectsToolbarProps = {
   statusFilter: string;
   priorityFilter: string;
   teamFilter: string;
   viewMode: ProjectsViewMode;
+  totalProjects: number;
+  selectedCount: number;
+  allSelected: boolean;
+  indeterminate: boolean;
   onStatusChange: (value: string) => void;
   onPriorityChange: (value: string) => void;
   onTeamChange: (value: string) => void;
   onViewModeChange: (mode: ProjectsViewMode) => void;
+  onSelectAllChange: (checked: boolean) => void;
 };
 
 function ProjectsToolbar({
@@ -30,18 +41,48 @@ function ProjectsToolbar({
   priorityFilter,
   teamFilter,
   viewMode,
+  totalProjects,
+  selectedCount,
+  allSelected,
+  indeterminate,
   onStatusChange,
   onPriorityChange,
   onTeamChange,
   onViewModeChange,
+  onSelectAllChange,
 }: ProjectsToolbarProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-3">
+        <label
+          className={cn(
+            TOOLBAR_CONTROL_CLASS,
+            "inline-flex min-w-[132px] cursor-pointer items-center gap-2.5 px-3",
+            totalProjects === 0 && "cursor-not-allowed opacity-50",
+          )}
+        >
+          <Checkbox
+            checked={allSelected}
+            indeterminate={indeterminate}
+            disabled={totalProjects === 0}
+            onChange={(event) => onSelectAllChange(event.target.checked)}
+            className="m-0! leading-none [&_.ant-checkbox]:top-0"
+          />
+          <span className="text-sm font-medium whitespace-nowrap text-foreground">
+            Select all
+            {selectedCount > 0 ? (
+              <span className="text-muted">
+                {" "}
+                ({selectedCount}/{totalProjects})
+              </span>
+            ) : null}
+          </span>
+        </label>
+
         <Select
           value={statusFilter}
           onChange={onStatusChange}
-          className="min-w-[180px]"
+          className={cn("min-w-[180px]", TOOLBAR_SELECT_CLASS)}
           options={PROJECT_STATUS_FILTER_OPTIONS.map((option) => ({
             value: option.value,
             label: `Status: ${option.label}`,
@@ -50,7 +91,7 @@ function ProjectsToolbar({
         <Select
           value={priorityFilter}
           onChange={onPriorityChange}
-          className="min-w-[150px]"
+          className={cn("min-w-[150px]", TOOLBAR_SELECT_CLASS)}
           options={PROJECT_PRIORITY_FILTER_OPTIONS.map((option) => ({
             value: option.value,
             label: `Priority: ${option.label}`,
@@ -60,7 +101,7 @@ function ProjectsToolbar({
         <Select
           value={teamFilter}
           onChange={onTeamChange}
-          className="min-w-[170px]"
+          className={cn("min-w-[170px]", TOOLBAR_SELECT_CLASS)}
           options={PROJECT_TEAM_FILTER_OPTIONS.map((option) => ({
             value: option.value,
             label: `Team: ${option.label}`,

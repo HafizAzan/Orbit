@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
 import { cn } from "../../../lib/utils";
+import WorkspaceNavLink from "../common/workspace-nav-link";
 
 type ProjectWorkspaceTab = "overview" | "board";
 
@@ -22,9 +22,10 @@ function ProjectWorkspaceTabs({ projectId, active }: ProjectWorkspaceTabsProps) 
         const href = tab.key === "overview" ? getProjectDetailPath(projectId) : getProjectBoardPath(projectId);
 
         return (
-          <Link
+          <WorkspaceNavLink
             key={tab.key}
             to={href}
+            preserveReturn
             className={cn(
               "border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors",
               active === tab.key
@@ -33,7 +34,7 @@ function ProjectWorkspaceTabs({ projectId, active }: ProjectWorkspaceTabsProps) 
             )}
           >
             {tab.label}
-          </Link>
+          </WorkspaceNavLink>
         );
       })}
     </nav>

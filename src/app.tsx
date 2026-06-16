@@ -22,6 +22,10 @@ import ChoosePlanCheckoutSuccess from "./pages/choose-plan-checkout-success";
 import ChoosePlanCheckoutCancel from "./pages/choose-plan-checkout-cancel";
 import WorkspaceProjectDetail from "./pages/workspace/project-detail";
 import WorkspaceProjectBoard from "./pages/workspace/project-board";
+import WorkspaceProjectCreate from "./pages/workspace/project-create";
+import WorkspaceProjectEdit from "./pages/workspace/project-edit";
+import WorkspaceTaskCreate from "./pages/workspace/task-create";
+import WorkspaceTaskEdit from "./pages/workspace/task-edit";
 
 function App() {
   return (
@@ -43,6 +47,10 @@ function App() {
                 {WORKSPACE_ROUTES_LIST.map((route: WorkspaceRoute) => (
                   <ChildRoute key={route.path} path={route.path} element={<route.component />} />
                 ))}
+                <ChildRoute path={WORKSPACE_ROUTES.PROJECT_CREATE} element={<WorkspaceProjectCreate />} />
+                <ChildRoute path={WORKSPACE_ROUTES.PROJECT_EDIT} element={<WorkspaceProjectEdit />} />
+                <ChildRoute path={WORKSPACE_ROUTES.TASK_CREATE} element={<WorkspaceTaskCreate />} />
+                <ChildRoute path={WORKSPACE_ROUTES.TASK_EDIT} element={<WorkspaceTaskEdit />} />
                 <ChildRoute path={WORKSPACE_ROUTES.PROJECT_DETAIL} element={<WorkspaceProjectDetail />} />
                 <ChildRoute path={`${WORKSPACE_ROUTES.PROJECT_DETAIL}/board`} element={<WorkspaceProjectBoard />} />
               </ChildRoute>

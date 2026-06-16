@@ -1,7 +1,12 @@
 import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import { Input, Select } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import createWorkspaceTaskTableColumns from "../../../columns/workspace-task-table-columns";
+import { getTaskEditPath } from "../../../data/workspace-task-form";
+import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
+import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
+import { toast } from "../../../lib/toast";
 import {
   DEFAULT_TASK_TABLE_FILTERS,
   TASK_ASSIGNEE_FILTER_OPTIONS,
@@ -16,9 +21,9 @@ import {
   type TaskTableFilters,
   type WorkspaceTask,
 } from "../../../data/workspace-tasks";
-import { matchesSearchQuery, paginateItems } from "../../../lib/helper";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import BulkDeleteTasksButton from "./bulk-delete-tasks-button";
 
 function countActiveTaskFilters(filters: TaskTableFilters) {
   return Object.values(filters).filter((value) => value !== "all").length;
@@ -72,19 +77,41 @@ type TasksTableProps = {
 };
 
 function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [tasks, setTasks] = useState(data);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<TaskTableFilters>(DEFAULT_TASK_TABLE_FILTERS);
   const [page, setPage] = useState(1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  const columns = useMemo(() => createWorkspaceTaskTableColumns(), []);
+  useEffect(() => {
+    setTasks(data);
+  }, [data]);
+
+  const selectedCount = selectedRowKeys.length;
+
+  const handleEdit = useCallback(
+    (record: WorkspaceTask) => {
+      navigate(getTaskEditPath(record.id), createWorkspaceNavState(location.pathname));
+    },
+    [location.pathname, navigate],
+  );
+
+  const columns = useMemo(
+    () =>
+      createWorkspaceTaskTableColumns({
+        onEdit: handleEdit,
+      }),
+    [handleEdit],
+  );
   const activeFilterCount = countActiveTaskFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
 
   const filteredData = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return data.filter((task) => {
+    return tasks.filter((task) => {
       if (!matchesTaskFilters(task, filters)) return false;
       if (!query) return true;
 
@@ -95,7 +122,7 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
         matchesSearchQuery(task.assignee.name, query)
       );
     });
-  }, [data, filters, search]);
+  }, [filters, search, tasks]);
 
   useEffect(() => {
     setPage(1);
@@ -115,6 +142,16 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
     setFilters(DEFAULT_TASK_TABLE_FILTERS);
     setSearch("");
   };
+
+  const handleBulkDelete = useCallback(async () => {
+    const deletedCount = selectedRowKeys.length;
+
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    setTasks((current) => current.filter((task) => !selectedRowKeys.includes(task.id)));
+    setSelectedRowKeys([]);
+    toast.success(`${deletedCount} ${pluralize(deletedCount, "task")} deleted successfully`);
+  }, [selectedRowKeys]);
 
   const resultsSummary = (
     <span className="text-sm text-muted">
@@ -137,19 +174,25 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
             placeholder="Search tasks, IDs, or assignees..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="max-w-md rounded-xl! bg-background!"
+            className="w-full max-w-md rounded-xl! bg-background!"
           />
 
-          {activeFilterCount > 0 || search.trim() ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="inline-flex w-fit items-center gap-1 text-sm font-medium text-muted transition-colors hover:text-foreground"
-            >
-              <CloseOutlined className="text-[10px]" />
-              Clear all
-            </button>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-3">
+            {selectedCount > 0 ? (
+              <BulkDeleteTasksButton selectedCount={selectedCount} onDelete={handleBulkDelete} />
+            ) : null}
+
+            {activeFilterCount > 0 || search.trim() ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex w-fit items-center gap-1 text-sm font-medium text-muted transition-colors hover:text-foreground"
+              >
+                <CloseOutlined className="text-[10px]" />
+                Clear all
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

@@ -19,9 +19,7 @@ import type {
   VerifyRegisterResponse,
 } from "../types/auth.types";
 
-const sendRegisterOtp = async (
-  data: RegisterSendOtpRequest,
-): Promise<RegisterSendOtpResponse> => {
+const sendRegisterOtp = async (data: RegisterSendOtpRequest): Promise<RegisterSendOtpResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.REGISTER_SEND_OTP, data);
   return assertApiSuccess<RegisterSendOtpResponse>(response);
 };
@@ -40,9 +38,7 @@ const resendRegisterOtp = async (email: string): Promise<ResendRegisterOtpRespon
   return assertApiSuccess<ResendRegisterOtpResponse>(response);
 };
 
-const verifyRegister = async (
-  data: VerifyRegisterRequest,
-): Promise<VerifyRegisterResponse> => {
+const verifyRegister = async (data: VerifyRegisterRequest): Promise<VerifyRegisterResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.REGISTER_VERIFY, data);
   return assertApiSuccess<VerifyRegisterResponse>(response);
 };
@@ -51,6 +47,7 @@ const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.LOGIN, {
     email: data.email.trim().toLowerCase(),
     password: data.password,
+    remember: data.remember === true,
   });
   return assertApiSuccess<LoginResponse>(response);
 };
@@ -62,9 +59,7 @@ const logout = async (): Promise<LogoutResponse> => {
   return assertApiSuccess<LogoutResponse>(response);
 };
 
-const forgotPassword = async (
-  data: ForgotPasswordRequest,
-): Promise<ForgotPasswordResponse> => {
+const forgotPassword = async (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.FORGOT_PASSWORD, {
     email: data.email.trim().toLowerCase(),
   });
@@ -78,9 +73,7 @@ const validateResetToken = async (token: string): Promise<ValidateResetTokenResp
   return assertApiSuccess<ValidateResetTokenResponse>(response);
 };
 
-const resetPassword = async (
-  data: ResetPasswordRequest,
-): Promise<ResetPasswordResponse> => {
+const resetPassword = async (data: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.RESET_PASSWORD, {
     token: data.token.trim(),
     password: data.password,

@@ -5,17 +5,14 @@ import { isPlatformAdminUser, PLAN_ROUTES } from "../../lib/auth-routing";
 import { isWorkspaceUser } from "../../lib/workspace-routing";
 import { ADMIN_ROUTES } from "../admin-routes";
 import { UN_AUTH_ROUTES } from "../public-routes";
+import Loader from "../../component/ui/loader";
 
 function RequireWorkspaceUser() {
   const app = useAppContext();
   const location = useLocation();
 
   if (app?.isBootstrapping) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted">Loading...</p>
-      </div>
-    );
+    return <Loader fullScreen />;
   }
 
   if (!app?.isAuthenticated || !app.user) {

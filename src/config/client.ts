@@ -1,6 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 import { ApiRequestError } from "../lib/api-error";
-import { getAccessToken } from "../lib/cookies";
+import { getAccessToken } from "../lib/auth-session";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 

@@ -4,6 +4,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import type { WorkspaceKanbanBoard } from "../../../data/workspace-board";
 import { getProjectDetailPath } from "../../../data/workspace-project-detail";
+import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
+import { useWorkspaceReturnTo } from "../../../lib/workspace-navigation";
+import WorkspaceBackLink from "../common/workspace-back-link";
+import WorkspaceNavLink from "../common/workspace-nav-link";
 import ProjectTeamAvatars from "../projects/project-team-avatars";
 import ProjectWorkspaceTabs from "../projects/project-workspace-tabs";
 import { Title } from "../../ui/typography";
@@ -13,16 +17,24 @@ type KanbanBoardHeaderProps = {
 };
 
 function KanbanBoardHeader({ board }: KanbanBoardHeaderProps) {
+  const { returnPath, returnLabel } = useWorkspaceReturnTo(WORKSPACE_ROUTES.PROJECTS, "Projects");
+
   return (
     <div className="mb-6">
-      <nav className="text-sm text-muted">
-        <Link to="/projects" className="font-medium transition-colors hover:text-primary">
-          Projects
+      <WorkspaceBackLink
+        fallbackPath={WORKSPACE_ROUTES.PROJECTS}
+        fallbackLabel="Projects"
+        className="text-sm font-medium text-primary transition-opacity hover:opacity-80"
+      />
+
+      <nav className="mt-4 text-sm text-muted">
+        <Link to={returnPath} className="font-medium transition-colors hover:text-primary">
+          {returnLabel}
         </Link>
         <span className="mx-2 text-slate-300">›</span>
-        <Link to={getProjectDetailPath(board.projectId)} className="font-medium transition-colors hover:text-primary">
+        <WorkspaceNavLink to={getProjectDetailPath(board.projectId)} preserveReturn className="font-medium transition-colors hover:text-primary">
           {board.projectName}
-        </Link>
+        </WorkspaceNavLink>
         <span className="mx-2 text-slate-300">›</span>
         <span>Board</span>
       </nav>

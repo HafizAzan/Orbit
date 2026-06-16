@@ -22,12 +22,15 @@ function LoginForm() {
 
   const handleFinish = async (values: LoginFormValues) => {
     try {
+      const remember = values.remember === true;
+
       const result = await login({
         email: values.email.trim().toLowerCase(),
         password: values.password,
+        remember,
       });
 
-      saveAuthSession(result.accessToken, result.user);
+      saveAuthSession(result.accessToken, result.user, remember);
       app?.setUser(result.user);
       showApiSuccessToast(result.message);
       navigate(getPostAuthRedirectPath(result.user));

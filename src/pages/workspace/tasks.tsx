@@ -2,13 +2,17 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React from "react";
 import TasksTable from "../../component/workspace/tasks/tasks-table";
+import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-link";
+import { getTaskCreatePath } from "../../data/workspace-task-form";
 import { Paragraph, Title } from "../../component/ui/typography";
 
 function WorkspaceTasks() {
   const createButton = (
-    <Button type="primary" icon={<PlusOutlined />} size="large" className="font-semibold!">
-      Create Task
-    </Button>
+    <WorkspaceNavLink to={getTaskCreatePath()}>
+      <Button type="primary" icon={<PlusOutlined />} size="large" className="font-semibold!">
+        Create Task
+      </Button>
+    </WorkspaceNavLink>
   );
 
   return (

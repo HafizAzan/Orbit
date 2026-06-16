@@ -1,6 +1,6 @@
-import { CalendarOutlined, CommentOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, CommentOutlined } from "@ant-design/icons";
+import { Checkbox } from "antd";
 import React from "react";
-import { Link } from "react-router-dom";
 import { getProjectDetailPath } from "../../../data/workspace-project-detail";
 import {
   PROJECT_ICON_MAP,
@@ -9,26 +9,112 @@ import {
 } from "../../../data/workspace-projects";
 import { formatDate } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
+import WorkspaceNavLink from "../common/workspace-nav-link";
 import ProjectTeamAvatars from "./project-team-avatars";
 
 type ProjectCardProps = {
   project: WorkspaceProject;
   viewMode?: "grid" | "list";
+  selected?: boolean;
+  onSelectedChange?: (selected: boolean) => void;
 };
 
-function ProjectCard({ project, viewMode = "grid" }: ProjectCardProps) {
+function ProjectProgress({
+  progress,
+  progressClass,
+  compact = false,
+}: {
+  progress: number;
+  progressClass: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={cn("w-full", compact && "min-w-0")}>
+      <div className="mb-2 flex items-center justify-between gap-2 text-sm">
+        <span className="font-medium text-muted">Progress</span>
+        <span className="shrink-0 font-bold tabular-nums text-foreground">{progress}%</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+        <div
+          className={cn("h-full rounded-full transition-all duration-500", progressClass)}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ProjectStats({ taskCount, commentCount, className }: { taskCount: number; commentCount: number; className?: string }) {
+  return (
+    <div className={cn("flex flex-col gap-2 text-sm text-muted", className)}>
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <CheckCircleOutlined />
+        {taskCount} Tasks
+      </span>
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <CommentOutlined />
+        {commentCount}
+      </span>
+    </div>
+  );
+}
+
+type ProjectCardShellProps = {
+  project: WorkspaceProject;
+  selected: boolean;
+  onSelectedChange?: (selected: boolean) => void;
+  viewMode: "grid" | "list";
+  children: React.ReactNode;
+};
+
+function ProjectCardShell({ project, selected, onSelectedChange, viewMode, children }: ProjectCardShellProps) {
+  return (
+    <article
+      className={cn(
+        "relative rounded-2xl border bg-card shadow-sm transition-all",
+        selected ? "border-primary bg-feature-sync/40 ring-2 ring-primary/15" : "border-border hover:shadow-md",
+      )}
+    >
+      <div
+        className={cn(
+          "absolute top-4 left-4 z-10",
+          viewMode === "list" && "lg:top-1/2 lg:-translate-y-1/2",
+        )}
+      >
+        <Checkbox
+          checked={selected}
+          aria-label={`Select ${project.title}`}
+          className="rounded-md bg-card/95 p-0.5 shadow-sm"
+          onChange={(event) => onSelectedChange?.(event.target.checked)}
+          onClick={(event) => event.stopPropagation()}
+        />
+      </div>
+
+      <WorkspaceNavLink
+        to={getProjectDetailPath(project.id)}
+        className={cn("block text-inherit no-underline", viewMode === "grid" ? "p-5 pt-5 pl-12" : "p-4 pt-4 pl-12 sm:p-5 sm:pt-5 sm:pl-12")}
+      >
+        {children}
+      </WorkspaceNavLink>
+    </article>
+  );
+}
+
+function ProjectCardGrid({
+  project,
+  selected,
+  onSelectedChange,
+}: {
+  project: WorkspaceProject;
+  selected: boolean;
+  onSelectedChange?: (selected: boolean) => void;
+}) {
   const Icon = PROJECT_ICON_MAP[project.icon];
   const statusConfig = PROJECT_STATUS_CONFIG[project.status];
 
   return (
-    <Link
-      to={getProjectDetailPath(project.id)}
-      className={cn(
-        "flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md",
-        viewMode === "list" && "lg:flex-row lg:items-center lg:gap-6",
-      )}
-    >
-      <div className={cn("min-w-0 flex-1", viewMode === "list" && "lg:flex lg:items-start lg:gap-5")}>
+    <ProjectCardShell project={project} selected={selected} onSelectedChange={onSelectedChange} viewMode="grid">
+      <div className="flex flex-col">
         <div className="flex items-start justify-between gap-3">
           <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", project.iconBg, project.iconColor)}>
             <Icon className="text-lg" />
@@ -43,50 +129,103 @@ function ProjectCard({ project, viewMode = "grid" }: ProjectCardProps) {
           </span>
         </div>
 
-        <div className={cn("mt-4", viewMode === "list" && "lg:mt-0 lg:flex-1")}>
+        <div className="mt-4 min-w-0">
           <h3 className="text-lg font-semibold text-foreground">{project.title}</h3>
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">{project.description}</p>
         </div>
 
-        <div className={cn("mt-5", viewMode === "list" && "lg:mt-3 lg:max-w-md")}>
-          <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-            <span className="font-medium text-muted">Progress</span>
-            <span className="font-bold text-foreground">{project.progress}%</span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-            <div
-              className={cn("h-full rounded-full transition-all duration-500", statusConfig.progressClass)}
-              style={{ width: `${project.progress}%` }}
-            />
-          </div>
+        <div className="mt-5">
+          <ProjectProgress progress={project.progress} progressClass={statusConfig.progressClass} />
         </div>
 
-        <div className="mt-5 flex items-center justify-between gap-3">
+        <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <ProjectTeamAvatars members={project.members} />
-          <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap text-muted">
             <CalendarOutlined className="text-xs" />
             {formatDate(project.dueDate)}
           </span>
         </div>
-      </div>
 
-      <div
-        className={cn(
-          "mt-5 flex items-center gap-5 border-t border-border pt-4 text-sm text-muted",
-          viewMode === "list" && "lg:mt-0 lg:w-48 lg:flex-col lg:items-start lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6",
-        )}
-      >
-        <span className="inline-flex items-center gap-1.5">
-          <CheckCircleOutlined />
-          {project.taskCount} Tasks
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <CommentOutlined />
-          {project.commentCount}
-        </span>
+        <div className="mt-5 flex items-center gap-5 border-t border-border pt-4">
+          <ProjectStats taskCount={project.taskCount} commentCount={project.commentCount} className="flex-row gap-5" />
+        </div>
       </div>
-    </Link>
+    </ProjectCardShell>
   );
+}
+
+function ProjectCardList({
+  project,
+  selected,
+  onSelectedChange,
+}: {
+  project: WorkspaceProject;
+  selected: boolean;
+  onSelectedChange?: (selected: boolean) => void;
+}) {
+  const Icon = PROJECT_ICON_MAP[project.icon];
+  const statusConfig = PROJECT_STATUS_CONFIG[project.status];
+
+  return (
+    <ProjectCardShell project={project} selected={selected} onSelectedChange={onSelectedChange} viewMode="list">
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.8fr)_148px_104px_132px_108px] lg:items-center lg:gap-x-5 xl:gap-x-6">
+        <div className="flex min-w-0 items-start gap-4">
+          <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", project.iconBg, project.iconColor)}>
+            <Icon className="text-lg" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h3 className="truncate text-base font-semibold text-foreground lg:text-lg">{project.title}</h3>
+              <span
+                className={cn(
+                  "inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
+                  statusConfig.badgeClass,
+                )}
+              >
+                {statusConfig.label}
+              </span>
+            </div>
+            <p className="mt-1 line-clamp-1 text-sm text-muted">{project.description}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 border-t border-border pt-4 lg:mt-0 lg:border-t-0 lg:pt-0">
+          <ProjectProgress progress={project.progress} progressClass={statusConfig.progressClass} compact />
+        </div>
+
+        <div className="mt-4 flex items-center border-t border-border pt-4 lg:mt-0 lg:h-8 lg:border-t-0 lg:pt-0">
+          <ProjectTeamAvatars members={project.members} className="min-w-[88px]" />
+        </div>
+
+        <div className="mt-4 flex items-center border-t border-border pt-4 lg:mt-0 lg:border-t-0 lg:pt-0">
+          <span className="inline-flex items-center gap-1.5 text-sm whitespace-nowrap text-muted">
+            <CalendarOutlined className="shrink-0 text-xs" />
+            {formatDate(project.dueDate)}
+          </span>
+        </div>
+
+        <div className="mt-4 flex items-center border-t border-border pt-4 lg:mt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-5">
+          <ProjectStats taskCount={project.taskCount} commentCount={project.commentCount} />
+        </div>
+      </div>
+    </ProjectCardShell>
+  );
+}
+
+function ProjectCard({
+  project,
+  viewMode = "grid",
+  selected = false,
+  onSelectedChange,
+}: ProjectCardProps) {
+  if (viewMode === "list") {
+    return (
+      <ProjectCardList project={project} selected={selected} onSelectedChange={onSelectedChange} />
+    );
+  }
+
+  return <ProjectCardGrid project={project} selected={selected} onSelectedChange={onSelectedChange} />;
 }
 
 export default React.memo(ProjectCard);

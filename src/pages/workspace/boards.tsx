@@ -1,9 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { getAllProjectBoardSummaries } from "../../data/workspace-board";
 import { getProjectBoardPath } from "../../data/workspace-project-detail";
 import { PROJECT_STATUS_CONFIG, WORKSPACE_PROJECTS } from "../../data/workspace-projects";
 import ProjectTeamAvatars from "../../component/workspace/projects/project-team-avatars";
+import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-link";
 import { Paragraph, Title } from "../../component/ui/typography";
 
 function WorkspaceBoards() {
@@ -26,7 +26,7 @@ function WorkspaceBoards() {
           const statusConfig = project ? PROJECT_STATUS_CONFIG[project.status] : null;
 
           return (
-            <Link
+            <WorkspaceNavLink
               key={board.projectId}
               to={getProjectBoardPath(board.projectId)}
               className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
@@ -53,7 +53,7 @@ function WorkspaceBoards() {
                   <p className="text-muted">{board.inProgressCount} in progress</p>
                 </div>
               </div>
-            </Link>
+            </WorkspaceNavLink>
           );
         })}
       </div>
