@@ -8,7 +8,6 @@ import {
   isRememberMeEnabled,
   saveStoredUser,
 } from "../lib/auth-session";
-import { toast } from "../lib/toast";
 import type { AuthUser } from "../types/auth.types";
 
 type AppContextValue = {

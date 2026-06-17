@@ -19,9 +19,16 @@ import { cn } from "../../../../lib/utils";
 type TaskFormMainProps = {
   values: TaskFormValues;
   onChange: (values: TaskFormValues) => void;
+  projectOptions?: Array<{ value: string; label: string }>;
+  disableProject?: boolean;
 };
 
-function TaskFormMain({ values, onChange }: TaskFormMainProps) {
+function TaskFormMain({
+  values,
+  onChange,
+  projectOptions = TASK_PROJECT_OPTIONS,
+  disableProject = false,
+}: TaskFormMainProps) {
   const updateValues = (patch: Partial<TaskFormValues>) => {
     onChange({ ...values, ...patch });
   };
@@ -47,7 +54,8 @@ function TaskFormMain({ values, onChange }: TaskFormMainProps) {
             <Select
               value={values.projectId}
               onChange={(projectId) => updateValues({ projectId })}
-              options={TASK_PROJECT_OPTIONS}
+              options={projectOptions}
+              disabled={disableProject}
               size="large"
               className="w-full"
             />

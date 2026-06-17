@@ -19,6 +19,8 @@ export type WorkspacePermission =
   | "task.create"
   | "task.edit"
   | "task.delete_any"
+  | "my_tasks.view"
+  | "tasks.view_all"
   | "reports.view";
 
 type WorkspaceRole = Extract<RegisterAs, "owner" | "admin" | "manager" | "member">;
@@ -42,6 +44,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "task.create",
     "task.edit",
     "task.delete_any",
+    "tasks.view_all",
     "reports.view",
   ],
   admin: [
@@ -62,18 +65,21 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "task.create",
     "task.edit",
     "task.delete_any",
+    "tasks.view_all",
     "reports.view",
   ],
   manager: [
     "team.view",
     "project.create",
     "project.edit",
+    "project.delete",
     "task.create",
     "task.edit",
     "task.delete_any",
+    "tasks.view_all",
     "reports.view",
   ],
-  member: ["task.create", "task.edit"],
+  member: ["my_tasks.view", "task.create", "task.edit"],
 };
 
 export const SETTINGS_SECTION_PERMISSIONS: Record<WorkspaceSettingsSectionId, WorkspacePermission> = {

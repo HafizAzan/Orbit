@@ -21,18 +21,25 @@ type WorkspaceTeamTableColumnOptions = {
   onEditRole?: (record: TeamMember) => void;
   onResendInvite?: (record: TeamMember) => void;
   onDeactivate?: (record: TeamMember) => void;
+  canChangeRole?: boolean;
+  canManageInvites?: boolean;
 };
 
-function getActionItems(record: TeamMember): MenuProps["items"] {
-  const items: MenuProps["items"] = [
-    { key: "edit-role", label: "Change role", icon: <UserSwitchOutlined /> },
-  ];
+function getActionItems(
+  record: TeamMember,
+  { canChangeRole = false, canManageInvites = false }: Pick<WorkspaceTeamTableColumnOptions, "canChangeRole" | "canManageInvites">,
+): MenuProps["items"] {
+  const items: MenuProps["items"] = [];
 
-  if (record.status === "invited") {
+  if (canChangeRole) {
+    items.push({ key: "edit-role", label: "Change role", icon: <UserSwitchOutlined /> });
+  }
+
+  if (canManageInvites && record.status === "invited") {
     items.push({ key: "resend", label: "Resend invite", icon: <MailOutlined /> });
   }
 
-  if (record.role !== "owner") {
+  if (canChangeRole && record.role !== "owner") {
     items.push({ type: "divider" });
     items.push({
       key: "deactivate",
@@ -49,7 +56,11 @@ function createWorkspaceTeamTableColumns({
   onEditRole,
   onResendInvite,
   onDeactivate,
+  canChangeRole = false,
+  canManageInvites = false,
 }: WorkspaceTeamTableColumnOptions = {}): ColumnsType<TeamMember> {
+  const showActions = canChangeRole || canManageInvites;
+
   return [
     {
       title: "Member",
@@ -138,28 +149,32 @@ function createWorkspaceTeamTableColumns({
       width: 140,
       render: (lastActive: string) => <span className="text-sm text-muted">{lastActive}</span>,
     },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 64,
-      align: "center",
-      render: (_, record) => (
-        <Dropdown
-          menu={{
-            items: getActionItems(record),
-            onClick: ({ key }) => {
-              if (key === "edit-role") onEditRole?.(record);
-              if (key === "resend") onResendInvite?.(record);
-              if (key === "deactivate") onDeactivate?.(record);
-            },
-          }}
-          trigger={["click"]}
-          placement="bottomRight"
-        >
-          <Button type="text" icon={<EllipsisOutlined />} className="text-muted!" aria-label="Member actions" />
-        </Dropdown>
-      ),
-    },
+    ...(showActions
+      ? [
+          {
+            title: "Actions",
+            key: "actions",
+            width: 64,
+            align: "center" as const,
+            render: (_: unknown, record: TeamMember) => (
+              <Dropdown
+                menu={{
+                  items: getActionItems(record, { canChangeRole, canManageInvites }),
+                  onClick: ({ key }) => {
+                    if (key === "edit-role") onEditRole?.(record);
+                    if (key === "resend") onResendInvite?.(record);
+                    if (key === "deactivate") onDeactivate?.(record);
+                  },
+                }}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <Button type="text" icon={<EllipsisOutlined />} className="text-muted!" aria-label="Member actions" />
+              </Dropdown>
+            ),
+          },
+        ]
+      : []),
   ];
 }
 

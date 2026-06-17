@@ -4,6 +4,7 @@ import type {
   WorkspaceTaskStatus,
 } from "./workspace-tasks";
 import { TASK_ASSIGNEE_FILTER_OPTIONS, WORKSPACE_TASKS } from "./workspace-tasks";
+import { MY_TASKS, type MyTask } from "./workspace-my-tasks";
 import { WORKSPACE_PROJECTS } from "./workspace-projects";
 
 export type TaskFormValues = {
@@ -67,14 +68,14 @@ export const TASK_PROJECT_OPTIONS = WORKSPACE_PROJECTS.map((project) => ({
 
 export const DEFAULT_TASK_FORM_VALUES: TaskFormValues = {
   title: "",
-  projectId: "1",
+  projectId: "",
   status: "todo",
-  priority: "critical",
-  estimatedHours: 4,
+  priority: "medium",
+  estimatedHours: null,
   description: "",
-  assigneeId: "sarah-jenkins",
+  assigneeId: "",
   dueDate: "",
-  labels: ["Frontend", "Design"],
+  labels: [],
 };
 
 const TASK_FORM_DETAILS: Record<string, Partial<Pick<TaskFormValues, "description" | "estimatedHours" | "labels">>> = {
@@ -90,8 +91,26 @@ const TASK_FORM_DETAILS: Record<string, Partial<Pick<TaskFormValues, "descriptio
   },
 };
 
+export function mapMyTaskToWorkspaceTask(task: MyTask): WorkspaceTask {
+  return {
+    id: task.id,
+    taskCode: task.taskCode,
+    title: task.title,
+    project: task.project,
+    projectId: task.projectId,
+    assignee: task.assignee,
+    priority: task.priority,
+    status: task.status,
+    dueDate: task.dueDate,
+  };
+}
+
 export function getWorkspaceTaskById(taskId: string) {
-  return WORKSPACE_TASKS.find((task) => task.id === taskId) ?? null;
+  const teamTask = WORKSPACE_TASKS.find((task) => task.id === taskId);
+  if (teamTask) return teamTask;
+
+  const myTask = MY_TASKS.find((task) => task.id === taskId);
+  return myTask ? mapMyTaskToWorkspaceTask(myTask) : null;
 }
 
 export function getTaskProjectLabel(projectId: string) {
@@ -104,6 +123,7 @@ export function getTaskAssigneeById(assigneeId: string) {
 
 export function mapTaskToFormValues(task: WorkspaceTask): TaskFormValues {
   const details = TASK_FORM_DETAILS[task.id];
+  const myTask = MY_TASKS.find((item) => item.id === task.id);
 
   return {
     title: task.title,
@@ -111,7 +131,7 @@ export function mapTaskToFormValues(task: WorkspaceTask): TaskFormValues {
     status: task.status,
     priority: task.priority,
     estimatedHours: details?.estimatedHours ?? 4,
-    description: details?.description ?? "",
+    description: details?.description ?? myTask?.description ?? "",
     assigneeId: task.assignee.id,
     dueDate: task.dueDate,
     labels: details?.labels ?? ["Frontend"],

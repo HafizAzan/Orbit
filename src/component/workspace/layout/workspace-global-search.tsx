@@ -2,6 +2,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { AutoComplete, Input } from "antd";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../../../context/app-context";
 import {
   groupWorkspaceSearchResults,
   searchWorkspaceGlobal,
@@ -11,10 +12,14 @@ import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
 
 function WorkspaceGlobalSearch() {
   const navigate = useNavigate();
+  const app = useAppContext();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
-  const results = useMemo(() => searchWorkspaceGlobal(query), [query]);
+  const results = useMemo(
+    () => searchWorkspaceGlobal(query, app?.user?.role, app?.user?.name),
+    [app?.user?.name, app?.user?.role, query],
+  );
   const resultMap = useMemo(() => new Map(results.map((result) => [result.id, result])), [results]);
   const groupedOptions = useMemo(() => groupWorkspaceSearchResults(results), [results]);
 

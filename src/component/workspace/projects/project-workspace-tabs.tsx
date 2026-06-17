@@ -1,5 +1,6 @@
 import React from "react";
 import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { cn } from "../../../lib/utils";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 
@@ -16,6 +17,12 @@ const TABS: { key: ProjectWorkspaceTab; label: string }[] = [
 ];
 
 function ProjectWorkspaceTabs({ projectId, active }: ProjectWorkspaceTabsProps) {
+  const { role } = useWorkspacePermissions();
+
+  if (role === "member") {
+    return null;
+  }
+
   return (
     <nav className="mt-6 flex gap-1 border-b border-border">
       {TABS.map((tab) => {

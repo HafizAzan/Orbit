@@ -12,7 +12,7 @@ export function getWorkspaceRoleLabel(role: RegisterAs) {
     case "member":
       return "Member";
     default:
-      return "Member";
+      return "User";
   }
 }
 
@@ -32,6 +32,26 @@ export function getWorkspaceBrandSubtitle(organizationName?: string | null) {
   return "Enterprise Workspace";
 }
 
-export function getWorkspaceHomePath() {
+export function getWorkspaceHomePath(role?: RegisterAs) {
+  if (role === "member") {
+    return WORKSPACE_ROUTES.MY_TASKS;
+  }
+
   return WORKSPACE_ROUTES.DASHBOARD;
+}
+
+export function getWorkspaceTaskHubPath(role?: RegisterAs) {
+  if (role === "member") {
+    return WORKSPACE_ROUTES.MY_TASKS;
+  }
+
+  return WORKSPACE_ROUTES.TASKS;
+}
+
+export function getProjectWorkspacePath(role: RegisterAs | undefined, projectId: string) {
+  if (role === "member") {
+    return `${WORKSPACE_ROUTES.PROJECTS}/${projectId}/board`;
+  }
+
+  return `${WORKSPACE_ROUTES.PROJECTS}/${projectId}`;
 }

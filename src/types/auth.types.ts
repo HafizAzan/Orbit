@@ -116,6 +116,34 @@ export type AuthSessionResponse = {
 
 export type VerifyRegisterResponse = AuthSessionResponse;
 
+export type InviteValidationResponse = {
+  isValid: true;
+  email: string;
+  fullName: string;
+  role: RegisterAs;
+  roleLabel: string;
+  department: string;
+  departmentLabel: string;
+  organizationName: string;
+  organizationSlug: string;
+  inviterName: string;
+  expiresAt: string;
+};
+
+export type AcceptInviteRequest = {
+  token: string;
+  password: string;
+  fullName?: string;
+};
+
+export type AcceptInviteResponse = AuthSessionResponse;
+
+export type AcceptInviteFormValues = {
+  fullName: string;
+  password: string;
+  confirmPassword: string;
+};
+
 export type RegisterFormValues = {
   fullName: string;
   organizationName: string;

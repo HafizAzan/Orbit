@@ -20,9 +20,10 @@ type OrganizationsTableProps = {
   emptyAction?: React.ReactNode;
   onEdit?: (record: OrganizationRecord) => void;
   onDelete?: (record: OrganizationRecord) => Promise<void>;
+  onBulkDelete?: (records: OrganizationRecord[]) => Promise<void>;
 };
 
-function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete }: OrganizationsTableProps) {
+function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete, onBulkDelete }: OrganizationsTableProps) {
   const [rows, setRows] = useState(data);
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useOrganizationFilters();
@@ -79,12 +80,26 @@ function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete }: Organi
   const selectedCount = selectedRowKeys.length;
   const hasSelection = selectedCount > 0;
 
-  const handleBulkDeleteConfirm = () => {
-    setRows((current) => current.filter((row) => !selectedRowKeys.includes(row.id)));
-    toast.success(`${selectedCount} ${pluralize(selectedCount, "organization")} deleted successfully`);
-    setSelectedRowKeys([]);
-    setBulkDeleteOpen(false);
-  };
+  const handleBulkDeleteConfirm = useCallback(async () => {
+    const selectedRecords = rows.filter((row) => selectedRowKeys.includes(row.id));
+
+    try {
+      if (onBulkDelete) {
+        await onBulkDelete(selectedRecords);
+      } else if (onDelete) {
+        await Promise.all(selectedRecords.map((record) => onDelete(record)));
+        toast.success(`${selectedCount} ${pluralize(selectedCount, "organization")} deleted successfully`);
+      } else {
+        setRows((current) => current.filter((row) => !selectedRowKeys.includes(row.id)));
+        toast.success(`${selectedCount} ${pluralize(selectedCount, "organization")} deleted successfully`);
+      }
+
+      setSelectedRowKeys([]);
+      setBulkDeleteOpen(false);
+    } catch {
+      // Parent handlers show API errors.
+    }
+  }, [onBulkDelete, onDelete, rows, selectedCount, selectedRowKeys]);
 
   const handleSingleDeleteConfirm = useCallback(async () => {
     if (!pendingDelete) return;

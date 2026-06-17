@@ -1,9 +1,11 @@
-import { getProjectDetailPath } from "../data/workspace-project-detail";
+import { getProjectBoardPath, getProjectDetailPath } from "../data/workspace-project-detail";
 import { WORKSPACE_PROJECTS } from "../data/workspace-projects";
+import { getMyTasksForAssignee, MY_TASKS, resolveMemberAssigneeId } from "../data/workspace-my-tasks";
 import { TEAM_MEMBERS } from "../data/workspace-teams";
 import { getTaskEditPath } from "../data/workspace-task-form";
 import { WORKSPACE_TASKS } from "../data/workspace-tasks";
 import { WORKSPACE_ROUTES } from "../router/workspace-routes";
+import type { RegisterAs } from "../types/auth.types";
 import { matchesSearchQuery } from "./helper";
 
 export const WORKSPACE_TABLE_SEARCH_PARAM = "search";
@@ -46,7 +48,61 @@ function pushResult(
   counts[result.category] += 1;
 }
 
-export function searchWorkspaceGlobal(query: string): WorkspaceGlobalSearchResult[] {
+function searchMemberWorkspaceGlobal(query: string, userName?: string | null) {
+  const normalizedQuery = query.trim();
+  if (normalizedQuery.length < MIN_QUERY_LENGTH) return [];
+
+  const results: WorkspaceGlobalSearchResult[] = [];
+  const counts: Record<WorkspaceGlobalSearchCategory, number> = {
+    projects: 0,
+    tasks: 0,
+    team: 0,
+  };
+
+  const assigneeId = resolveMemberAssigneeId(userName);
+  const myTasks = getMyTasksForAssignee(assigneeId, MY_TASKS);
+
+  for (const task of myTasks) {
+    const matches =
+      matchesSearchQuery(task.title, normalizedQuery) ||
+      matchesSearchQuery(task.taskCode, normalizedQuery) ||
+      matchesSearchQuery(task.project, normalizedQuery);
+
+    if (!matches) continue;
+
+    pushResult(results, counts, {
+      id: `task-${task.id}`,
+      category: "tasks",
+      title: task.title,
+      subtitle: `${task.taskCode} · ${task.project}`,
+      route: getTaskEditPath(task.id),
+    });
+  }
+
+  const projectIds = new Set(myTasks.map((task) => task.projectId));
+
+  for (const project of WORKSPACE_PROJECTS) {
+    if (!projectIds.has(project.id)) continue;
+
+    const matches =
+      matchesSearchQuery(project.title, normalizedQuery) ||
+      matchesSearchQuery(project.description, normalizedQuery);
+
+    if (!matches) continue;
+
+    pushResult(results, counts, {
+      id: `project-${project.id}`,
+      category: "projects",
+      title: project.title,
+      subtitle: project.description,
+      route: getProjectBoardPath(project.id),
+    });
+  }
+
+  return results;
+}
+
+function searchTeamWorkspaceGlobal(query: string) {
   const normalizedQuery = query.trim();
   if (normalizedQuery.length < MIN_QUERY_LENGTH) return [];
 
@@ -108,6 +164,14 @@ export function searchWorkspaceGlobal(query: string): WorkspaceGlobalSearchResul
   }
 
   return results;
+}
+
+export function searchWorkspaceGlobal(query: string, role?: RegisterAs, userName?: string | null) {
+  if (role === "member") {
+    return searchMemberWorkspaceGlobal(query, userName);
+  }
+
+  return searchTeamWorkspaceGlobal(query);
 }
 
 export function groupWorkspaceSearchResults(results: WorkspaceGlobalSearchResult[]) {

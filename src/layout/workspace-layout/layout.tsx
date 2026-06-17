@@ -13,8 +13,11 @@ import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
 
 function WorkspaceSidebarContent(props: { onNavigate?: () => void }) {
   const app = useAppContext();
-  const role = app?.user?.role ?? "member";
-  const { mainItems, bottomItems } = useMemo(() => getWorkspaceNavItemsForRole(role), [role]);
+  const role = app?.user?.role;
+  const { mainItems, bottomItems } = useMemo(
+    () => (role ? getWorkspaceNavItemsForRole(role) : { mainItems: [], bottomItems: [] }),
+    [role],
+  );
 
   const handleNavItemClick = (item: { key: string }) => {
     if (item.key === "dashboard") {
@@ -27,7 +30,7 @@ function WorkspaceSidebarContent(props: { onNavigate?: () => void }) {
       navItems={mainItems}
       bottomNavItems={bottomItems}
       brandSubtitle={getWorkspaceBrandSubtitle(app?.user?.organization?.name)}
-      homePath={getWorkspaceHomePath()}
+      homePath={role ? getWorkspaceHomePath(role) : WORKSPACE_ROUTES.DASHBOARD}
       onNavigate={props.onNavigate}
       onNavItemClick={handleNavItemClick}
     />
@@ -51,7 +54,7 @@ function WorkspaceHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
       onMenuOpen={onMenuOpen}
       search={<WorkspaceGlobalSearch />}
       profileName={user?.name ?? "Workspace User"}
-      profileRole={getWorkspaceRoleLabel(user?.role ?? "member")}
+      profileRole={user?.role ? getWorkspaceRoleLabel(user.role) : "User"}
       profilePath={WORKSPACE_ROUTES.PROFILE}
       actions={<WorkspaceNotificationsDropdown />}
     />

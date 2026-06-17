@@ -8,6 +8,8 @@ import {
   resetPassword,
   sendRegisterOtp,
   validateResetToken,
+  validateInviteToken,
+  acceptInvite,
   verifyRegister,
 } from "../api-services/auth.service";
 import type {
@@ -23,6 +25,9 @@ import type {
   ResetPasswordRequest,
   ResetPasswordResponse,
   ValidateResetTokenResponse,
+  InviteValidationResponse,
+  AcceptInviteRequest,
+  AcceptInviteResponse,
   VerifyRegisterRequest,
   VerifyRegisterResponse,
 } from "../types/auth.types";
@@ -79,6 +84,21 @@ export function useRegisterPending(email: string | null, enabled = true) {
 export function useResendRegisterOtp() {
   return useMutation<ResendRegisterOtpResponse, Error, string>({
     mutationFn: resendRegisterOtp,
+  });
+}
+
+export function useAcceptInvite() {
+  return useMutation<AcceptInviteResponse, Error, AcceptInviteRequest>({
+    mutationFn: acceptInvite,
+  });
+}
+
+export function useValidateInviteToken(token: string | null) {
+  return useQuery<InviteValidationResponse, Error>({
+    queryKey: ["invite-validate", token],
+    queryFn: () => validateInviteToken(token!),
+    enabled: Boolean(token),
+    retry: false,
   });
 }
 

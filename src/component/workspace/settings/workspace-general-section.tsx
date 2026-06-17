@@ -1,7 +1,8 @@
-import { CloudUploadOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
-import React from "react";
+import React, { useMemo } from "react";
 import type { WorkspaceSettings } from "../../../data/workspace-settings";
+import { getWorkspaceSlugPreview } from "../../../lib/workspace-organization-settings";
+import { cn } from "../../../lib/utils";
 import SettingsField from "../../admin/settings/settings-field";
 import SettingsSection from "../../admin/settings/settings-section";
 
@@ -22,6 +23,11 @@ function WorkspaceGeneralSection({
   saving = false,
   showActions = true,
 }: WorkspaceGeneralSectionProps) {
+  const previewSlug = useMemo(
+    () => getWorkspaceSlugPreview(settings.workspaceSlug),
+    [settings.workspaceSlug],
+  );
+
   return (
     <SettingsSection
       id="workspace-general"
@@ -40,28 +46,26 @@ function WorkspaceGeneralSection({
         </SettingsField>
 
         <SettingsField label="Workspace URL">
-          <Input
-            value={settings.workspaceUrl}
-            onChange={(event) => onChange("workspaceUrl", event.target.value)}
-            placeholder="flowsync.io/workspace/acme"
-            size="large"
-            className="rounded-xl! bg-background!"
-          />
+          <div className="rounded-xl border border-border bg-background px-4 py-3">
+            <p className="text-sm text-muted">
+              flowsync.io/workspace/
+              <span className={cn("font-semibold", settings.workspaceSlug.trim() ? "text-primary" : "text-muted")}>
+                {previewSlug}
+              </span>
+            </p>
+          </div>
         </SettingsField>
       </div>
 
       <div className="mt-5">
-        <SettingsField label="Workspace Logo" hint="PNG or SVG. Max file size 2MB.">
-          <button
-            type="button"
-            className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/60 px-6 py-8 text-center transition-colors hover:border-primary/30 hover:bg-background"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-feature-sync text-primary">
-              <CloudUploadOutlined className="text-xl" />
-            </div>
-            <p className="mt-3 text-sm font-medium text-foreground">Click to upload or drag and drop</p>
-            <p className="mt-1 text-xs text-muted">Recommended size 256×256px</p>
-          </button>
+        <SettingsField label="Workspace Slug" hint="Used in your public workspace URL. Lowercase letters, numbers, and dashes only.">
+          <Input
+            value={settings.workspaceSlug}
+            onChange={(event) => onChange("workspaceSlug", event.target.value.toLowerCase())}
+            placeholder="acme"
+            size="large"
+            className="rounded-xl! bg-background!"
+          />
         </SettingsField>
       </div>
 

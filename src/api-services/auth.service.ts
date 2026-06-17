@@ -15,6 +15,9 @@ import type {
   ResetPasswordRequest,
   ResetPasswordResponse,
   ValidateResetTokenResponse,
+  InviteValidationResponse,
+  AcceptInviteRequest,
+  AcceptInviteResponse,
   VerifyRegisterRequest,
   VerifyRegisterResponse,
 } from "../types/auth.types";
@@ -81,6 +84,22 @@ const resetPassword = async (data: ResetPasswordRequest): Promise<ResetPasswordR
   return assertApiSuccess<ResetPasswordResponse>(response);
 };
 
+const validateInviteToken = async (token: string): Promise<InviteValidationResponse> => {
+  const response = await ApiService.get(API_ROUTES.AUTH.INVITE_VALIDATE, {
+    params: { token: token.trim() },
+  });
+  return assertApiSuccess<InviteValidationResponse>(response);
+};
+
+const acceptInvite = async (data: AcceptInviteRequest): Promise<AcceptInviteResponse> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.INVITE_ACCEPT, {
+    token: data.token.trim(),
+    password: data.password,
+    fullName: data.fullName?.trim() || undefined,
+  });
+  return assertApiSuccess<AcceptInviteResponse>(response);
+};
+
 const getMe = async (): Promise<AuthUser> => {
   const response = await ApiService.get(API_ROUTES.AUTH.ME, AUTH_REQUEST);
   return assertApiSuccess<AuthUser>(response);
@@ -96,5 +115,7 @@ export {
   resetPassword,
   sendRegisterOtp,
   validateResetToken,
+  acceptInvite,
+  validateInviteToken,
   verifyRegister,
 };

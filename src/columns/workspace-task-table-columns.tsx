@@ -15,28 +15,43 @@ type WorkspaceTaskTableColumnOptions = {
   onView?: (record: WorkspaceTask) => void;
   onEdit?: (record: WorkspaceTask) => void;
   onDelete?: (record: WorkspaceTask) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
 };
 
-function getActionItems(record: WorkspaceTask): MenuProps["items"] {
-  return [
-    { key: "view", label: "View details", icon: <EyeOutlined /> },
-    { key: "edit", label: "Edit task", icon: <EditOutlined /> },
-    { type: "divider" },
-    {
+function getActionItems(
+  record: WorkspaceTask,
+  { canEdit = false, canDelete = false }: Pick<WorkspaceTaskTableColumnOptions, "canEdit" | "canDelete">,
+): MenuProps["items"] {
+  const items: MenuProps["items"] = [{ key: "view", label: "View details", icon: <EyeOutlined /> }];
+
+  if (canEdit) {
+    items.push({ key: "edit", label: "Edit task", icon: <EditOutlined /> });
+  }
+
+  if (canDelete) {
+    items.push({ type: "divider" });
+    items.push({
       key: "delete",
       label: "Delete",
       icon: <DeleteOutlined />,
       danger: true,
       disabled: record.status === "done",
-    },
-  ];
+    });
+  }
+
+  return items;
 }
 
 function createWorkspaceTaskTableColumns({
   onView,
   onEdit,
   onDelete,
+  canEdit = false,
+  canDelete = false,
 }: WorkspaceTaskTableColumnOptions = {}): ColumnsType<WorkspaceTask> {
+  const showActions = canEdit || canDelete;
+
   return [
     {
       title: "Task ID",
@@ -125,27 +140,31 @@ function createWorkspaceTaskTableColumns({
       sorter: (a, b) => a.dueDate.localeCompare(b.dueDate),
       render: (dueDate: string) => <span className="text-sm text-muted">{formatDate(dueDate)}</span>,
     },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 48,
-      render: (_, record) => (
-        <Dropdown
-          menu={{
-            items: getActionItems(record),
-            onClick: ({ key }) => {
-              if (key === "view") onView?.(record);
-              if (key === "edit") onEdit?.(record);
-              if (key === "delete") onDelete?.(record);
-            },
-          }}
-          trigger={["click"]}
-          placement="bottomRight"
-        >
-          <Button type="text" icon={<EllipsisOutlined />} className="text-muted!" aria-label="Actions" />
-        </Dropdown>
-      ),
-    },
+    ...(showActions
+      ? [
+          {
+            title: "Actions",
+            key: "actions",
+            width: 48,
+            render: (_: unknown, record: WorkspaceTask) => (
+              <Dropdown
+                menu={{
+                  items: getActionItems(record, { canEdit, canDelete }),
+                  onClick: ({ key }) => {
+                    if (key === "view") onView?.(record);
+                    if (key === "edit") onEdit?.(record);
+                    if (key === "delete") onDelete?.(record);
+                  },
+                }}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <Button type="text" icon={<EllipsisOutlined />} className="text-muted!" aria-label="Actions" />
+              </Dropdown>
+            ),
+          },
+        ]
+      : []),
   ];
 }
 

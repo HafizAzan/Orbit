@@ -1,21 +1,33 @@
 import { ArrowUpOutlined, ReloadOutlined } from "@ant-design/icons";
 import React from "react";
-import {
-  TEAM_SUMMARY_ICONS,
-  TEAM_SUMMARY_STATS,
-} from "../../../data/workspace-teams";
-import { toast } from "../../../lib/toast";
+import { TEAM_SUMMARY_ICONS } from "../../../data/workspace-teams";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
+import { useResendAllPendingInvites, useTeamStats } from "../../../hooks/use-workspace-team";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 
 function TeamSummaryCards() {
-  const { totalSeats, pendingInvites, activeToday, activeTodayTrend } = TEAM_SUMMARY_STATS;
-  const seatUsagePercent = Math.round((totalSeats.used / totalSeats.total) * 100);
+  const { can } = useWorkspacePermissions();
+  const canInvite = can("team.invite");
+  const { data: stats } = useTeamStats();
+  const { mutateAsync: resendAllPending, isPending } = useResendAllPendingInvites();
+
+  const totalSeats = stats?.totalSeats ?? { used: 0, total: 0 };
+  const pendingInvites = stats?.pendingInvites ?? 0;
+  const activeToday = stats?.activeToday ?? 0;
+  const activeTodayTrend = stats?.activeTodayTrend ?? "+0% from last week";
+  const seatUsagePercent = totalSeats.total > 0 ? Math.round((totalSeats.used / totalSeats.total) * 100) : 0;
   const SeatsIcon = TEAM_SUMMARY_ICONS.seats;
   const InvitesIcon = TEAM_SUMMARY_ICONS.invites;
   const ActiveIcon = TEAM_SUMMARY_ICONS.active;
 
-  const handleResendAll = () => {
-    toast.success("Pending invites resent successfully");
+  const handleResendAll = async () => {
+    try {
+      const result = await resendAllPending();
+      showApiSuccessToast(result.message);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
   };
 
   return (
@@ -54,7 +66,8 @@ function TeamSummaryCards() {
         <button
           type="button"
           onClick={handleResendAll}
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-sky-600 transition-colors hover:text-sky-700"
+          disabled={!canInvite || isPending || pendingInvites === 0}
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-sky-600 transition-colors hover:text-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ReloadOutlined className="text-xs" />
           Resend all pending

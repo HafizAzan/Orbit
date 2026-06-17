@@ -1,13 +1,14 @@
+import React, { useCallback } from "react";
 import { EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WorkspaceProjectDetail } from "../../../data/workspace-project-detail";
 import { getProjectEditPath } from "../../../data/workspace-project-form";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
+import { useDeleteProject } from "../../../hooks/use-workspace-projects";
 import { PROJECT_STATUS_CONFIG } from "../../../data/workspace-projects";
-import { toast } from "../../../lib/toast";
-import { cn } from "../../../lib/utils";
-import { useWorkspaceReturnTo } from "../../../lib/workspace-navigation";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
+import { cn } from "../../../lib/utils";import { useWorkspaceReturnTo } from "../../../lib/workspace-navigation";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import WorkspaceBackLink from "../common/workspace-back-link";
 import WorkspaceNavLink from "../common/workspace-nav-link";
@@ -17,23 +18,28 @@ import { Paragraph, Title } from "../../ui/typography";
 
 type ProjectDetailHeaderProps = {
   project: WorkspaceProjectDetail;
+  canDelete?: boolean;
 };
 
-function ProjectDetailHeader({ project }: ProjectDetailHeaderProps) {
+function ProjectDetailHeader({ project, canDelete = false }: ProjectDetailHeaderProps) {
   const navigate = useNavigate();
-
+  const { can } = useWorkspacePermissions();
+  const { mutateAsync: deleteProject } = useDeleteProject();
+  const canEditProject = can("project.edit");
+  const canDeleteProject = can("project.delete") || canDelete;
   const { returnPath } = useWorkspaceReturnTo(WORKSPACE_ROUTES.PROJECTS, "Projects");
 
   const statusConfig = PROJECT_STATUS_CONFIG[project.status];
 
   const handleDeleteProject = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    toast.success(`"${project.title}" deleted successfully`);
-
-    navigate(returnPath);
-  }, [navigate, project.title, returnPath]);
-
+    try {
+      const result = await deleteProject(project.id);
+      showApiSuccessToast(result.message);
+      navigate(returnPath);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  }, [deleteProject, navigate, project.id, returnPath]);
   return (
     <div className="mb-6">
       <WorkspaceBackLink
@@ -62,13 +68,17 @@ function ProjectDetailHeader({ project }: ProjectDetailHeaderProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <WorkspaceNavLink to={getProjectEditPath(project.id)} preserveReturn>
-            <Button type="primary" icon={<EditOutlined />} size="large" className="font-semibold!">
-              Edit Project
-            </Button>
-          </WorkspaceNavLink>
+          {canEditProject ? (
+            <WorkspaceNavLink to={getProjectEditPath(project.id)} preserveReturn>
+              <Button type="primary" icon={<EditOutlined />} size="large" className="font-semibold!">
+                Edit Project
+              </Button>
+            </WorkspaceNavLink>
+          ) : null}
 
-          <DeleteProjectButton projectName={project.title} onDelete={handleDeleteProject} className="font-semibold!" />
+          {canDeleteProject ? (
+            <DeleteProjectButton projectName={project.title} onDelete={handleDeleteProject} className="font-semibold!" />
+          ) : null}
         </div>
       </div>
 

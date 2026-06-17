@@ -15,9 +15,15 @@ type TaskFormSidebarProps = {
   values: TaskFormValues;
   reporterName: string;
   onChange: (values: TaskFormValues) => void;
+  assigneeOptions?: TaskAssigneeOption[];
 };
 
-function TaskFormSidebar({ values, reporterName, onChange }: TaskFormSidebarProps) {
+function TaskFormSidebar({
+  values,
+  reporterName,
+  onChange,
+  assigneeOptions = TASK_ASSIGNEE_OPTIONS,
+}: TaskFormSidebarProps) {
   const updateValues = (patch: Partial<TaskFormValues>) => {
     onChange({ ...values, ...patch });
   };
@@ -41,7 +47,11 @@ function TaskFormSidebar({ values, reporterName, onChange }: TaskFormSidebarProp
         <div className="mt-4 space-y-4">
           <div>
             <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Assignee</p>
-            <SelectAssignee value={values.assigneeId} onChange={(assigneeId) => updateValues({ assigneeId })} />
+            <SelectAssignee
+              value={values.assigneeId}
+              onChange={(assigneeId) => updateValues({ assigneeId })}
+              options={assigneeOptions}
+            />
           </div>
 
           <div>
@@ -108,11 +118,6 @@ function TaskFormSidebar({ values, reporterName, onChange }: TaskFormSidebarProp
   );
 }
 
-type SelectAssigneeProps = {
-  value: string;
-  onChange: (value: string) => void;
-};
-
 function AssigneeOptionContent({ assignee }: { assignee: TaskAssigneeOption }) {
   return (
     <div className="flex items-center gap-2.5">
@@ -124,24 +129,32 @@ function AssigneeOptionContent({ assignee }: { assignee: TaskAssigneeOption }) {
   );
 }
 
-function SelectAssignee({ value, onChange }: SelectAssigneeProps) {
-  const selectedAssignee = getTaskAssigneeById(value);
+type SelectAssigneeProps = {
+  value: string;
+  onChange: (value: string) => void;
+  options?: TaskAssigneeOption[];
+};
+
+function SelectAssignee({ value, onChange, options = TASK_ASSIGNEE_OPTIONS }: SelectAssigneeProps) {
+  const selectedAssignee =
+    options.find((item) => item.id === value) ?? getTaskAssigneeById(value);
 
   return (
     <Select
-      value={value}
+      value={value || undefined}
       onChange={onChange}
       size="large"
       showSearch
+      allowClear
       optionFilterProp="label"
       placeholder="Select assignee"
       className="w-full [&_.ant-select-selector]:rounded-xl! [&_.ant-select-selector]:border-border! [&_.ant-select-selector]:bg-background/50!"
-      options={TASK_ASSIGNEE_OPTIONS.map((option) => ({
+      options={options.map((option) => ({
         value: option.id,
         label: option.name,
       }))}
       optionRender={(option) => {
-        const assignee = TASK_ASSIGNEE_OPTIONS.find((item) => item.id === option.value);
+        const assignee = options.find((item) => item.id === option.value);
         if (!assignee) return option.label;
         return <AssigneeOptionContent assignee={assignee} />;
       }}

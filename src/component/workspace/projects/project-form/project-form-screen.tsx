@@ -4,8 +4,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../../context/app-context";
 import { DEFAULT_PROJECT_FORM_VALUES, type ProjectFormValues } from "../../../../data/workspace-project-form";
 import { getProjectDetailPath } from "../../../../data/workspace-project-detail";
+import {
+  useCreateProject,
+  useDeleteProject,
+  useUpdateProject,
+} from "../../../../hooks/use-workspace-projects";
+import useWorkspacePermissions from "../../../../hooks/use-workspace-permissions";
+import { showApiErrorToast, showApiSuccessToast } from "../../../../lib/api-error";
 import { useWorkspaceReturnTo } from "../../../../lib/workspace-navigation";
 import { WORKSPACE_ROUTES } from "../../../../router/workspace-routes";
+import { mapFormValuesToCreateRequest } from "../../../../types/project.types";
 import { toast } from "../../../../lib/toast";
 import { Paragraph, Title } from "../../../ui/typography";
 import ProjectFormFields from "./project-form-fields";
@@ -17,11 +25,21 @@ type ProjectFormScreenProps = {
   mode: "create" | "edit";
   projectId?: string;
   initialValues?: ProjectFormValues;
+  canDelete?: boolean;
 };
 
-function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FORM_VALUES }: ProjectFormScreenProps) {
+function ProjectFormScreen({
+  mode,
+  projectId,
+  initialValues = DEFAULT_PROJECT_FORM_VALUES,
+  canDelete = false,
+}: ProjectFormScreenProps) {
   const navigate = useNavigate();
   const app = useAppContext();
+  const { can } = useWorkspacePermissions();
+  const { mutateAsync: createProject } = useCreateProject();
+  const { mutateAsync: updateProject } = useUpdateProject();
+  const { mutateAsync: deleteProject } = useDeleteProject();
   const { returnPath, returnLabel } = useWorkspaceReturnTo(WORKSPACE_ROUTES.PROJECTS, "Projects");
   const [values, setValues] = useState<ProjectFormValues>(initialValues);
   const [isKeyManual, setIsKeyManual] = useState(mode === "edit");
@@ -31,6 +49,7 @@ function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FO
   const leadName = app?.user?.name?.trim() || "You";
   const pageTitle = isEdit ? "Edit Project" : "Create New Project";
   const submitLabel = isEdit ? "Save Changes" : "Create Project";
+  const showDelete = isEdit && (can("project.delete") || canDelete);
 
   useEffect(() => {
     setValues(initialValues);
@@ -51,26 +70,36 @@ function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FO
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const payload = mapFormValuesToCreateRequest(values);
 
       if (isEdit && projectId) {
-        toast.success("Project updated successfully");
+        await updateProject({ projectId, data: payload });
+        showApiSuccessToast("Project updated successfully");
         navigate(getProjectDetailPath(projectId));
         return;
       }
 
-      toast.success("Project created successfully");
-      navigate(returnPath);
+      const created = await createProject(payload);
+      showApiSuccessToast("Project created successfully");
+      navigate(getProjectDetailPath(created.id));
+    } catch (error) {
+      showApiErrorToast(error);
     } finally {
       setIsSubmitting(false);
     }
-  }, [isEdit, navigate, projectId, returnPath, values.key, values.name]);
+  }, [createProject, isEdit, navigate, projectId, updateProject, values]);
 
   const handleDeleteProject = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    toast.success(`"${values.name.trim()}" deleted successfully`);
-    navigate(returnPath);
-  }, [navigate, returnPath, values.name]);
+    if (!projectId) return;
+
+    try {
+      const result = await deleteProject(projectId);
+      showApiSuccessToast(result.message);
+      navigate(returnPath);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  }, [deleteProject, navigate, projectId, returnPath]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -105,7 +134,9 @@ function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FO
           {pageTitle}
         </Title>
         <Paragraph size="sm" className="mt-1 text-muted">
-          {isEdit ? "Update your project details, timeline, and team assignments." : "Set up your workspace and define your project's goals."}
+          {isEdit
+            ? "Update your project details, timeline, and squad assignments."
+            : "Create a project for your squad. Managers only see projects they belong to."}
         </Paragraph>
       </div>
 
@@ -114,7 +145,7 @@ function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FO
           <ProjectFormFields values={values} isKeyManual={isKeyManual} onChange={setValues} onKeyManualChange={setIsKeyManual} />
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {isEdit && projectId ? (
+            {showDelete && projectId ? (
               <DeleteProjectButton
                 projectName={values.name.trim() || "this project"}
                 onDelete={handleDeleteProject}

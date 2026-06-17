@@ -8,7 +8,7 @@ export type WorkspaceSettingsSectionId =
 
 export type WorkspaceSettings = {
   workspaceName: string;
-  workspaceUrl: string;
+  workspaceSlug: string;
   twoFactorEnabled: boolean;
   ssoEnabled: boolean;
   dailyDigest: boolean;
@@ -52,7 +52,7 @@ export const WORKSPACE_SETTINGS_NAV_ITEMS: { id: WorkspaceSettingsSectionId; lab
 
 export const DEFAULT_WORKSPACE_SETTINGS: WorkspaceSettings = {
   workspaceName: "Acme Workspace",
-  workspaceUrl: "flowsync.io/workspace/acme",
+  workspaceSlug: "acme",
   twoFactorEnabled: true,
   ssoEnabled: false,
   dailyDigest: true,

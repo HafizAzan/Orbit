@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import createWorkspaceTaskTableColumns from "../../../columns/workspace-task-table-columns";
 import { getTaskEditPath } from "../../../data/workspace-task-form";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
 import { toast } from "../../../lib/toast";
@@ -74,11 +75,15 @@ function matchesTaskFilters(task: WorkspaceTask, filters: TaskTableFilters) {
 type TasksTableProps = {
   data?: WorkspaceTask[];
   emptyAction?: React.ReactNode;
+  onBulkDelete?: (taskIds: string[]) => Promise<void>;
 };
 
-function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
+function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: TasksTableProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { can } = useWorkspacePermissions();
+  const canEditTask = can("task.edit");
+  const canDeleteAnyTask = can("task.delete_any");
   const [tasks, setTasks] = useState(data);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<TaskTableFilters>(DEFAULT_TASK_TABLE_FILTERS);
@@ -88,6 +93,26 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
   useEffect(() => {
     setTasks(data);
   }, [data]);
+
+  const projectFilterOptions = useMemo(() => {
+    const uniqueProjects = new Map<string, string>();
+    tasks.forEach((task) => uniqueProjects.set(task.projectId, task.project));
+
+    return [
+      { value: "all", label: "All projects" },
+      ...Array.from(uniqueProjects.entries()).map(([value, label]) => ({ value, label })),
+    ];
+  }, [tasks]);
+
+  const assigneeFilterOptions = useMemo(() => {
+    const uniqueAssignees = new Map<string, string>();
+    tasks.forEach((task) => uniqueAssignees.set(task.assignee.id, task.assignee.name));
+
+    return [
+      { value: "all", label: "All assignees" },
+      ...Array.from(uniqueAssignees.entries()).map(([value, label]) => ({ value, label })),
+    ];
+  }, [tasks]);
 
   const selectedCount = selectedRowKeys.length;
 
@@ -101,9 +126,11 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
   const columns = useMemo(
     () =>
       createWorkspaceTaskTableColumns({
-        onEdit: handleEdit,
+        onEdit: canEditTask ? handleEdit : undefined,
+        canEdit: canEditTask,
+        canDelete: canDeleteAnyTask,
       }),
-    [handleEdit],
+    [canDeleteAnyTask, canEditTask, handleEdit],
   );
   const activeFilterCount = countActiveTaskFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
@@ -144,14 +171,18 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
   };
 
   const handleBulkDelete = useCallback(async () => {
-    const deletedCount = selectedRowKeys.length;
+    const taskIds = selectedRowKeys.map(String);
 
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    if (onBulkDelete) {
+      await onBulkDelete(taskIds);
+      setSelectedRowKeys([]);
+      return;
+    }
 
     setTasks((current) => current.filter((task) => !selectedRowKeys.includes(task.id)));
     setSelectedRowKeys([]);
-    toast.success(`${deletedCount} ${pluralize(deletedCount, "task")} deleted successfully`);
-  }, [selectedRowKeys]);
+    toast.success(`${taskIds.length} ${pluralize(taskIds.length, "task")} deleted successfully`);
+  }, [onBulkDelete, selectedRowKeys]);
 
   const resultsSummary = (
     <span className="text-sm text-muted">
@@ -217,10 +248,7 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
           <Select
             value={filters.assignee}
             onChange={(value) => handleFilterChange("assignee", value)}
-            options={TASK_ASSIGNEE_FILTER_OPTIONS.map((option) => ({
-              value: option.value,
-              label: option.label,
-            }))}
+            options={assigneeFilterOptions}
             className="w-full"
           />
           <Select
@@ -235,10 +263,7 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
           <Select
             value={filters.project}
             onChange={(value) => handleFilterChange("project", value)}
-            options={TASK_PROJECT_FILTER_OPTIONS.map((option) => ({
-              value: option.value,
-              label: option.label,
-            }))}
+            options={projectFilterOptions}
             className="w-full"
           />
         </div>
@@ -273,11 +298,15 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction }: TasksTableProps) {
         rowKey="id"
         columns={columns}
         dataSource={paginatedData}
-        rowSelection={{
-          type: "checkbox",
-          selectedRowKeys,
-          onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
-        }}
+        rowSelection={
+          canDeleteAnyTask
+            ? {
+                type: "checkbox",
+                selectedRowKeys,
+                onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
+              }
+            : undefined
+        }
         scroll={{ x: 1100 }}
         pagination={false}
         wrapperClassName="border-0! rounded-none! shadow-none!"

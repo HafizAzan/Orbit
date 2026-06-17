@@ -3,22 +3,35 @@ import ProjectCard from "../../component/workspace/projects/project-card";
 import ProjectTemplateCard from "../../component/workspace/projects/project-template-card";
 import ProjectsPageHeader from "../../component/workspace/projects/projects-page-header";
 import ProjectsToolbar from "../../component/workspace/projects/projects-toolbar";
-import type { ProjectsViewMode, WorkspaceProject } from "../../data/workspace-projects";
-import { WORKSPACE_PROJECTS } from "../../data/workspace-projects";
+import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
+import { AdminListPageSkeleton } from "../../component/skeletons";
+import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
+import { useDeleteProject, useProjects } from "../../hooks/use-workspace-projects";
+import type { ProjectsViewMode } from "../../data/workspace-projects";
+import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { pluralize } from "../../lib/helper";
-import { toast } from "../../lib/toast";
 import { cn } from "../../lib/utils";
 
 function WorkspaceProjects() {
-  const [projects, setProjects] = useState<WorkspaceProject[]>(WORKSPACE_PROJECTS);
+  const { can } = useWorkspacePermissions();
+  const { data: projects = [], isLoading, isError } = useProjects();
+  const { mutateAsync: deleteProject } = useDeleteProject();
+  const canDeleteProject = can("project.delete");
+  const canCreateProject = can("project.create");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
   const [viewMode, setViewMode] = useState<ProjectsViewMode>("grid");
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
 
+  const workspaceProjects = useMemo(
+    () => projects.map(mapApiProjectToWorkspaceProject),
+    [projects],
+  );
+
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
+    return workspaceProjects.filter((project) => {
       if (statusFilter !== "all" && project.status !== statusFilter) {
         return false;
       }
@@ -33,7 +46,7 @@ function WorkspaceProjects() {
 
       return true;
     });
-  }, [priorityFilter, projects, statusFilter, teamFilter]);
+  }, [priorityFilter, workspaceProjects, statusFilter, teamFilter]);
 
   const filteredProjectIds = useMemo(
     () => filteredProjects.map((project) => project.id),
@@ -42,7 +55,7 @@ function WorkspaceProjects() {
 
   useEffect(() => {
     setSelectedProjectIds([]);
-  }, [statusFilter, priorityFilter, teamFilter]);
+  }, [statusFilter, priorityFilter, teamFilter, workspaceProjects]);
 
   const selectedCount = selectedProjectIds.length;
   const allSelected = filteredProjects.length > 0 && filteredProjectIds.every((id) => selectedProjectIds.includes(id));
@@ -66,18 +79,39 @@ function WorkspaceProjects() {
   }, []);
 
   const handleBulkDelete = useCallback(async () => {
-    const deletedCount = selectedProjectIds.length;
+    try {
+      for (const projectId of selectedProjectIds) {
+        await deleteProject(projectId);
+      }
 
-    await new Promise((resolve) => setTimeout(resolve, 400));
+      showApiSuccessToast(
+        `${selectedCount} ${pluralize(selectedCount, "project")} deleted successfully`,
+      );
+      setSelectedProjectIds([]);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  }, [deleteProject, selectedCount, selectedProjectIds]);
 
-    setProjects((current) => current.filter((project) => !selectedProjectIds.includes(project.id)));
-    setSelectedProjectIds([]);
-    toast.success(`${deletedCount} ${pluralize(deletedCount, "project")} deleted successfully`);
-  }, [selectedProjectIds]);
+  if (isLoading) {
+    return <AdminListPageSkeleton tableColumns={3} />;
+  }
+
+  if (isError) {
+    return (
+      <WorkspaceNotFound
+        title="Unable to load projects"
+        description="We could not load your projects. The server may be unavailable — please try again shortly."
+      />
+    );
+  }
 
   return (
     <div className="mx-auto max-w-8xl">
-      <ProjectsPageHeader selectedCount={selectedCount} onBulkDelete={handleBulkDelete} />
+      <ProjectsPageHeader
+        selectedCount={selectedCount}
+        onBulkDelete={canDeleteProject ? handleBulkDelete : undefined}
+      />
       <ProjectsToolbar
         statusFilter={statusFilter}
         priorityFilter={priorityFilter}
@@ -87,6 +121,7 @@ function WorkspaceProjects() {
         selectedCount={selectedCount}
         allSelected={allSelected}
         indeterminate={indeterminate}
+        canSelect={canDeleteProject}
         onStatusChange={setStatusFilter}
         onPriorityChange={setPriorityFilter}
         onTeamChange={setTeamFilter}
@@ -106,11 +141,12 @@ function WorkspaceProjects() {
             key={project.id}
             project={project}
             viewMode={viewMode}
+            selectable={canDeleteProject}
             selected={selectedProjectIds.includes(project.id)}
             onSelectedChange={(selected) => handleProjectSelectedChange(project.id, selected)}
           />
         ))}
-        {viewMode === "grid" ? <ProjectTemplateCard /> : null}
+        {viewMode === "grid" && canCreateProject ? <ProjectTemplateCard /> : null}
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import ProjectTeamAvatars from "./project-team-avatars";
 type ProjectCardProps = {
   project: WorkspaceProject;
   viewMode?: "grid" | "list";
+  selectable?: boolean;
   selected?: boolean;
   onSelectedChange?: (selected: boolean) => void;
 };
@@ -61,13 +62,17 @@ function ProjectStats({ taskCount, commentCount, className }: { taskCount: numbe
 
 type ProjectCardShellProps = {
   project: WorkspaceProject;
+  selectable: boolean;
   selected: boolean;
   onSelectedChange?: (selected: boolean) => void;
   viewMode: "grid" | "list";
   children: React.ReactNode;
 };
 
-function ProjectCardShell({ project, selected, onSelectedChange, viewMode, children }: ProjectCardShellProps) {
+function ProjectCardShell({ project, selectable, selected, onSelectedChange, viewMode, children }: ProjectCardShellProps) {
+  const contentPadding =
+    viewMode === "grid" ? (selectable ? "p-5 pt-5 pl-12" : "p-5") : selectable ? "p-4 pt-4 pl-12 sm:p-5 sm:pt-5 sm:pl-12" : "p-4 sm:p-5";
+
   return (
     <article
       className={cn(
@@ -75,25 +80,24 @@ function ProjectCardShell({ project, selected, onSelectedChange, viewMode, child
         selected ? "border-primary bg-feature-sync/40 ring-2 ring-primary/15" : "border-border hover:shadow-md",
       )}
     >
-      <div
-        className={cn(
-          "absolute top-4 left-4 z-10",
-          viewMode === "list" && "lg:top-1/2 lg:-translate-y-1/2",
-        )}
-      >
-        <Checkbox
-          checked={selected}
-          aria-label={`Select ${project.title}`}
-          className="rounded-md bg-card/95 p-0.5 shadow-sm"
-          onChange={(event) => onSelectedChange?.(event.target.checked)}
-          onClick={(event) => event.stopPropagation()}
-        />
-      </div>
+      {selectable ? (
+        <div
+          className={cn(
+            "absolute top-4 left-4 z-10",
+            viewMode === "list" && "lg:top-1/2 lg:-translate-y-1/2",
+          )}
+        >
+          <Checkbox
+            checked={selected}
+            aria-label={`Select ${project.title}`}
+            className="rounded-md bg-card/95 p-0.5 shadow-sm"
+            onChange={(event) => onSelectedChange?.(event.target.checked)}
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      ) : null}
 
-      <WorkspaceNavLink
-        to={getProjectDetailPath(project.id)}
-        className={cn("block text-inherit no-underline", viewMode === "grid" ? "p-5 pt-5 pl-12" : "p-4 pt-4 pl-12 sm:p-5 sm:pt-5 sm:pl-12")}
-      >
+      <WorkspaceNavLink to={getProjectDetailPath(project.id)} className={cn("block text-inherit no-underline", contentPadding)}>
         {children}
       </WorkspaceNavLink>
     </article>
@@ -102,10 +106,12 @@ function ProjectCardShell({ project, selected, onSelectedChange, viewMode, child
 
 function ProjectCardGrid({
   project,
+  selectable,
   selected,
   onSelectedChange,
 }: {
   project: WorkspaceProject;
+  selectable: boolean;
   selected: boolean;
   onSelectedChange?: (selected: boolean) => void;
 }) {
@@ -113,7 +119,7 @@ function ProjectCardGrid({
   const statusConfig = PROJECT_STATUS_CONFIG[project.status];
 
   return (
-    <ProjectCardShell project={project} selected={selected} onSelectedChange={onSelectedChange} viewMode="grid">
+    <ProjectCardShell project={project} selectable={selectable} selected={selected} onSelectedChange={onSelectedChange} viewMode="grid">
       <div className="flex flex-col">
         <div className="flex items-start justify-between gap-3">
           <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", project.iconBg, project.iconColor)}>
@@ -156,10 +162,12 @@ function ProjectCardGrid({
 
 function ProjectCardList({
   project,
+  selectable,
   selected,
   onSelectedChange,
 }: {
   project: WorkspaceProject;
+  selectable: boolean;
   selected: boolean;
   onSelectedChange?: (selected: boolean) => void;
 }) {
@@ -167,7 +175,7 @@ function ProjectCardList({
   const statusConfig = PROJECT_STATUS_CONFIG[project.status];
 
   return (
-    <ProjectCardShell project={project} selected={selected} onSelectedChange={onSelectedChange} viewMode="list">
+    <ProjectCardShell project={project} selectable={selectable} selected={selected} onSelectedChange={onSelectedChange} viewMode="list">
       <div className="lg:grid lg:grid-cols-[minmax(0,1.8fr)_148px_104px_132px_108px] lg:items-center lg:gap-x-5 xl:gap-x-6">
         <div className="flex min-w-0 items-start gap-4">
           <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", project.iconBg, project.iconColor)}>
@@ -216,16 +224,29 @@ function ProjectCardList({
 function ProjectCard({
   project,
   viewMode = "grid",
+  selectable = false,
   selected = false,
   onSelectedChange,
 }: ProjectCardProps) {
   if (viewMode === "list") {
     return (
-      <ProjectCardList project={project} selected={selected} onSelectedChange={onSelectedChange} />
+      <ProjectCardList
+        project={project}
+        selectable={selectable}
+        selected={selected}
+        onSelectedChange={onSelectedChange}
+      />
     );
   }
 
-  return <ProjectCardGrid project={project} selected={selected} onSelectedChange={onSelectedChange} />;
+  return (
+    <ProjectCardGrid
+      project={project}
+      selectable={selectable}
+      selected={selected}
+      onSelectedChange={onSelectedChange}
+    />
+  );
 }
 
 export default React.memo(ProjectCard);

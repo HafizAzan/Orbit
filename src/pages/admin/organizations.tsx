@@ -48,6 +48,24 @@ function AdminOrganizations() {
     [deleteOrganization],
   );
 
+  const handleBulkDelete = useCallback(
+    async (records: OrganizationRecord[]) => {
+      try {
+        for (const record of records) {
+          await deleteOrganization(record.id);
+        }
+
+        showApiSuccessToast(
+          `${records.length} ${records.length === 1 ? "organization" : "organizations"} deleted successfully.`,
+        );
+      } catch (error) {
+        showApiErrorToast(error);
+        throw error;
+      }
+    },
+    [deleteOrganization],
+  );
+
   const createButton = (
     <Button type="primary" icon={<PlusOutlined />} size="large" className="font-semibold!" onClick={handleOpenCreate}>
       Create Organization
@@ -79,7 +97,13 @@ function AdminOrganizations() {
         ))}
       </div>
 
-      <OrganizationsTable data={organizations} emptyAction={createButton} onEdit={handleOpenEdit} onDelete={handleDelete} />
+      <OrganizationsTable
+        data={organizations}
+        emptyAction={createButton}
+        onEdit={handleOpenEdit}
+        onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
+      />
 
       <OrganizationCreateModal open={formModalOpen} record={editingOrganization} onClose={handleCloseFormModal} />
     </div>

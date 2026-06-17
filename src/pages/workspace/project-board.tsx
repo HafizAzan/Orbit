@@ -1,16 +1,33 @@
-import React from "react";
-import { Navigate, useParams } from "react-router-dom";
+import React, { useMemo } from "react";
+import { useParams } from "react-router-dom";
 import KanbanBoardHeader from "../../component/workspace/boards/kanban-board-header";
 import KanbanColumn from "../../component/workspace/boards/kanban-column";
-import { getProjectKanbanBoard } from "../../data/workspace-board";
-import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
+import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
+import { AdminListPageSkeleton } from "../../component/skeletons";
+import { useBoard } from "../../hooks/use-workspace-tasks";
+import { mapApiBoardToKanbanBoard } from "../../types/task.types";
 
 function WorkspaceProjectBoard() {
   const { projectId = "" } = useParams();
-  const board = getProjectKanbanBoard(projectId);
+  const { data, isLoading, isError } = useBoard(projectId);
 
-  if (!board) {
-    return <Navigate to={WORKSPACE_ROUTES.PROJECTS} replace />;
+  const board = useMemo(() => (data ? mapApiBoardToKanbanBoard(data) : null), [data]);
+
+  if (isLoading) {
+    return <AdminListPageSkeleton tableColumns={4} />;
+  }
+
+  if (isError || !board) {
+    return (
+      <WorkspaceNotFound
+        title={isError ? "Unable to load board" : "Board not found"}
+        description={
+          isError
+            ? "We could not load this project board. The server may be unavailable or you may not have access."
+            : "This board does not exist or you do not have access to it."
+        }
+      />
+    );
   }
 
   return (

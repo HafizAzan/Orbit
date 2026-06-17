@@ -1,5 +1,6 @@
 import { ADMIN_ROUTES } from "../router/admin-routes";
 import { WORKSPACE_ROUTES } from "../router/workspace-routes";
+import { getWorkspaceHomePath } from "./workspace-routing";
 import type { AuthUser } from "../types/auth.types";
 
 export function isPlatformAdminUser(user: AuthUser) {
@@ -25,7 +26,7 @@ export function getPostAuthRedirectPath(user: AuthUser) {
     return PLAN_ROUTES.CHOOSE_PLAN;
   }
 
-  return WORKSPACE_ROUTES.DASHBOARD;
+  return getWorkspaceHomePath(user.role);
 }
 
 export function getAuthenticatedHeaderAction(user: AuthUser) {
@@ -33,6 +34,13 @@ export function getAuthenticatedHeaderAction(user: AuthUser) {
     return {
       label: "Dashboard",
       path: ADMIN_ROUTES.DASHBOARD,
+    };
+  }
+
+  if (user.role === "member") {
+    return {
+      label: "My Tasks",
+      path: WORKSPACE_ROUTES.MY_TASKS,
     };
   }
 

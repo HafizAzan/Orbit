@@ -3,9 +3,11 @@ import { Button } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
 import type { WorkspaceKanbanBoard } from "../../../data/workspace-board";
-import { getProjectDetailPath } from "../../../data/workspace-project-detail";
-import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
+import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
+import { getTaskCreatePath } from "../../../data/workspace-task-form";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { useWorkspaceReturnTo } from "../../../lib/workspace-navigation";
+import { getWorkspaceHomePath } from "../../../lib/workspace-routing";
 import WorkspaceBackLink from "../common/workspace-back-link";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import ProjectTeamAvatars from "../projects/project-team-avatars";
@@ -17,13 +19,17 @@ type KanbanBoardHeaderProps = {
 };
 
 function KanbanBoardHeader({ board }: KanbanBoardHeaderProps) {
-  const { returnPath, returnLabel } = useWorkspaceReturnTo(WORKSPACE_ROUTES.PROJECTS, "Projects");
+  const { can, role } = useWorkspacePermissions();
+  const canCreateTask = can("task.create");
+  const memberHomePath = getWorkspaceHomePath(role);
+  const { returnPath, returnLabel } = useWorkspaceReturnTo(memberHomePath, role === "member" ? "My Tasks" : "Projects");
+  const projectLink = role === "member" ? getProjectBoardPath(board.projectId) : getProjectDetailPath(board.projectId);
 
   return (
     <div className="mb-6">
       <WorkspaceBackLink
-        fallbackPath={WORKSPACE_ROUTES.PROJECTS}
-        fallbackLabel="Projects"
+        fallbackPath={memberHomePath}
+        fallbackLabel={role === "member" ? "My Tasks" : "Projects"}
         className="text-sm font-medium text-primary transition-opacity hover:opacity-80"
       />
 
@@ -32,7 +38,7 @@ function KanbanBoardHeader({ board }: KanbanBoardHeaderProps) {
           {returnLabel}
         </Link>
         <span className="mx-2 text-slate-300">›</span>
-        <WorkspaceNavLink to={getProjectDetailPath(board.projectId)} preserveReturn className="font-medium transition-colors hover:text-primary">
+        <WorkspaceNavLink to={projectLink} preserveReturn className="font-medium transition-colors hover:text-primary">
           {board.projectName}
         </WorkspaceNavLink>
         <span className="mx-2 text-slate-300">›</span>
@@ -54,9 +60,13 @@ function KanbanBoardHeader({ board }: KanbanBoardHeaderProps) {
           <Button icon={<ShareAltOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
             Share
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
-            Create Task
-          </Button>
+          {canCreateTask ? (
+            <WorkspaceNavLink to={getTaskCreatePath(board.projectId)} preserveReturn>
+              <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
+                Create Task
+              </Button>
+            </WorkspaceNavLink>
+          ) : null}
         </div>
       </div>
 

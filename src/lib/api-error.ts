@@ -59,10 +59,22 @@ export function parseApiError(data: unknown): ApiRequestError {
   return apiError;
 }
 
+function isAxiosLikeError(data: unknown): data is { isAxiosError: true } {
+  return Boolean(data && typeof data === "object" && "isAxiosError" in data && (data as { isAxiosError?: boolean }).isAxiosError);
+}
+
 export function assertApiSuccess<T>(data: unknown): T {
+  if (data == null || typeof data !== "object") {
+    throw new ApiRequestError("Unable to reach the server. Please try again.");
+  }
+
+  if (isAxiosLikeError(data)) {
+    throw new ApiRequestError("Unable to reach the server. Please try again.");
+  }
+
   const error = data as ApiErrorBody;
 
-  if (error?.statusCode && error.statusCode >= 400) {
+  if (error.statusCode && error.statusCode >= 400) {
     throw parseApiError(data);
   }
 

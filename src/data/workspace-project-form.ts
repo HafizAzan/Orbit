@@ -69,7 +69,7 @@ export const DEFAULT_PROJECT_FORM_VALUES: ProjectFormValues = {
   startDate: "",
   dueDate: "",
   visibility: "private",
-  memberIds: ["m1", "m2"],
+  memberIds: [],
 };
 
 const TEAM_ID_TO_CATEGORY: Record<string, ProjectCategory> = {

@@ -8,20 +8,19 @@ import {
 import { Button, Checkbox, Form, Input, Select } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  createInvitedTeamMember,
   findTeamMemberByEmail,
   TEAM_DEPARTMENT_OPTIONS,
   TEAM_INVITE_ROLE_OPTIONS,
-  TEAM_MEMBERS,
   TEAM_ROLE_PERMISSIONS,
-  TEAM_SUMMARY_STATS,
   type TeamInvitePayload,
   type TeamInviteRole,
   type TeamMember,
   type TeamMemberDepartment,
 } from "../../../data/workspace-teams";
+import { useInviteTeamMember, useTeamStats } from "../../../hooks/use-workspace-team";
+import { mapTeamInvitePayloadToRequest } from "../../../types/team.types";
 import { normalizeEmail } from "../../../lib/helper";
-import { toast } from "../../../lib/toast";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 import Modal from "../../ui/modal";
 import { Label, Paragraph, Text, Title } from "../../ui/typography";
@@ -30,7 +29,6 @@ type InviteMemberModalProps = {
   open: boolean;
   onClose: () => void;
   members?: TeamMember[];
-  onInvited?: (member: TeamMember) => void;
 };
 
 type InviteMemberFormValues = {
@@ -53,10 +51,15 @@ const DEFAULT_FORM_VALUES: InviteMemberFormValues = {
   sendWelcomeEmail: true,
 };
 
-function SeatUsageBanner() {
-  const { totalSeats } = TEAM_SUMMARY_STATS;
-  const remainingSeats = totalSeats.total - totalSeats.used;
-  const seatUsagePercent = Math.round((totalSeats.used / totalSeats.total) * 100);
+function SeatUsageBanner({
+  used,
+  total,
+}: {
+  used: number;
+  total: number;
+}) {
+  const remainingSeats = total - used;
+  const seatUsagePercent = total > 0 ? Math.round((used / total) * 100) : 0;
   const isFull = remainingSeats <= 0;
 
   return (
@@ -72,7 +75,7 @@ function SeatUsageBanner() {
             {isFull ? "No seats available" : `${remainingSeats} seat${remainingSeats === 1 ? "" : "s"} remaining`}
           </Text>
           <Paragraph size="xs" className="mt-1 mb-0! text-muted">
-            {totalSeats.used} of {totalSeats.total} seats used in your workspace.
+            {used} of {total} seats used in your workspace.
           </Paragraph>
         </div>
         <span
@@ -121,7 +124,7 @@ function InviteSuccessContent({ email, role }: { email: string; role: TeamInvite
         </p>
         <ul className="mt-2 space-y-1.5 text-sm text-muted">
           <li>They receive a secure invite link valid for 7 days.</li>
-          <li>Once accepted, they appear in your team list as Invited.</li>
+          <li>Once accepted, they appear in your team list as Active.</li>
           <li>You can resend or revoke the invite anytime.</li>
         </ul>
       </div>
@@ -129,9 +132,10 @@ function InviteSuccessContent({ email, role }: { email: string; role: TeamInvite
   );
 }
 
-function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }: InviteMemberModalProps) {
+function InviteMemberModal({ open, onClose, members = [] }: InviteMemberModalProps) {
   const [form] = Form.useForm<InviteMemberFormValues>();
-  const [submitting, setSubmitting] = useState(false);
+  const { data: stats } = useTeamStats();
+  const { mutateAsync: inviteMember, isPending } = useInviteTeamMember();
   const [step, setStep] = useState<InviteModalStep>("form");
   const [invitedEmail, setInvitedEmail] = useState("");
   const [invitedRole, setInvitedRole] = useState<TeamInviteRole>(DEFAULT_FORM_VALUES.role);
@@ -139,7 +143,8 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
   const selectedRole = Form.useWatch("role", form) ?? DEFAULT_FORM_VALUES.role;
   const permissions = TEAM_ROLE_PERMISSIONS[selectedRole];
 
-  const remainingSeats = TEAM_SUMMARY_STATS.totalSeats.total - TEAM_SUMMARY_STATS.totalSeats.used;
+  const totalSeats = stats?.totalSeats ?? { used: 0, total: 0 };
+  const remainingSeats = totalSeats.total - totalSeats.used;
   const seatsAvailable = remainingSeats > 0;
 
   const memberEmails = useMemo(
@@ -150,7 +155,6 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
   useEffect(() => {
     if (!open) {
       form.resetFields();
-      setSubmitting(false);
       setStep("form");
       setInvitedEmail("");
       setInvitedRole(DEFAULT_FORM_VALUES.role);
@@ -187,7 +191,7 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
 
   const handleFinish = async (values: InviteMemberFormValues) => {
     if (!seatsAvailable) {
-      toast.error("No seats available. Upgrade your plan or free up a seat first.");
+      showApiErrorToast(new Error("No seats available. Upgrade your plan or free up a seat first."));
       return;
     }
 
@@ -195,8 +199,6 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
     if (memberEmails.has(normalizedEmail)) {
       return;
     }
-
-    setSubmitting(true);
 
     const payload: TeamInvitePayload = {
       email: normalizedEmail,
@@ -208,14 +210,13 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
     };
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 650));
-      onInvited?.(createInvitedTeamMember(payload));
+      await inviteMember(mapTeamInvitePayloadToRequest(payload));
       setInvitedEmail(normalizedEmail);
       setInvitedRole(values.role);
       setStep("success");
-      toast.success(`Invitation sent to ${normalizedEmail}`);
-    } finally {
-      setSubmitting(false);
+      showApiSuccessToast(`Invitation sent to ${normalizedEmail}`);
+    } catch (error) {
+      showApiErrorToast(error);
     }
   };
 
@@ -232,8 +233,8 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
       open={open}
       onCancel={onClose}
       footer={null}
-      closable={!submitting}
-      maskClosable={!submitting && step === "form"}
+      closable={!isPending}
+      maskClosable={!isPending && step === "form"}
       width={step === "success" ? 460 : 540}
       classNames={{
         container: "rounded-2xl! overflow-hidden! p-0! shadow-xl!",
@@ -266,147 +267,147 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
         <div className={MODAL_SHELL_CLASS}>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             <div className="px-6 pt-6 pb-5">
-            <div className="flex items-start gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-feature-sync text-primary">
-                <UserAddOutlined className="text-lg" />
-              </span>
-              <div className="min-w-0">
-                <Title level={4} className="mb-0! text-foreground">
-                  Invite Team Member
-                </Title>
-                <Paragraph size="sm" className="mt-1 mb-0! text-muted">
-                  Send a secure invite link and assign a role before they join your workspace.
-                </Paragraph>
-              </div>
-            </div>
-
-            <div className="mt-5">
-              <SeatUsageBanner />
-            </div>
-
-            <Form
-              form={form}
-              layout="vertical"
-              requiredMark={false}
-              initialValues={DEFAULT_FORM_VALUES}
-              className="mt-5 space-y-4 [&_.ant-form-item]:mb-0!"
-              onFinish={handleFinish}
-            >
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Form.Item
-                  name="email"
-                  label={<Label>Email Address</Label>}
-                  className="sm:col-span-2"
-                  rules={[
-                    { required: true, message: "Please enter an email address" },
-                    { type: "email", message: "Please enter a valid email address" },
-                    { validator: validateEmailAvailability },
-                  ]}
-                >
-                  <Input
-                    size="large"
-                    prefix={<MailOutlined className="text-muted" />}
-                    placeholder="e.g. alex@example.com"
-                    autoComplete="email"
-                    className="rounded-xl! border-border! bg-card!"
-                  />
-                </Form.Item>
-
-                <Form.Item name="name" label={<Label>Full Name</Label>} extra="Optional — helps personalize the invite email.">
-                  <Input
-                    size="large"
-                    placeholder="e.g. Alex Johnson"
-                    autoComplete="name"
-                    className="rounded-xl! border-border! bg-card!"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="department"
-                  label={<Label>Department</Label>}
-                  rules={[{ required: true, message: "Please select a department" }]}
-                >
-                  <Select
-                    size="large"
-                    options={TEAM_DEPARTMENT_OPTIONS}
-                    placeholder="Select department"
-                    className="w-full"
-                  />
-                </Form.Item>
+              <div className="flex items-start gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-feature-sync text-primary">
+                  <UserAddOutlined className="text-lg" />
+                </span>
+                <div className="min-w-0">
+                  <Title level={4} className="mb-0! text-foreground">
+                    Invite Team Member
+                  </Title>
+                  <Paragraph size="sm" className="mt-1 mb-0! text-muted">
+                    Send a secure invite link and assign a role before they join your workspace.
+                  </Paragraph>
+                </div>
               </div>
 
-              <div>
-                <Label className="mb-2 block">Role</Label>
-                <Form.Item name="role" rules={[{ required: true, message: "Please select a role" }]}>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    {TEAM_INVITE_ROLE_OPTIONS.map((option) => {
-                      const isSelected = selectedRole === option.value;
-                      const roleInfo = TEAM_ROLE_PERMISSIONS[option.value];
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => form.setFieldValue("role", option.value)}
-                          className={cn(
-                            "flex flex-col items-start gap-2 rounded-xl border px-3.5 py-3 text-left transition-all",
-                            isSelected
-                              ? "border-primary bg-feature-sync shadow-sm"
-                              : "border-border bg-card hover:border-primary/25",
-                          )}
-                        >
-                          <span className="flex w-full items-center gap-2">
-                            <span
-                              className={cn(
-                                "inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wide",
-                                roleInfo.accent,
-                              )}
-                            >
-                              {roleInfo.title}
-                            </span>
-                            {isSelected ? <CheckOutlined className="ml-auto text-xs text-primary" /> : null}
-                          </span>
-                          <span className="text-xs leading-relaxed text-muted">{roleInfo.description}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </Form.Item>
+              <div className="mt-5">
+                <SeatUsageBanner used={totalSeats.used} total={totalSeats.total} />
               </div>
 
-              <div className="rounded-2xl border border-primary/15 bg-feature-sync/60 p-4">
-                <p className="flex items-center gap-2 text-sm font-semibold text-primary">
-                  <InfoCircleOutlined />
-                  {permissions.title} permissions
-                </p>
-                <ul className="mt-3 space-y-2">
-                  {permissions.bullets.map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-2 text-sm text-muted">
-                      <CheckOutlined className="mt-0.5 shrink-0 text-xs text-primary" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <Form.Item
-                name="message"
-                label={<Label>Personal Message</Label>}
-                extra="Optional note included in the invitation email."
+              <Form
+                form={form}
+                layout="vertical"
+                requiredMark={false}
+                initialValues={DEFAULT_FORM_VALUES}
+                className="mt-5 space-y-4 [&_.ant-form-item]:mb-0!"
+                onFinish={handleFinish}
               >
-                <Input.TextArea
-                  rows={3}
-                  maxLength={280}
-                  showCount
-                  placeholder="Welcome to the team! Looking forward to working with you."
-                  className="rounded-xl! border-border! bg-card!"
-                />
-              </Form.Item>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Form.Item
+                    name="email"
+                    label={<Label>Email Address</Label>}
+                    className="sm:col-span-2"
+                    rules={[
+                      { required: true, message: "Please enter an email address" },
+                      { type: "email", message: "Please enter a valid email address" },
+                      { validator: validateEmailAvailability },
+                    ]}
+                  >
+                    <Input
+                      size="large"
+                      prefix={<MailOutlined className="text-muted" />}
+                      placeholder="e.g. alex@example.com"
+                      autoComplete="email"
+                      className="rounded-xl! border-border! bg-card!"
+                    />
+                  </Form.Item>
 
-              <Form.Item name="sendWelcomeEmail" valuePropName="checked" className="mb-0!">
-                <Checkbox className="text-sm text-muted">Send welcome email with workspace overview</Checkbox>
-              </Form.Item>
-            </Form>
+                  <Form.Item name="name" label={<Label>Full Name</Label>} extra="Optional — helps personalize the invite email.">
+                    <Input
+                      size="large"
+                      placeholder="e.g. Alex Johnson"
+                      autoComplete="name"
+                      className="rounded-xl! border-border! bg-card!"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="department"
+                    label={<Label>Department</Label>}
+                    rules={[{ required: true, message: "Please select a department" }]}
+                  >
+                    <Select
+                      size="large"
+                      options={TEAM_DEPARTMENT_OPTIONS}
+                      placeholder="Select department"
+                      className="w-full"
+                    />
+                  </Form.Item>
+                </div>
+
+                <div>
+                  <Label className="mb-2 block">Role</Label>
+                  <Form.Item name="role" rules={[{ required: true, message: "Please select a role" }]}>
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                      {TEAM_INVITE_ROLE_OPTIONS.map((option) => {
+                        const isSelected = selectedRole === option.value;
+                        const roleInfo = TEAM_ROLE_PERMISSIONS[option.value];
+
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => form.setFieldValue("role", option.value)}
+                            className={cn(
+                              "flex flex-col items-start gap-2 rounded-xl border px-3.5 py-3 text-left transition-all",
+                              isSelected
+                                ? "border-primary bg-feature-sync shadow-sm"
+                                : "border-border bg-card hover:border-primary/25",
+                            )}
+                          >
+                            <span className="flex w-full items-center gap-2">
+                              <span
+                                className={cn(
+                                  "inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wide",
+                                  roleInfo.accent,
+                                )}
+                              >
+                                {roleInfo.title}
+                              </span>
+                              {isSelected ? <CheckOutlined className="ml-auto text-xs text-primary" /> : null}
+                            </span>
+                            <span className="text-xs leading-relaxed text-muted">{roleInfo.description}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Form.Item>
+                </div>
+
+                <div className="rounded-2xl border border-primary/15 bg-feature-sync/60 p-4">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-primary">
+                    <InfoCircleOutlined />
+                    {permissions.title} permissions
+                  </p>
+                  <ul className="mt-3 space-y-2">
+                    {permissions.bullets.map((bullet) => (
+                      <li key={bullet} className="flex items-start gap-2 text-sm text-muted">
+                        <CheckOutlined className="mt-0.5 shrink-0 text-xs text-primary" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Form.Item
+                  name="message"
+                  label={<Label>Personal Message</Label>}
+                  extra="Optional note included in the invitation email."
+                >
+                  <Input.TextArea
+                    rows={3}
+                    maxLength={280}
+                    showCount
+                    placeholder="Welcome to the team! Looking forward to working with you."
+                    className="rounded-xl! border-border! bg-card!"
+                  />
+                </Form.Item>
+
+                <Form.Item name="sendWelcomeEmail" valuePropName="checked" className="mb-0!">
+                  <Checkbox className="text-sm text-muted">Send welcome email with workspace overview</Checkbox>
+                </Form.Item>
+              </Form>
             </div>
           </div>
 
@@ -414,7 +415,7 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
             <Button
               size="large"
               onClick={onClose}
-              disabled={submitting}
+              disabled={isPending}
               className="h-11! rounded-xl! font-medium! sm:min-w-30"
             >
               Cancel
@@ -422,7 +423,7 @@ function InviteMemberModal({ open, onClose, members = TEAM_MEMBERS, onInvited }:
             <Button
               type="primary"
               size="large"
-              loading={submitting}
+              loading={isPending}
               disabled={!seatsAvailable}
               onClick={() => form.submit()}
               className="h-11! rounded-xl! font-semibold! sm:min-w-40"

@@ -10,6 +10,7 @@ const UN_AUTH_ROUTES: Record<string, string> = {
   HOME: "/",
   LOGIN: "/login",
   REGISTER: "/register",
+  ACCEPT_INVITE: "/accept-invite",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
   VERIFY_EMAIL: "/verify-email",
@@ -21,7 +22,7 @@ const UN_AUTH_ROUTES: Record<string, string> = {
   PRIVACY: "/privacy-policy",
 };
 
-const AUTH_ROUTE_KEYS = ["LOGIN", "REGISTER", "FORGOT_PASSWORD", "VERIFY_EMAIL", "VERIFY_OTP", "RESET_PASSWORD"] as const;
+const AUTH_ROUTE_KEYS = ["LOGIN", "REGISTER", "ACCEPT_INVITE", "FORGOT_PASSWORD", "VERIFY_EMAIL", "VERIFY_OTP", "RESET_PASSWORD"] as const;
 
 function resolvePageImport(key: string) {
   const routePath = UN_AUTH_ROUTES[key];

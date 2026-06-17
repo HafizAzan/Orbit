@@ -2,10 +2,10 @@ import { BulbOutlined } from "@ant-design/icons";
 import { Avatar } from "antd";
 import React, { useMemo } from "react";
 import {
-  ASSIGNABLE_PROJECT_MEMBERS,
   PROJECT_PRIORITY_OPTIONS,
   type ProjectFormValues,
 } from "../../../../data/workspace-project-form";
+import { useAssignableProjectMembers } from "../../../../hooks/use-workspace-projects";
 import { formatDate } from "../../../../lib/helper";
 import ProjectTeamAvatars from "../project-team-avatars";
 
@@ -15,9 +15,10 @@ type ProjectFormPreviewProps = {
 };
 
 function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
+  const { data: assignableMembers = [] } = useAssignableProjectMembers();
   const selectedMembers = useMemo(
-    () => ASSIGNABLE_PROJECT_MEMBERS.filter((member) => values.memberIds.includes(member.id)),
-    [values.memberIds],
+    () => assignableMembers.filter((member) => values.memberIds.includes(member.id)),
+    [assignableMembers, values.memberIds],
   );
 
   const priorityLabel = PROJECT_PRIORITY_OPTIONS.find((option) => option.value === values.priority)?.label ?? "Medium";

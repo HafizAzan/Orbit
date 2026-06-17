@@ -32,6 +32,11 @@ function useWorkspaceSettings({
   const changeCount = useMemo(() => countObjectChanges(settings, savedSettings), [settings, savedSettings]);
 
   useEffect(() => {
+    setSavedSettings(initialSettings);
+    setSettings(initialSettings);
+  }, [initialSettings]);
+
+  useEffect(() => {
     if (!isValidWorkspaceSettingsTab(tabParam)) {
       setSearchParams({ tab: getWorkspaceSettingsTabSlug(DEFAULT_WORKSPACE_SETTINGS_TAB) }, { replace: true });
     }
@@ -67,7 +72,10 @@ function useWorkspaceSettings({
       }
 
       setSavedSettings(settings);
-      toast.success("Workspace settings saved successfully");
+
+      if (!onSave) {
+        toast.success("Workspace settings saved successfully");
+      }
     } finally {
       setSaving(false);
     }

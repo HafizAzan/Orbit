@@ -34,6 +34,7 @@ type ProjectsToolbarProps = {
   onTeamChange: (value: string) => void;
   onViewModeChange: (mode: ProjectsViewMode) => void;
   onSelectAllChange: (checked: boolean) => void;
+  canSelect?: boolean;
 };
 
 function ProjectsToolbar({
@@ -50,34 +51,37 @@ function ProjectsToolbar({
   onTeamChange,
   onViewModeChange,
   onSelectAllChange,
+  canSelect = false,
 }: ProjectsToolbarProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-3">
-        <label
-          className={cn(
-            TOOLBAR_CONTROL_CLASS,
-            "inline-flex min-w-[132px] cursor-pointer items-center gap-2.5 px-3",
-            totalProjects === 0 && "cursor-not-allowed opacity-50",
-          )}
-        >
-          <Checkbox
-            checked={allSelected}
-            indeterminate={indeterminate}
-            disabled={totalProjects === 0}
-            onChange={(event) => onSelectAllChange(event.target.checked)}
-            className="m-0! leading-none [&_.ant-checkbox]:top-0"
-          />
-          <span className="text-sm font-medium whitespace-nowrap text-foreground">
-            Select all
-            {selectedCount > 0 ? (
-              <span className="text-muted">
-                {" "}
-                ({selectedCount}/{totalProjects})
-              </span>
-            ) : null}
-          </span>
-        </label>
+        {canSelect ? (
+          <label
+            className={cn(
+              TOOLBAR_CONTROL_CLASS,
+              "inline-flex min-w-[132px] cursor-pointer items-center gap-2.5 px-3",
+              totalProjects === 0 && "cursor-not-allowed opacity-50",
+            )}
+          >
+            <Checkbox
+              checked={allSelected}
+              indeterminate={indeterminate}
+              disabled={totalProjects === 0}
+              onChange={(event) => onSelectAllChange(event.target.checked)}
+              className="m-0! leading-none [&_.ant-checkbox]:top-0"
+            />
+            <span className="text-sm font-medium whitespace-nowrap text-foreground">
+              Select all
+              {selectedCount > 0 ? (
+                <span className="text-muted">
+                  {" "}
+                  ({selectedCount}/{totalProjects})
+                </span>
+              ) : null}
+            </span>
+          </label>
+        ) : null}
 
         <Select
           value={statusFilter}

@@ -4,16 +4,21 @@ import React, { useCallback, useMemo, useState } from "react";
 import InviteMemberModal from "../../component/workspace/teams/invite-member-modal";
 import TeamSummaryCards from "../../component/workspace/teams/team-summary-cards";
 import TeamsTable from "../../component/workspace/teams/teams-table";
+import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
+import { AdminListPageSkeleton } from "../../component/skeletons";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
-import { TEAM_MEMBERS, type TeamMember } from "../../data/workspace-teams";
+import { useTeamMembers } from "../../hooks/use-workspace-team";
+import { mapApiTeamMemberToTeamMember } from "../../types/team.types";
 import { Paragraph, Title } from "../../component/ui/typography";
 
 function WorkspaceTeamsContent() {
   const { can } = useWorkspacePermissions();
-  const [members, setMembers] = useState<TeamMember[]>(TEAM_MEMBERS);
+  const { data: members = [], isLoading, isError } = useTeamMembers();
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const canInvite = can("team.invite");
+
+  const teamMembers = useMemo(() => members.map(mapApiTeamMemberToTeamMember), [members]);
 
   const openInviteModal = useCallback(() => {
     setInviteModalOpen(true);
@@ -23,25 +28,28 @@ function WorkspaceTeamsContent() {
     setInviteModalOpen(false);
   }, []);
 
-  const handleMemberInvited = useCallback((member: TeamMember) => {
-    setMembers((current) => [member, ...current]);
-  }, []);
-
   const inviteButton = useMemo(
     () =>
       canInvite ? (
-        <Button
-          type="primary"
-          icon={<UserAddOutlined />}
-          size="large"
-          className="font-semibold!"
-          onClick={openInviteModal}
-        >
+        <Button type="primary" icon={<UserAddOutlined />} size="large" className="font-semibold!" onClick={openInviteModal}>
           Invite Member
         </Button>
       ) : null,
     [canInvite, openInviteModal],
   );
+
+  if (isLoading) {
+    return <AdminListPageSkeleton tableColumns={7} />;
+  }
+
+  if (isError) {
+    return (
+      <WorkspaceNotFound
+        title="Unable to load team"
+        description="We could not load your team. The server may be unavailable — please try again shortly."
+      />
+    );
+  }
 
   return (
     <div className="mx-auto max-w-8xl">
@@ -51,24 +59,19 @@ function WorkspaceTeamsContent() {
             Team Management
           </Title>
           <Paragraph size="sm" className="mt-1 text-muted">
-            Manage your workspace members, assign roles, and monitor team activity.
+            View your project squad. Managers only see people from their own projects.
           </Paragraph>
         </div>
 
         {inviteButton}
       </div>
 
-      <TeamsTable data={members} emptyAction={inviteButton} />
+      <TeamsTable data={teamMembers} emptyAction={inviteButton} />
 
       <TeamSummaryCards />
 
       {canInvite ? (
-        <InviteMemberModal
-          open={inviteModalOpen}
-          onClose={closeInviteModal}
-          members={members}
-          onInvited={handleMemberInvited}
-        />
+        <InviteMemberModal open={inviteModalOpen} onClose={closeInviteModal} members={teamMembers} />
       ) : null}
     </div>
   );
