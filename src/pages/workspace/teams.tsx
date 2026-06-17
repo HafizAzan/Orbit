@@ -4,12 +4,16 @@ import React, { useCallback, useMemo, useState } from "react";
 import InviteMemberModal from "../../component/workspace/teams/invite-member-modal";
 import TeamSummaryCards from "../../component/workspace/teams/team-summary-cards";
 import TeamsTable from "../../component/workspace/teams/teams-table";
+import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
+import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { TEAM_MEMBERS, type TeamMember } from "../../data/workspace-teams";
 import { Paragraph, Title } from "../../component/ui/typography";
 
-function WorkspaceTeams() {
+function WorkspaceTeamsContent() {
+  const { can } = useWorkspacePermissions();
   const [members, setMembers] = useState<TeamMember[]>(TEAM_MEMBERS);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const canInvite = can("team.invite");
 
   const openInviteModal = useCallback(() => {
     setInviteModalOpen(true);
@@ -24,18 +28,19 @@ function WorkspaceTeams() {
   }, []);
 
   const inviteButton = useMemo(
-    () => (
-      <Button
-        type="primary"
-        icon={<UserAddOutlined />}
-        size="large"
-        className="font-semibold!"
-        onClick={openInviteModal}
-      >
-        Invite Member
-      </Button>
-    ),
-    [openInviteModal],
+    () =>
+      canInvite ? (
+        <Button
+          type="primary"
+          icon={<UserAddOutlined />}
+          size="large"
+          className="font-semibold!"
+          onClick={openInviteModal}
+        >
+          Invite Member
+        </Button>
+      ) : null,
+    [canInvite, openInviteModal],
   );
 
   return (
@@ -57,13 +62,27 @@ function WorkspaceTeams() {
 
       <TeamSummaryCards />
 
-      <InviteMemberModal
-        open={inviteModalOpen}
-        onClose={closeInviteModal}
-        members={members}
-        onInvited={handleMemberInvited}
-      />
+      {canInvite ? (
+        <InviteMemberModal
+          open={inviteModalOpen}
+          onClose={closeInviteModal}
+          members={members}
+          onInvited={handleMemberInvited}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function WorkspaceTeams() {
+  return (
+    <WorkspaceRoleGate
+      permission="team.view"
+      title="Team access restricted"
+      description="Members cannot access team management. Contact your workspace admin if you need access."
+    >
+      <WorkspaceTeamsContent />
+    </WorkspaceRoleGate>
   );
 }
 

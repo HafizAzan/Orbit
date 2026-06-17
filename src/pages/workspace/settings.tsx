@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useWorkspaceSettings from "../../hooks/use-workspace-settings";
+import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import WorkspaceBillingSection from "../../component/workspace/settings/workspace-billing-section";
 import WorkspaceGeneralSection from "../../component/workspace/settings/workspace-general-section";
 import WorkspaceIntegrationsSection from "../../component/workspace/settings/workspace-integrations-section";
@@ -7,10 +8,15 @@ import WorkspaceMembersSection from "../../component/workspace/settings/workspac
 import WorkspaceNotificationsSection from "../../component/workspace/settings/workspace-notifications-section";
 import WorkspaceSecuritySection from "../../component/workspace/settings/workspace-security-section";
 import WorkspaceSettingsNav from "../../component/workspace/settings/workspace-settings-nav";
+import WorkspaceAccessDenied from "../../component/workspace/workspace-access-denied";
+import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import SettingsSaveBar from "../../component/admin/settings/settings-save-bar";
 import { Paragraph, Title } from "../../component/ui/typography";
+import {
+  WORKSPACE_SETTINGS_NAV_ITEMS,
+} from "../../data/workspace-settings";
 
-function WorkspaceSettings() {
+function WorkspaceSettingsContent() {
   const {
     settings,
     activeTab,
@@ -21,8 +27,26 @@ function WorkspaceSettings() {
     handleDiscard,
     handleSave,
   } = useWorkspaceSettings();
+  const { canAccessSettingsTab } = useWorkspacePermissions();
+
+  const firstAllowedTab = WORKSPACE_SETTINGS_NAV_ITEMS.find((item) => canAccessSettingsTab(item.id))?.id;
+
+  useEffect(() => {
+    if (!canAccessSettingsTab(activeTab) && firstAllowedTab) {
+      handleTabChange(firstAllowedTab);
+    }
+  }, [activeTab, canAccessSettingsTab, firstAllowedTab, handleTabChange]);
 
   const renderContent = () => {
+    if (!canAccessSettingsTab(activeTab)) {
+      return (
+        <WorkspaceAccessDenied
+          title="Settings section restricted"
+          description="You do not have permission to view this settings section."
+        />
+      );
+    }
+
     if (activeTab === "general") {
       return (
         <WorkspaceGeneralSection
@@ -73,7 +97,7 @@ function WorkspaceSettings() {
         <div className="min-w-0 flex-1">
           {renderContent()}
 
-          {activeTab !== "general" ? (
+          {activeTab !== "general" && canAccessSettingsTab(activeTab) ? (
             <SettingsSaveBar
               changeCount={changeCount}
               onDiscard={handleDiscard}
@@ -84,6 +108,18 @@ function WorkspaceSettings() {
         </div>
       </div>
     </div>
+  );
+}
+
+function WorkspaceSettings() {
+  return (
+    <WorkspaceRoleGate
+      permission="settings.view"
+      title="Settings access restricted"
+      description="Only workspace owners and admins can manage organization settings."
+    >
+      <WorkspaceSettingsContent />
+    </WorkspaceRoleGate>
   );
 }
 

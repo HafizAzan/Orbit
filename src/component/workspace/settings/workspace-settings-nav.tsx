@@ -3,6 +3,7 @@ import {
   WORKSPACE_SETTINGS_NAV_ITEMS,
   type WorkspaceSettingsSectionId,
 } from "../../../data/workspace-settings";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { cn } from "../../../lib/utils";
 
 type WorkspaceSettingsNavProps = {
@@ -11,11 +12,13 @@ type WorkspaceSettingsNavProps = {
 };
 
 function WorkspaceSettingsNav({ activeSection, onNavigate }: WorkspaceSettingsNavProps) {
+  const { canAccessSettingsTab } = useWorkspacePermissions();
+  const visibleItems = WORKSPACE_SETTINGS_NAV_ITEMS.filter((item) => canAccessSettingsTab(item.id));
   return (
     <nav className="rounded-2xl border border-border bg-card p-3 shadow-sm lg:sticky lg:top-28">
       <p className="mb-3 px-3 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase">Settings</p>
       <ul className="space-y-1">
-        {WORKSPACE_SETTINGS_NAV_ITEMS.map((item) => (
+        {visibleItems.map((item) => (
           <li key={item.id}>
             <button
               type="button"
