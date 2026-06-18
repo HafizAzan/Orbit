@@ -45,6 +45,35 @@ const updateTask = async (
   return assertApiSuccess<ApiWorkspaceTask>(response);
 };
 
+const uploadTaskAttachment = async (taskId: string, file: File): Promise<ApiWorkspaceTask["attachments"][number]> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await ApiService.post(
+    `${API_ROUTES.TASKS.LIST}/${taskId}/attachments`,
+    formData,
+    {
+      requireAuth: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+
+  return assertApiSuccess<ApiWorkspaceTask["attachments"][number]>(response);
+};
+
+const deleteTaskAttachment = async (
+  taskId: string,
+  attachmentId: string,
+): Promise<{ message: string }> => {
+  const response = await ApiService.delete(
+    `${API_ROUTES.TASKS.LIST}/${taskId}/attachments/${attachmentId}`,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<{ message: string }>(response);
+};
+
 const deleteTask = async (taskId: string): Promise<{ message: string }> => {
   const response = await ApiService.delete(`${API_ROUTES.TASKS.LIST}/${taskId}`, AUTH_REQUEST);
   return assertApiSuccess<{ message: string }>(response);
@@ -73,6 +102,7 @@ const getBoard = async (projectId: string): Promise<WorkspaceKanbanBoardResponse
 export {
   createTask,
   deleteTask,
+  deleteTaskAttachment,
   getBoard,
   getDashboard,
   getReports,
@@ -81,4 +111,5 @@ export {
   listMyTasks,
   listTasks,
   updateTask,
+  uploadTaskAttachment,
 };

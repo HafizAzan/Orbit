@@ -12,8 +12,11 @@ function ProjectActivityFeed({ items }: ProjectActivityFeedProps) {
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <h3 className="text-lg font-semibold text-foreground">Activity Feed</h3>
 
-      <ul className="mt-5 space-y-5">
-        {items.map((item) => (
+      {items.length === 0 ? (
+        <p className="mt-5 text-sm text-muted">No task activity yet for this project.</p>
+      ) : (
+        <ul className="mt-5 space-y-5">
+          {items.map((item) => (
           <li key={item.id} className="flex gap-3">
             <div
               className={cn(
@@ -38,7 +41,8 @@ function ProjectActivityFeed({ items }: ProjectActivityFeedProps) {
             </div>
           </li>
         ))}
-      </ul>
+        </ul>
+      )}
     </article>
   );
 }

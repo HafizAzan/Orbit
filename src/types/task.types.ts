@@ -4,6 +4,15 @@ import type {
   WorkspaceTaskStatus,
 } from "../data/workspace-tasks";
 
+export type ApiTaskAttachment = {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  url: string;
+  createdAt: string;
+};
+
 export type ApiWorkspaceTask = {
   id: string;
   taskCode: string;
@@ -21,6 +30,9 @@ export type ApiWorkspaceTask = {
   priority: WorkspaceTaskPriority;
   status: WorkspaceTaskStatus;
   dueDate: string | null;
+  estimatedHours: number | null;
+  labels: string[];
+  attachments: ApiTaskAttachment[];
   createdById: string;
   createdAt: string;
   updatedAt: string;
@@ -34,14 +46,20 @@ export type CreateTaskRequest = {
   priority?: WorkspaceTaskPriority;
   assigneeId?: string;
   dueDate?: string;
+  estimatedHours?: number | null;
+  labels?: string[];
 };
 
-export type UpdateTaskRequest = Partial<
-  Omit<CreateTaskRequest, "projectId"> & {
-    assigneeId?: string | null;
-    dueDate?: string | null;
-  }
->;
+export type UpdateTaskRequest = {
+  title?: string;
+  description?: string;
+  status?: WorkspaceTaskStatus;
+  priority?: WorkspaceTaskPriority;
+  assigneeId?: string | null;
+  dueDate?: string | null;
+  estimatedHours?: number | null;
+  labels?: string[];
+};
 
 export type WorkspaceDashboardResponse = {
   metrics: Array<{
@@ -156,11 +174,20 @@ export function mapApiTaskToFormValues(task: ApiWorkspaceTask): import("../data/
     projectId: task.projectId,
     status: task.status,
     priority: task.priority,
-    estimatedHours: null,
+    estimatedHours: task.estimatedHours,
     description: task.description,
     assigneeId: task.assignee?.id ?? "",
-    dueDate: task.dueDate ?? "",
-    labels: [],
+    dueDate: task.dueDate
+      ? String(task.dueDate).slice(0, 10)
+      : "",
+    labels: task.labels ?? [],
+    attachments: (task.attachments ?? []).map((attachment) => ({
+      id: attachment.id,
+      name: attachment.fileName,
+      size: attachment.size,
+      type: attachment.mimeType,
+      url: attachment.url,
+    })),
   };
 }
 

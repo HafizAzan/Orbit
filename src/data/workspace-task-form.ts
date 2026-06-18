@@ -1,11 +1,16 @@
 import type {
-  WorkspaceTask,
   WorkspaceTaskPriority,
   WorkspaceTaskStatus,
 } from "./workspace-tasks";
-import { TASK_ASSIGNEE_FILTER_OPTIONS, WORKSPACE_TASKS } from "./workspace-tasks";
-import { MY_TASKS, type MyTask } from "./workspace-my-tasks";
-import { WORKSPACE_PROJECTS } from "./workspace-projects";
+
+export type TaskFormAttachment = {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  file?: File;
+  url?: string;
+};
 
 export type TaskFormValues = {
   title: string;
@@ -17,6 +22,7 @@ export type TaskFormValues = {
   assigneeId: string;
   dueDate: string;
   labels: string[];
+  attachments: TaskFormAttachment[];
 };
 
 export type TaskAssigneeOption = {
@@ -48,24 +54,6 @@ export const TASK_FORM_PRIORITY_OPTIONS: {
 
 export const TASK_LABEL_OPTIONS = ["Frontend", "Design", "Backend", "Bug", "QA", "Docs"] as const;
 
-export const TASK_ASSIGNEE_OPTIONS: TaskAssigneeOption[] = TASK_ASSIGNEE_FILTER_OPTIONS.filter(
-  (option) => option.value !== "all",
-).map((option) => ({
-  id: option.value,
-  name: option.label,
-  initials: option.label
-    .split(" ")
-    .map((part) => part.charAt(0))
-    .join("")
-    .slice(0, 2)
-    .toUpperCase(),
-}));
-
-export const TASK_PROJECT_OPTIONS = WORKSPACE_PROJECTS.map((project) => ({
-  value: project.id,
-  label: project.id === "1" ? "Project Omega" : project.title,
-}));
-
 export const DEFAULT_TASK_FORM_VALUES: TaskFormValues = {
   title: "",
   projectId: "",
@@ -76,71 +64,30 @@ export const DEFAULT_TASK_FORM_VALUES: TaskFormValues = {
   assigneeId: "",
   dueDate: "",
   labels: [],
+  attachments: [],
 };
 
-const TASK_FORM_DETAILS: Record<string, Partial<Pick<TaskFormValues, "description" | "estimatedHours" | "labels">>> = {
-  "1": {
-    description: "Refactor the authentication flow to support SSO and session refresh tokens.",
-    estimatedHours: 8,
-    labels: ["Frontend", "Backend"],
-  },
-  "2": {
-    description: "Document all public API endpoints with request/response examples.",
-    estimatedHours: 6,
-    labels: ["Docs"],
-  },
-};
-
-export function mapMyTaskToWorkspaceTask(task: MyTask): WorkspaceTask {
-  return {
-    id: task.id,
-    taskCode: task.taskCode,
-    title: task.title,
-    project: task.project,
-    projectId: task.projectId,
-    assignee: task.assignee,
-    priority: task.priority,
-    status: task.status,
-    dueDate: task.dueDate,
-  };
+export function getTaskProjectLabel(
+  projectId: string,
+  projects?: Array<{ id: string; title: string }>,
+) {
+  return projects?.find((project) => project.id === projectId)?.title ?? "Project";
 }
 
-export function getWorkspaceTaskById(taskId: string) {
-  const teamTask = WORKSPACE_TASKS.find((task) => task.id === taskId);
-  if (teamTask) return teamTask;
-
-  const myTask = MY_TASKS.find((task) => task.id === taskId);
-  return myTask ? mapMyTaskToWorkspaceTask(myTask) : null;
-}
-
-export function getTaskProjectLabel(projectId: string) {
-  return TASK_PROJECT_OPTIONS.find((option) => option.value === projectId)?.label ?? "Project";
-}
-
-export function getTaskAssigneeById(assigneeId: string) {
-  return TASK_ASSIGNEE_OPTIONS.find((option) => option.id === assigneeId) ?? null;
-}
-
-export function mapTaskToFormValues(task: WorkspaceTask): TaskFormValues {
-  const details = TASK_FORM_DETAILS[task.id];
-  const myTask = MY_TASKS.find((item) => item.id === task.id);
-
-  return {
-    title: task.title,
-    projectId: task.projectId,
-    status: task.status,
-    priority: task.priority,
-    estimatedHours: details?.estimatedHours ?? 4,
-    description: details?.description ?? myTask?.description ?? "",
-    assigneeId: task.assignee.id,
-    dueDate: task.dueDate,
-    labels: details?.labels ?? ["Frontend"],
-  };
+export function getTaskAssigneeById(
+  assigneeId: string,
+  assignees?: TaskAssigneeOption[],
+) {
+  return assignees?.find((option) => option.id === assigneeId) ?? null;
 }
 
 export function getTaskCreatePath(projectId?: string) {
   if (!projectId) return "/tasks/new";
   return `/tasks/new?project=${projectId}`;
+}
+
+export function getTaskDetailPath(taskId: string) {
+  return `/tasks/${taskId}`;
 }
 
 export function getTaskEditPath(taskId: string) {

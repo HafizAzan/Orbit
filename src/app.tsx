@@ -28,6 +28,7 @@ import WorkspaceProjectBoard from "./pages/workspace/project-board";
 import WorkspaceProjectCreate from "./pages/workspace/project-create";
 import WorkspaceProjectEdit from "./pages/workspace/project-edit";
 import WorkspaceTaskCreate from "./pages/workspace/task-create";
+import WorkspaceTaskDetail from "./pages/workspace/task-detail";
 import WorkspaceTaskEdit from "./pages/workspace/task-edit";
 import WorkspaceNotFound from "./component/workspace/workspace-not-found";
 import NotFound from "./pages/not-found";
@@ -58,6 +59,7 @@ function App() {
                   <ChildRoute path={WORKSPACE_ROUTES.PROJECT_EDIT} element={<WorkspaceProjectEdit />} />
                   <ChildRoute path={WORKSPACE_ROUTES.TASK_CREATE} element={<WorkspaceTaskCreate />} />
                   <ChildRoute path={WORKSPACE_ROUTES.TASK_EDIT} element={<WorkspaceTaskEdit />} />
+                  <ChildRoute path={WORKSPACE_ROUTES.TASK_DETAIL} element={<WorkspaceTaskDetail />} />
                   <ChildRoute path={WORKSPACE_ROUTES.PROJECT_DETAIL} element={<WorkspaceProjectDetail />} />
                   <ChildRoute path={`${WORKSPACE_ROUTES.PROJECT_DETAIL}/board`} element={<WorkspaceProjectBoard />} />
                   <ChildRoute path="*" element={<WorkspaceNotFound />} />

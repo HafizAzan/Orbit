@@ -20,6 +20,8 @@ export type ApiWorkspaceProject = {
   dueDate: string | null;
   startDate: string | null;
   taskCount: number;
+  completedTaskCount: number;
+  totalEstimatedHours: number;
   commentCount: number;
   icon: WorkspaceProject["icon"];
   iconBg: string;

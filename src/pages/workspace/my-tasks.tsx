@@ -8,15 +8,16 @@ import MyTasksFilterBar from "../../component/workspace/my-tasks/my-tasks-filter
 import MyTasksPageHeader from "../../component/workspace/my-tasks/my-tasks-page-header";
 import type { MyTasksViewMode } from "../../component/workspace/my-tasks/my-tasks-page-header";
 import MyTasksUpcomingSection from "../../component/workspace/my-tasks/my-tasks-upcoming-section";
+import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import { AdminListPageSkeleton } from "../../component/skeletons";
 import {
+  buildMyTasksProjectFilterOptions,
   DEFAULT_MY_TASKS_FILTERS,
   type MyTask,
   type MyTasksFilters,
 } from "../../data/workspace-my-tasks";
-import { getTaskEditPath } from "../../data/workspace-task-form";
+import { getTaskDetailPath } from "../../data/workspace-task-form";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useMyTasks, useUpdateTask } from "../../hooks/use-workspace-tasks";
 import { createWorkspaceNavState } from "../../lib/workspace-navigation";
@@ -34,7 +35,8 @@ function WorkspaceMyTasksContent() {
   const navigate = useNavigate();
   const { can } = useWorkspacePermissions();
   const canCreateTask = can("task.create");
-  const { data = [], isLoading, isError } = useMyTasks();
+  const myTasksQuery = useMyTasks();
+  const { data = [] } = myTasksQuery;
   const { mutateAsync: updateTask } = useUpdateTask();
   const [viewMode, setViewMode] = useState<MyTasksViewMode>("list");
   const [filters, setFilters] = useState<MyTasksFilters>(DEFAULT_MY_TASKS_FILTERS);
@@ -44,6 +46,7 @@ function WorkspaceMyTasksContent() {
   const filteredTasks = useMemo(() => filterMyTasks(tasks, filters), [filters, tasks]);
   const groupedTasks = useMemo(() => groupMyTasksByBucket(filteredTasks), [filteredTasks]);
   const remainingCount = useMemo(() => countRemainingMyTasks(filteredTasks), [filteredTasks]);
+  const projectFilterOptions = useMemo(() => buildMyTasksProjectFilterOptions(tasks), [tasks]);
 
   const handleFilterChange = useCallback((key: keyof MyTasksFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -51,7 +54,7 @@ function WorkspaceMyTasksContent() {
 
   const handleOpenTask = useCallback(
     (task: MyTask) => {
-      navigate(getTaskEditPath(task.id), createWorkspaceNavState(WORKSPACE_ROUTES.MY_TASKS, "My Tasks"));
+      navigate(getTaskDetailPath(task.id), createWorkspaceNavState(WORKSPACE_ROUTES.MY_TASKS, "My Tasks"));
     },
     [navigate],
   );
@@ -74,47 +77,45 @@ function WorkspaceMyTasksContent() {
     toast.success("Completed tasks remain in history — filter or archive coming soon");
   }, []);
 
-  if (isLoading) {
-    return <AdminListPageSkeleton tableColumns={4} />;
-  }
-
-  if (isError) {
-    return (
-      <WorkspaceNotFound
-        title="Unable to load your tasks"
-        description="We could not load your assigned tasks. Please try again shortly."
-      />
-    );
-  }
-
   return (
-    <div className="mx-auto max-w-8xl">
-      <MyTasksPageHeader viewMode={viewMode} onViewModeChange={setViewMode} />
+    <QueryPageGuard
+      query={myTasksQuery}
+      loading={<AdminListPageSkeleton tableColumns={4} />}
+      errorTitle="Unable to load your tasks"
+    >
+      <div className="mx-auto max-w-8xl">
+        <MyTasksPageHeader viewMode={viewMode} onViewModeChange={setViewMode} />
 
-      {viewMode === "list" ? (
-        <>
-          <MyTasksFilterBar filters={filters} remainingCount={remainingCount} onChange={handleFilterChange} />
+        {viewMode === "list" ? (
+          <>
+            <MyTasksFilterBar
+              filters={filters}
+              remainingCount={remainingCount}
+              projectOptions={projectFilterOptions}
+              onChange={handleFilterChange}
+            />
 
-          <MyTasksDueTodaySection
-            tasks={groupedTasks.due_today}
-            canCreateTask={canCreateTask}
-            onOpenTask={handleOpenTask}
-          />
+            <MyTasksDueTodaySection
+              tasks={groupedTasks.due_today}
+              canCreateTask={canCreateTask}
+              onOpenTask={handleOpenTask}
+            />
 
-          <MyTasksAssignedSection
-            tasks={groupedTasks.assigned}
-            onToggleComplete={handleToggleComplete}
-            onOpenTask={handleOpenTask}
-          />
+            <MyTasksAssignedSection
+              tasks={groupedTasks.assigned}
+              onToggleComplete={handleToggleComplete}
+              onOpenTask={handleOpenTask}
+            />
 
-          <MyTasksUpcomingSection tasks={groupedTasks.upcoming} onOpenTask={handleOpenTask} />
+            <MyTasksUpcomingSection tasks={groupedTasks.upcoming} onOpenTask={handleOpenTask} />
 
-          <MyTasksCompletedSection count={groupedTasks.completed.length} onClearAll={handleClearCompleted} />
-        </>
-      ) : (
-        <MyTasksCalendarView />
-      )}
-    </div>
+            <MyTasksCompletedSection count={groupedTasks.completed.length} onClearAll={handleClearCompleted} />
+          </>
+        ) : (
+          <MyTasksCalendarView />
+        )}
+      </div>
+    </QueryPageGuard>
   );
 }
 

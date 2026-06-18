@@ -246,6 +246,11 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
                   prefix="$"
                   className="w-full! rounded-xl! [&_.ant-input-number-input]:rounded-xl!"
                   controls={false}
+                  onKeyDown={(event) => {
+                    if (["e", "E", "+", "-"].includes(event.key)) {
+                      event.preventDefault();
+                    }
+                  }}
                 />
               </Form.Item>
 

@@ -17,6 +17,7 @@ export const WORKSPACE_ROUTES = {
   TASKS: "/tasks",
   MY_TASKS: "/my-tasks",
   TASK_CREATE: "/tasks/new",
+  TASK_DETAIL: "/tasks/:taskId",
   TASK_EDIT: "/tasks/:taskId/edit",
   TEAMS: "/teams",
   CALENDAR: "/calendar",

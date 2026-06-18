@@ -1,5 +1,6 @@
-import { Button, Select, Table } from "antd";
-import React, { useMemo } from "react";
+import { Button, Dropdown, Select, Table } from "antd";
+import { DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { OrganizationMember } from "../../../types/organization.types";
 import type { OrganizationMembersSummary } from "../../../types/organization.types";
@@ -14,7 +15,9 @@ import {
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
+import QueryErrorState from "../../common/query-error-state";
 import SettingsSection from "../../admin/settings/settings-section";
+import { ConfirmModal } from "../../ui/modal";
 import type { RegisterAs } from "../../../types/auth.types";
 
 type WorkspaceMembersSectionProps = {
@@ -68,9 +71,11 @@ function MemberRoleSelect({ member }: { member: OrganizationMember }) {
 
 function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionProps) {
   const { can } = useWorkspacePermissions();
-  const { data, isLoading } = useOrganizationMembers();
+  const membersQuery = useOrganizationMembers();
+  const { data } = membersQuery;
   const { mutateAsync: removeMember, isPending: removingMember } = useRemoveOrganizationMember();
   const canManageMembers = can("team.change_role");
+  const [pendingRemoveMember, setPendingRemoveMember] = useState<OrganizationMember | null>(null);
 
   const summary: OrganizationMembersSummary | undefined = data;
   const previewMembers = summary?.members.slice(0, 3) ?? [];
@@ -105,30 +110,40 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
             {
               title: "Actions",
               key: "actions",
+              width: 64,
+              align: "center" as const,
               render: (_: unknown, record: OrganizationMember) =>
                 record.role === "owner" ? null : (
-                  <Button
-                    danger
-                    size="small"
-                    loading={removingMember}
-                    className="font-medium!"
-                    onClick={async () => {
-                      try {
-                        const result = await removeMember(record.id);
-                        showApiSuccessToast(result.message);
-                      } catch (error) {
-                        showApiErrorToast(error);
-                      }
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: "deactivate",
+                          label: "Deactivate member",
+                          icon: <DeleteOutlined />,
+                          danger: true,
+                        },
+                      ],
+                      onClick: ({ key }) => {
+                        if (key === "deactivate") setPendingRemoveMember(record);
+                      },
                     }}
+                    trigger={["click"]}
+                    placement="bottomRight"
                   >
-                    Deactivate
-                  </Button>
+                    <Button
+                      type="text"
+                      icon={<EllipsisOutlined />}
+                      className="text-muted!"
+                      aria-label="Member actions"
+                    />
+                  </Dropdown>
                 ),
             },
           ]
         : []),
     ],
-    [canManageMembers, removeMember, removingMember],
+    [canManageMembers],
   );
 
   return (
@@ -180,11 +195,24 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
         </div>
       </div>
 
-      {expanded ? (
+      {expanded && membersQuery.isError ? (
+        <div className="mt-6">
+          <QueryErrorState
+            error={membersQuery.error}
+            title="Unable to load members"
+            onRetry={() => {
+              void membersQuery.refetch();
+            }}
+            isRetrying={membersQuery.isFetching}
+          />
+        </div>
+      ) : null}
+
+      {expanded && !membersQuery.isError ? (
         <div className="mt-6">
           <Table
             rowKey="id"
-            loading={isLoading}
+            loading={membersQuery.isPending}
             columns={columns}
             dataSource={summary?.members ?? []}
             pagination={false}
@@ -192,6 +220,35 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
           />
         </div>
       ) : null}
+
+      <ConfirmModal
+        open={pendingRemoveMember !== null}
+        onClose={() => setPendingRemoveMember(null)}
+        onConfirm={async () => {
+          if (!pendingRemoveMember) return;
+
+          try {
+            const result = await removeMember(pendingRemoveMember.id);
+            showApiSuccessToast(result.message);
+            setPendingRemoveMember(null);
+          } catch (error) {
+            showApiErrorToast(error);
+          }
+        }}
+        title="Deactivate member"
+        description={
+          pendingRemoveMember ? (
+            <>
+              Deactivate <span className="font-semibold text-foreground">{pendingRemoveMember.fullName}</span>? They
+              will lose workspace access until reactivated.
+            </>
+          ) : null
+        }
+        confirmText="Deactivate"
+        confirmDanger
+        confirmLoading={removingMember}
+        icon={<DeleteOutlined />}
+      />
     </SettingsSection>
   );
 }

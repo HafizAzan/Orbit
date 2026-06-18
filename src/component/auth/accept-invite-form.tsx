@@ -72,8 +72,9 @@ function AcceptInviteForm() {
   const [searchParams] = useSearchParams();
   const token = resolveInviteToken(searchParams);
 
-  const { data: invite, isLoading, isError, error } = useValidateInviteToken(token);
-  const { mutateAsync: acceptInvite, isPending } = useAcceptInvite();
+  const inviteQuery = useValidateInviteToken(token);
+  const { data: invite, isPending: isValidatingInvite, isError, error } = inviteQuery;
+  const { mutateAsync: acceptInvite, isPending: isAcceptingInvite } = useAcceptInvite();
 
   useEffect(() => {
     if (!token) {
@@ -109,7 +110,7 @@ function AcceptInviteForm() {
     return null;
   }
 
-  if (isLoading) {
+  if (isValidatingInvite) {
     return <AcceptInviteLoadingState />;
   }
 
@@ -228,7 +229,7 @@ function AcceptInviteForm() {
             htmlType="submit"
             block
             size="large"
-            loading={isPending}
+            loading={isAcceptingInvite}
             className="mt-1 h-11! font-semibold!"
           >
             Accept invitation & join workspace

@@ -1,9 +1,11 @@
 import { CalendarOutlined } from "@ant-design/icons";
 import React from "react";
+import { Link } from "react-router-dom";
 import type { KanbanTask } from "../../../data/workspace-board";
 import { KANBAN_PRIORITY_CONFIG } from "../../../data/workspace-board";
+import { getTaskDetailPath } from "../../../data/workspace-task-form";
+import MarkdownContent from "../../common/markdown-content";
 import { cn } from "../../../lib/utils";
-import { Text } from "../../ui/typography";
 
 type KanbanTaskCardProps = {
   task: KanbanTask;
@@ -15,9 +17,10 @@ function KanbanTaskCard({ task, variant = "default" }: KanbanTaskCardProps) {
   const isCompleted = variant === "completed";
 
   return (
-    <article
+    <Link
+      to={getTaskDetailPath(task.id)}
       className={cn(
-        "min-h-[120px] rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:min-h-[140px] sm:p-5 lg:p-6",
+        "block min-h-[120px] rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:min-h-[140px] sm:p-5 lg:p-6",
         isCompleted ? "border-emerald-100 bg-emerald-50/30" : "border-border",
         variant === "pending" && "border-amber-100 bg-amber-50/20",
       )}
@@ -41,9 +44,7 @@ function KanbanTaskCard({ task, variant = "default" }: KanbanTaskCardProps) {
       </h3>
 
       {task.description ? (
-        <Text as="p" size="sm" className="mt-3 line-clamp-3 text-muted">
-          {task.description}
-        </Text>
+        <MarkdownContent content={task.description} className="mt-3" lineClamp={3} interactive={false} />
       ) : null}
 
       <div className="mt-5 flex items-center justify-between gap-3">
@@ -62,7 +63,7 @@ function KanbanTaskCard({ task, variant = "default" }: KanbanTaskCardProps) {
           {task.assignee.initials}
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
 

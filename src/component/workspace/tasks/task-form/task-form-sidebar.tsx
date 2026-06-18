@@ -1,120 +1,121 @@
 import { ClockCircleOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { Avatar, Select } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import {
-  TASK_ASSIGNEE_OPTIONS,
-  TASK_LABEL_OPTIONS,
   getTaskAssigneeById,
   type TaskAssigneeOption,
   type TaskFormValues,
 } from "../../../../data/workspace-task-form";
 import { getInitial } from "../../../../lib/helper";
 import DatePicker from "../../../ui/date-picker";
+import TaskLabelsModal from "./task-labels-modal";
 
 type TaskFormSidebarProps = {
   values: TaskFormValues;
   reporterName: string;
   onChange: (values: TaskFormValues) => void;
-  assigneeOptions?: TaskAssigneeOption[];
+  assigneeOptions: TaskAssigneeOption[];
 };
 
 function TaskFormSidebar({
   values,
   reporterName,
   onChange,
-  assigneeOptions = TASK_ASSIGNEE_OPTIONS,
+  assigneeOptions,
 }: TaskFormSidebarProps) {
+  const [labelsModalOpen, setLabelsModalOpen] = useState(false);
+
   const updateValues = (patch: Partial<TaskFormValues>) => {
     onChange({ ...values, ...patch });
   };
 
-  const handleToggleLabel = (label: string) => {
-    if (values.labels.includes(label)) {
-      updateValues({ labels: values.labels.filter((item) => item !== label) });
-      return;
-    }
-
-    updateValues({ labels: [...values.labels, label] });
+  const handleRemoveLabel = (label: string) => {
+    updateValues({ labels: values.labels.filter((item) => item !== label) });
   };
 
-  const availableLabels = TASK_LABEL_OPTIONS.filter((label) => !values.labels.includes(label));
-
   return (
-    <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-foreground">People</h3>
+    <>
+      <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <h3 className="text-sm font-semibold text-foreground">People</h3>
 
-        <div className="mt-4 space-y-4">
-          <div>
-            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Assignee</p>
-            <SelectAssignee
-              value={values.assigneeId}
-              onChange={(assigneeId) => updateValues({ assigneeId })}
-              options={assigneeOptions}
-            />
-          </div>
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Assignee</p>
+              <SelectAssignee
+                value={values.assigneeId}
+                onChange={(assigneeId) => updateValues({ assigneeId })}
+                options={assigneeOptions}
+              />
+            </div>
 
-          <div>
-            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Reporter</p>
-            <div className="flex items-center gap-2.5 rounded-xl border border-border bg-background/50 p-3">
-              <Avatar size={32} className="bg-primary! text-xs! font-semibold! text-white!">
-                {getInitial(reporterName)}
-              </Avatar>
-              <span className="text-sm font-medium text-foreground">Me ({reporterName.split(" ")[0]})</span>
+            <div>
+              <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Reporter</p>
+              <div className="flex items-center gap-2.5 rounded-xl border border-border bg-background/50 p-3">
+                <Avatar size={32} className="bg-primary! text-xs! font-semibold! text-white!">
+                  {getInitial(reporterName)}
+                </Avatar>
+                <span className="text-sm font-medium text-foreground">Me ({reporterName.split(" ")[0]})</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-foreground">Dates</h3>
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Due Date</p>
-          <DatePicker value={values.dueDate} onChange={(dueDate) => updateValues({ dueDate })} placeholder="mm/dd/yyyy" />
-        </div>
-      </section>
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <h3 className="text-sm font-semibold text-foreground">Dates</h3>
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Due Date</p>
+            <DatePicker value={values.dueDate} onChange={(dueDate) => updateValues({ dueDate })} placeholder="mm/dd/yyyy" />
+          </div>
+        </section>
 
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-foreground">Classification</h3>
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Labels</p>
-          <div className="flex flex-wrap items-center gap-2">
-            {values.labels.map((label) => (
-              <span
-                key={label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-feature-sync px-3 py-1 text-xs font-semibold text-primary"
-              >
-                {label}
-                <button
-                  type="button"
-                  onClick={() => handleToggleLabel(label)}
-                  className="text-primary/70 transition-colors hover:text-primary"
-                  aria-label={`Remove ${label}`}
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <h3 className="text-sm font-semibold text-foreground">Classification</h3>
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Labels</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {values.labels.map((label) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-feature-sync px-3 py-1 text-xs font-semibold text-primary"
                 >
-                  <CloseOutlined className="text-[10px]" />
-                </button>
-              </span>
-            ))}
+                  {label}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLabel(label)}
+                    className="text-primary/70 transition-colors hover:text-primary"
+                    aria-label={`Remove ${label}`}
+                  >
+                    <CloseOutlined className="text-[10px]" />
+                  </button>
+                </span>
+              ))}
 
-            {availableLabels[0] ? (
               <button
                 type="button"
-                onClick={() => handleToggleLabel(availableLabels[0])}
+                onClick={() => setLabelsModalOpen(true)}
                 className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-dashed border-border text-muted transition-colors hover:border-primary/40 hover:text-primary"
-                aria-label="Add label"
+                aria-label="Add labels"
               >
                 <PlusOutlined className="text-xs" />
               </button>
-            ) : null}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="rounded-2xl border border-dashed border-border bg-background/40 p-5 text-center">
-        <ClockCircleOutlined className="text-xl text-muted" />
-        <p className="mt-3 text-sm text-muted">Activity will appear here as the task progresses.</p>
-      </section>
-    </aside>
+        <section className="rounded-2xl border border-dashed border-border bg-background/40 p-5 text-center">
+          <ClockCircleOutlined className="text-xl text-muted" />
+          <p className="mt-3 text-sm text-muted">Activity will appear here as the task progresses.</p>
+        </section>
+      </aside>
+
+      <TaskLabelsModal
+        open={labelsModalOpen}
+        selectedLabels={values.labels}
+        onClose={() => setLabelsModalOpen(false)}
+        onSave={(labels) => updateValues({ labels })}
+      />
+    </>
   );
 }
 
@@ -132,12 +133,11 @@ function AssigneeOptionContent({ assignee }: { assignee: TaskAssigneeOption }) {
 type SelectAssigneeProps = {
   value: string;
   onChange: (value: string) => void;
-  options?: TaskAssigneeOption[];
+  options: TaskAssigneeOption[];
 };
 
-function SelectAssignee({ value, onChange, options = TASK_ASSIGNEE_OPTIONS }: SelectAssigneeProps) {
-  const selectedAssignee =
-    options.find((item) => item.id === value) ?? getTaskAssigneeById(value);
+function SelectAssignee({ value, onChange, options }: SelectAssigneeProps) {
+  const selectedAssignee = options.find((item) => item.id === value) ?? getTaskAssigneeById(value, options);
 
   return (
     <Select

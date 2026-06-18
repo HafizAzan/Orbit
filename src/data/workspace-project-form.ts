@@ -1,4 +1,4 @@
-import type { ProjectPriority, ProjectTeamMember, WorkspaceProject } from "./workspace-projects";
+import type { ProjectPriority } from "./workspace-projects";
 
 export type ProjectVisibility = "private" | "public";
 
@@ -16,8 +16,11 @@ export type ProjectFormValues = {
   memberIds: string[];
 };
 
-export type AssignableProjectMember = ProjectTeamMember & {
+export type AssignableProjectMember = {
+  id: string;
+  name: string;
   email: string;
+  avatarColor: string;
 };
 
 export const PROJECT_CATEGORY_OPTIONS: { value: ProjectCategory; label: string }[] = [
@@ -51,15 +54,6 @@ export const PROJECT_VISIBILITY_OPTIONS: {
   },
 ];
 
-export const ASSIGNABLE_PROJECT_MEMBERS: AssignableProjectMember[] = [
-  { id: "m1", name: "Alex Rivera", email: "alex.rivera@flowsync.io", avatarColor: "bg-sky-100 text-sky-700" },
-  { id: "m2", name: "Sarah Chen", email: "sarah.chen@flowsync.io", avatarColor: "bg-violet-100 text-violet-700" },
-  { id: "m3", name: "Marcus Chen", email: "marcus.chen@flowsync.io", avatarColor: "bg-indigo-100 text-indigo-700" },
-  { id: "m4", name: "Elena Rodriguez", email: "elena.rodriguez@flowsync.io", avatarColor: "bg-amber-100 text-amber-700" },
-  { id: "m5", name: "David Kim", email: "david.kim@flowsync.io", avatarColor: "bg-emerald-100 text-emerald-700" },
-  { id: "m6", name: "Priya Sharma", email: "priya.sharma@flowsync.io", avatarColor: "bg-rose-100 text-rose-700" },
-];
-
 export const DEFAULT_PROJECT_FORM_VALUES: ProjectFormValues = {
   name: "",
   key: "",
@@ -70,13 +64,6 @@ export const DEFAULT_PROJECT_FORM_VALUES: ProjectFormValues = {
   dueDate: "",
   visibility: "private",
   memberIds: [],
-};
-
-const TEAM_ID_TO_CATEGORY: Record<string, ProjectCategory> = {
-  design: "design",
-  mobile: "engineering",
-  security: "operations",
-  platform: "engineering",
 };
 
 export function generateProjectKey(name: string) {
@@ -90,28 +77,6 @@ export function generateProjectKey(name: string) {
     .map((word) => word.charAt(0))
     .join("")
     .toUpperCase();
-}
-
-export function mapProjectToFormValues(project: WorkspaceProject): ProjectFormValues {
-  const dueDate = new Date(`${project.dueDate}T00:00:00`);
-  const startDate = new Date(dueDate);
-  startDate.setMonth(startDate.getMonth() - 3);
-
-  const memberIds = project.members
-    .map((member) => ASSIGNABLE_PROJECT_MEMBERS.find((candidate) => candidate.name === member.name)?.id)
-    .filter((id): id is string => Boolean(id));
-
-  return {
-    name: project.title,
-    key: generateProjectKey(project.title),
-    description: project.description,
-    category: TEAM_ID_TO_CATEGORY[project.teamId] ?? "product",
-    priority: project.priority,
-    startDate: startDate.toISOString().slice(0, 10),
-    dueDate: project.dueDate,
-    visibility: "private",
-    memberIds: memberIds.length > 0 ? memberIds : ["m1"],
-  };
 }
 
 export function getProjectCreatePath() {

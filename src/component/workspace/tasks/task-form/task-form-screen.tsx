@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../../context/app-context";
 import {
@@ -9,7 +9,10 @@ import { useWorkspaceReturnTo } from "../../../../lib/workspace-navigation";
 import useWorkspacePermissions from "../../../../hooks/use-workspace-permissions";
 import { useAssignableProjectMembers } from "../../../../hooks/use-workspace-projects";
 import { useProjects } from "../../../../hooks/use-workspace-projects";
-import { useCreateTask, useUpdateTask } from "../../../../hooks/use-workspace-tasks";
+import { getTask } from "../../../../api-services/task.service";
+import { useCreateTask, useUpdateTask, workspaceTaskQueryKey } from "../../../../hooks/use-workspace-tasks";
+import { useQueryClient } from "@tanstack/react-query";
+import { mapApiTaskToFormValues } from "../../../../types/task.types";
 import {
   DEFAULT_TASK_FORM_VALUES,
   getTaskProjectLabel,
@@ -17,6 +20,7 @@ import {
   type TaskFormValues,
 } from "../../../../data/workspace-task-form";
 import { showApiErrorToast, showApiSuccessToast } from "../../../../lib/api-error";
+import { syncTaskAttachments } from "../../../../lib/sync-task-attachments";
 import { toast } from "../../../../lib/toast";
 import { Paragraph, Title } from "../../../ui/typography";
 import TaskFormFooter from "./task-form-footer";
@@ -36,6 +40,7 @@ function TaskFormScreen({
   initialValues = DEFAULT_TASK_FORM_VALUES,
 }: TaskFormScreenProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const app = useAppContext();
   const { role } = useWorkspacePermissions();
   const { data: projects = [] } = useProjects();
@@ -47,6 +52,7 @@ function TaskFormScreen({
   const { returnPath, returnLabel } = useWorkspaceReturnTo(taskHubPath, taskHubLabel);
   const [values, setValues] = useState<TaskFormValues>(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const initialAttachmentsRef = useRef(initialValues.attachments);
 
   const isEdit = mode === "edit";
   const reporterName = app?.user?.name?.trim() || "You";
@@ -75,12 +81,16 @@ function TaskFormScreen({
   const projectLabel = useMemo(() => {
     return (
       projectOptions.find((option) => option.value === values.projectId)?.label ??
-      getTaskProjectLabel(values.projectId)
+      getTaskProjectLabel(values.projectId, projectOptions.map((option) => ({
+        id: option.value,
+        title: option.label,
+      })))
     );
   }, [projectOptions, values.projectId]);
 
   useEffect(() => {
     setValues(initialValues);
+    initialAttachmentsRef.current = initialValues.attachments;
   }, [initialValues]);
 
   useEffect(() => {
@@ -97,7 +107,7 @@ function TaskFormScreen({
     [isEdit, projectLabel, returnLabel, returnPath, role, values.projectId],
   );
 
-  const buildPayload = useCallback(() => {
+  const buildCreatePayload = useCallback(() => {
     return {
       projectId: values.projectId,
       title: values.title.trim(),
@@ -106,8 +116,44 @@ function TaskFormScreen({
       priority: values.priority,
       assigneeId: values.assigneeId || undefined,
       dueDate: values.dueDate || undefined,
+      estimatedHours: values.estimatedHours ?? undefined,
+      labels: values.labels,
     };
   }, [values]);
+
+  const buildUpdatePayload = useCallback(() => {
+    return {
+      title: values.title.trim(),
+      description: values.description.trim(),
+      status: values.status,
+      priority: values.priority,
+      assigneeId: values.assigneeId || null,
+      dueDate: values.dueDate || null,
+      estimatedHours: values.estimatedHours,
+      labels: values.labels,
+    };
+  }, [values]);
+
+  const refreshFormFromTask = useCallback(
+    async (savedTaskId: string) => {
+      const refreshed = await queryClient.fetchQuery({
+        queryKey: workspaceTaskQueryKey(savedTaskId),
+        queryFn: () => getTask(savedTaskId),
+      });
+      const mapped = mapApiTaskToFormValues(refreshed);
+      setValues(mapped);
+      initialAttachmentsRef.current = mapped.attachments;
+    },
+    [queryClient],
+  );
+
+  const persistAttachments = useCallback(
+    async (savedTaskId: string) => {
+      await syncTaskAttachments(savedTaskId, initialAttachmentsRef.current, values.attachments);
+      await refreshFormFromTask(savedTaskId);
+    },
+    [refreshFormFromTask, values.attachments],
+  );
 
   const validate = useCallback(() => {
     if (!values.title.trim()) {
@@ -129,13 +175,13 @@ function TaskFormScreen({
     setIsSubmitting(true);
 
     try {
-      const payload = buildPayload();
-
       if (isEdit && taskId) {
-        await updateTask({ taskId, data: payload });
+        await updateTask({ taskId, data: buildUpdatePayload() });
+        await persistAttachments(taskId);
         showApiSuccessToast("Task updated successfully");
       } else {
-        await createTask(payload);
+        const created = await createTask(buildCreatePayload());
+        await persistAttachments(created.id);
         showApiSuccessToast("Task created successfully");
       }
 
@@ -145,7 +191,18 @@ function TaskFormScreen({
     } finally {
       setIsSubmitting(false);
     }
-  }, [buildPayload, createTask, isEdit, navigate, returnPath, taskId, updateTask, validate]);
+  }, [
+    buildCreatePayload,
+    buildUpdatePayload,
+    createTask,
+    isEdit,
+    navigate,
+    persistAttachments,
+    returnPath,
+    taskId,
+    updateTask,
+    validate,
+  ]);
 
   const handleSaveAndContinue = useCallback(async () => {
     if (!validate()) return;
@@ -153,25 +210,37 @@ function TaskFormScreen({
     setIsSubmitting(true);
 
     try {
-      const payload = buildPayload();
-
       if (isEdit && taskId) {
-        await updateTask({ taskId, data: payload });
+        await updateTask({ taskId, data: buildUpdatePayload() });
+        await persistAttachments(taskId);
         showApiSuccessToast("Task updated successfully");
       } else {
-        await createTask(payload);
+        const created = await createTask(buildCreatePayload());
+        await persistAttachments(created.id);
         showApiSuccessToast("Task created successfully");
         setValues({
           ...DEFAULT_TASK_FORM_VALUES,
           projectId: values.projectId,
+          attachments: [],
         });
+        initialAttachmentsRef.current = [];
       }
     } catch (error) {
       showApiErrorToast(error);
     } finally {
       setIsSubmitting(false);
     }
-  }, [buildPayload, createTask, isEdit, taskId, updateTask, validate, values.projectId]);
+  }, [
+    buildCreatePayload,
+    buildUpdatePayload,
+    createTask,
+    isEdit,
+    persistAttachments,
+    taskId,
+    updateTask,
+    validate,
+    values.projectId,
+  ]);
 
   return (
     <div className="mx-auto max-w-8xl">

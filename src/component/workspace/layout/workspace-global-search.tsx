@@ -3,8 +3,12 @@ import { AutoComplete, Input } from "antd";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../context/app-context";
+import { useProjects } from "../../../hooks/use-workspace-projects";
+import { useTeamMembers } from "../../../hooks/use-workspace-team";
+import { useMyTasks, useTasks } from "../../../hooks/use-workspace-tasks";
 import {
   groupWorkspaceSearchResults,
+  searchMemberWorkspaceGlobal,
   searchWorkspaceGlobal,
   type WorkspaceGlobalSearchResult,
 } from "../../../lib/workspace-global-search";
@@ -15,11 +19,34 @@ function WorkspaceGlobalSearch() {
   const app = useAppContext();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const { data: projects = [] } = useProjects();
+  const { data: allTasks = [] } = useTasks();
+  const { data: myTasks = [] } = useMyTasks();
+  const { data: teamMembers = [] } = useTeamMembers();
 
-  const results = useMemo(
-    () => searchWorkspaceGlobal(query, app?.user?.role, app?.user?.name),
-    [app?.user?.name, app?.user?.role, query],
-  );
+  const isMember = app?.user?.role === "member";
+  const tasks = isMember ? myTasks : allTasks;
+  const memberProjects = useMemo(() => {
+    const projectIds = new Set(tasks.map((task) => task.projectId));
+    return projects.filter((project) => projectIds.has(project.id));
+  }, [projects, tasks]);
+
+  const results = useMemo(() => {
+    if (isMember) {
+      return searchMemberWorkspaceGlobal(query, {
+        projects: memberProjects,
+        tasks,
+        teamMembers: [],
+      });
+    }
+
+    return searchWorkspaceGlobal(query, {
+      projects,
+      tasks,
+      teamMembers,
+    });
+  }, [isMember, memberProjects, projects, query, tasks, teamMembers]);
+
   const resultMap = useMemo(() => new Map(results.map((result) => [result.id, result])), [results]);
   const groupedOptions = useMemo(() => groupWorkspaceSearchResults(results), [results]);
 

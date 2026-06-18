@@ -14,7 +14,9 @@ import WorkspaceSecuritySection from "../../component/workspace/settings/workspa
 import WorkspaceSettingsNav from "../../component/workspace/settings/workspace-settings-nav";
 import WorkspaceAccessDenied from "../../component/workspace/workspace-access-denied";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
+import QueryErrorState from "../../component/common/query-error-state";
 import SettingsSaveBar from "../../component/admin/settings/settings-save-bar";
+import { AdminListPageSkeleton } from "../../component/skeletons";
 import { Paragraph, Title } from "../../component/ui/typography";
 import { DEFAULT_WORKSPACE_SETTINGS, WORKSPACE_SETTINGS_NAV_ITEMS } from "../../data/workspace-settings";
 import {
@@ -26,7 +28,8 @@ import { useAppContext } from "../../context/app-context";
 
 function WorkspaceSettingsContent() {
   const app = useAppContext();
-  const { data: organization, isLoading } = useWorkspaceOrganization();
+  const organizationQuery = useWorkspaceOrganization();
+  const { data: organization } = organizationQuery;
   const { mutateAsync: updateOrganization } = useUpdateWorkspaceOrganization();
   const { canAccessSettingsTab } = useWorkspacePermissions();
 
@@ -74,8 +77,21 @@ function WorkspaceSettingsContent() {
   }, [handleSave]);
 
   const renderContent = () => {
-    if (isLoading && activeTab === "general") {
-      return <div className="rounded-2xl border border-border bg-card p-8 text-sm text-muted">Loading organization settings...</div>;
+    if (activeTab === "general" && organizationQuery.isPending) {
+      return <AdminListPageSkeleton tableColumns={2} />;
+    }
+
+    if (activeTab === "general" && organizationQuery.isError) {
+      return (
+        <QueryErrorState
+          error={organizationQuery.error}
+          title="Unable to load workspace settings"
+          onRetry={() => {
+            void organizationQuery.refetch();
+          }}
+          isRetrying={organizationQuery.isFetching}
+        />
+      );
     }
 
     if (!canAccessSettingsTab(activeTab)) {

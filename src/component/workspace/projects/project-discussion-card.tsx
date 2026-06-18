@@ -14,8 +14,11 @@ function ProjectDiscussionCard({ messages }: ProjectDiscussionCardProps) {
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <h3 className="text-lg font-semibold text-foreground">Discussion</h3>
 
-      <ul className="mt-5 space-y-4">
-        {messages.map((message) => (
+      {messages.length === 0 ? (
+        <p className="mt-5 text-sm text-muted">No project comments yet.</p>
+      ) : (
+        <ul className="mt-5 space-y-4">
+          {messages.map((message) => (
           <li key={message.id} className="flex gap-3">
             <div
               className={cn(
@@ -34,14 +37,16 @@ function ProjectDiscussionCard({ messages }: ProjectDiscussionCardProps) {
             </div>
           </li>
         ))}
-      </ul>
+        </ul>
+      )}
 
       <div className="mt-5 flex items-center gap-2">
-        <Input placeholder="Add a comment..." size="large" className="rounded-xl!" />
+        <Input placeholder="Add a comment..." size="large" className="rounded-xl!" disabled />
         <button
           type="button"
           aria-label="Send comment"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-opacity hover:opacity-90"
+          disabled
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/40 text-white"
         >
           <SendOutlined />
         </button>

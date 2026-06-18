@@ -3,6 +3,7 @@ import { Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { Link } from "react-router-dom";
 import { getProjectBoardPath } from "../data/workspace-project-detail";
+import { getTaskDetailPath } from "../data/workspace-task-form";
 import {
   TASK_PRIORITY_CONFIG,
   TASK_STATUS_CONFIG,
@@ -50,7 +51,7 @@ function createWorkspaceTaskTableColumns({
   canEdit = false,
   canDelete = false,
 }: WorkspaceTaskTableColumnOptions = {}): ColumnsType<WorkspaceTask> {
-  const showActions = canEdit || canDelete;
+  const showActions = Boolean(onView) || canEdit || canDelete;
 
   return [
     {
@@ -59,8 +60,13 @@ function createWorkspaceTaskTableColumns({
       key: "taskCode",
       width: 110,
       sorter: (a, b) => a.taskCode.localeCompare(b.taskCode),
-      render: (taskCode: string) => (
-        <span className="font-mono text-sm font-semibold text-primary">{taskCode}</span>
+      render: (taskCode: string, record) => (
+        <Link
+          to={getTaskDetailPath(record.id)}
+          className="font-mono text-sm font-semibold text-primary transition-opacity hover:opacity-80"
+        >
+          {taskCode}
+        </Link>
       ),
     },
     {
@@ -68,7 +74,14 @@ function createWorkspaceTaskTableColumns({
       dataIndex: "title",
       key: "title",
       sorter: (a, b) => a.title.localeCompare(b.title),
-      render: (title: string) => <span className="font-medium text-foreground">{title}</span>,
+      render: (title: string, record) => (
+        <Link
+          to={getTaskDetailPath(record.id)}
+          className="font-medium text-foreground transition-colors hover:text-primary"
+        >
+          {title}
+        </Link>
+      ),
     },
     {
       title: "Project",

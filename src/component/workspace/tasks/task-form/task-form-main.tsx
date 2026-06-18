@@ -1,32 +1,26 @@
-import {
-  BoldOutlined,
-  CloudUploadOutlined,
-  CodeOutlined,
-  ItalicOutlined,
-  LinkOutlined,
-  UnorderedListOutlined,
-} from "@ant-design/icons";
-import { Input, InputNumber, Select } from "antd";
 import React from "react";
+import { Input, Select } from "antd";
+import MarkdownEditor from "../../../common/markdown-editor";
+import IntegerInput from "../../../ui/integer-input";
 import {
   TASK_FORM_PRIORITY_OPTIONS,
   TASK_FORM_STATUS_OPTIONS,
-  TASK_PROJECT_OPTIONS,
   type TaskFormValues,
 } from "../../../../data/workspace-task-form";
 import { cn } from "../../../../lib/utils";
+import TaskAttachmentsField from "./task-attachments-field";
 
 type TaskFormMainProps = {
   values: TaskFormValues;
   onChange: (values: TaskFormValues) => void;
-  projectOptions?: Array<{ value: string; label: string }>;
+  projectOptions: Array<{ value: string; label: string }>;
   disableProject?: boolean;
 };
 
 function TaskFormMain({
   values,
   onChange,
-  projectOptions = TASK_PROJECT_OPTIONS,
+  projectOptions,
   disableProject = false,
 }: TaskFormMainProps) {
   const updateValues = (patch: Partial<TaskFormValues>) => {
@@ -96,7 +90,7 @@ function TaskFormMain({
 
           <div>
             <label className="mb-2 block text-sm font-medium text-foreground">Estimated Hours</label>
-            <InputNumber
+            <IntegerInput
               min={0}
               max={999}
               value={values.estimatedHours ?? undefined}
@@ -111,41 +105,19 @@ function TaskFormMain({
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <label className="mb-2 block text-sm font-medium text-foreground">Task Description</label>
-
-        <div className="mb-3 flex flex-wrap items-center gap-1 rounded-xl border border-border bg-background/60 p-2">
-          {[BoldOutlined, ItalicOutlined, UnorderedListOutlined, LinkOutlined, CodeOutlined].map((Icon, index) => (
-            <button
-              key={index}
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-card hover:text-foreground"
-              aria-label="Formatting option"
-            >
-              <Icon />
-            </button>
-          ))}
-        </div>
-
-        <Input.TextArea
+        <MarkdownEditor
           value={values.description}
-          onChange={(event) => updateValues({ description: event.target.value })}
+          onChange={(description) => updateValues({ description })}
           placeholder="Add a detailed description..."
-          rows={8}
-          className="rounded-xl! border-border! bg-background! resize-none!"
         />
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <label className="mb-2 block text-sm font-medium text-foreground">Attachments</label>
-        <button
-          type="button"
-          className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/60 px-6 py-10 text-center transition-colors hover:border-primary/30 hover:bg-background"
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-feature-sync text-primary">
-            <CloudUploadOutlined className="text-xl" />
-          </div>
-          <p className="mt-3 text-sm font-medium text-foreground">Click to upload or drag and drop</p>
-          <p className="mt-1 text-xs text-muted">PNG, JPG, PDF up to 10MB</p>
-        </button>
+        <TaskAttachmentsField
+          attachments={values.attachments}
+          onChange={(attachments) => updateValues({ attachments })}
+        />
       </div>
     </div>
   );

@@ -55,6 +55,10 @@ export function getWorkspacePathLabel(path: string) {
     return "Edit Task";
   }
 
+  if (/^\/tasks\/[^/]+$/.test(path) && path !== WORKSPACE_ROUTES.TASK_CREATE) {
+    return "Task Details";
+  }
+
   return undefined;
 }
 

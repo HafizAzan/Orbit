@@ -1,4 +1,3 @@
-import { PlusOutlined } from "@ant-design/icons";
 import React from "react";
 import type { ProjectDetailMember } from "../../../data/workspace-project-detail";
 import { getInitial } from "../../../lib/helper";
@@ -11,16 +10,7 @@ type ProjectTeamCardProps = {
 function ProjectTeamCard({ members }: ProjectTeamCardProps) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-foreground">Team</h3>
-        <button
-          type="button"
-          aria-label="Add team member"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:bg-background hover:text-primary"
-        >
-          <PlusOutlined />
-        </button>
-      </div>
+      <h3 className="mb-5 text-lg font-semibold text-foreground">Team</h3>
 
       <ul className="space-y-4">
         {members.map((member) => (

@@ -1,8 +1,9 @@
-import { FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { FilterOutlined, MailOutlined, SearchOutlined, UserSwitchOutlined } from "@ant-design/icons";
 import { Input, Select } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createWorkspaceTeamTableColumns from "../../../columns/workspace-team-table-columns";
 import ChangeMemberRoleModal from "./change-member-role-modal";
+import { ConfirmModal } from "../../ui/modal";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import {
   useResendTeamInvite,
@@ -46,6 +47,10 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
   const [filters, setFilters] = useState<TeamTableFilters>(DEFAULT_TEAM_TABLE_FILTERS);
   const [page, setPage] = useState(1);
   const [roleChangeMember, setRoleChangeMember] = useState<TeamMember | null>(null);
+  const [statusChangeMember, setStatusChangeMember] = useState<TeamMember | null>(null);
+  const [resendInviteMember, setResendInviteMember] = useState<TeamMember | null>(null);
+  const [statusChangeLoading, setStatusChangeLoading] = useState(false);
+  const [resendInviteLoading, setResendInviteLoading] = useState(false);
 
   const activeFilterCount = countActiveTeamFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
@@ -78,33 +83,48 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
     setRoleChangeMember(record);
   }, []);
 
-  const handleResendInvite = useCallback(
-    async (record: TeamMember) => {
-      try {
-        const result = await resendInvite(record.id);
-        showApiSuccessToast(result.message);
-      } catch (error) {
-        showApiErrorToast(error);
-      }
-    },
-    [resendInvite],
-  );
+  const handleResendInvite = useCallback((record: TeamMember) => {
+    setResendInviteMember(record);
+  }, []);
 
-  const handleDeactivate = useCallback(
-    async (record: TeamMember) => {
-      const nextStatus = record.status === "deactivated" ? "active" : "deactivated";
+  const handleConfirmResendInvite = useCallback(async () => {
+    if (!resendInviteMember) return;
 
-      try {
-        await updateStatus({ memberId: record.id, data: { status: nextStatus } });
-        showApiSuccessToast(
-          `${record.name} ${nextStatus === "active" ? "reactivated" : "deactivated"} successfully.`,
-        );
-      } catch (error) {
-        showApiErrorToast(error);
-      }
-    },
-    [updateStatus],
-  );
+    setResendInviteLoading(true);
+
+    try {
+      const result = await resendInvite(resendInviteMember.id);
+      showApiSuccessToast(result.message);
+      setResendInviteMember(null);
+    } catch (error) {
+      showApiErrorToast(error);
+    } finally {
+      setResendInviteLoading(false);
+    }
+  }, [resendInvite, resendInviteMember]);
+
+  const handleDeactivate = useCallback((record: TeamMember) => {
+    setStatusChangeMember(record);
+  }, []);
+
+  const handleConfirmStatusChange = useCallback(async () => {
+    if (!statusChangeMember) return;
+
+    const nextStatus = statusChangeMember.status === "deactivated" ? "active" : "deactivated";
+    setStatusChangeLoading(true);
+
+    try {
+      await updateStatus({ memberId: statusChangeMember.id, data: { status: nextStatus } });
+      showApiSuccessToast(
+        `${statusChangeMember.name} ${nextStatus === "active" ? "reactivated" : "deactivated"} successfully.`,
+      );
+      setStatusChangeMember(null);
+    } catch (error) {
+      showApiErrorToast(error);
+    } finally {
+      setStatusChangeLoading(false);
+    }
+  }, [statusChangeMember, updateStatus]);
 
   const columns = useMemo(
     () =>
@@ -192,6 +212,52 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
       </div>
 
       <ChangeMemberRoleModal member={roleChangeMember} onClose={() => setRoleChangeMember(null)} />
+
+      <ConfirmModal
+        open={statusChangeMember !== null}
+        onClose={() => setStatusChangeMember(null)}
+        onConfirm={handleConfirmStatusChange}
+        title={statusChangeMember?.status === "deactivated" ? "Reactivate member" : "Deactivate member"}
+        description={
+          statusChangeMember ? (
+            <>
+              {statusChangeMember.status === "deactivated" ? (
+                <>
+                  Reactivate <span className="font-semibold text-foreground">{statusChangeMember.name}</span>? They will
+                  regain access to the workspace.
+                </>
+              ) : (
+                <>
+                  Deactivate <span className="font-semibold text-foreground">{statusChangeMember.name}</span>? They will
+                  lose workspace access until reactivated.
+                </>
+              )}
+            </>
+          ) : null
+        }
+        confirmText={statusChangeMember?.status === "deactivated" ? "Reactivate" : "Deactivate"}
+        confirmDanger={statusChangeMember?.status !== "deactivated"}
+        confirmLoading={statusChangeLoading}
+        icon={<UserSwitchOutlined />}
+      />
+
+      <ConfirmModal
+        open={resendInviteMember !== null}
+        onClose={() => setResendInviteMember(null)}
+        onConfirm={handleConfirmResendInvite}
+        title="Resend invite"
+        description={
+          resendInviteMember ? (
+            <>
+              Send a new invite email to{" "}
+              <span className="font-semibold text-foreground">{resendInviteMember.email}</span>?
+            </>
+          ) : null
+        }
+        confirmText="Resend invite"
+        confirmLoading={resendInviteLoading}
+        icon={<MailOutlined />}
+      />
     </>
   );
 }

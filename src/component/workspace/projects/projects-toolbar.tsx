@@ -10,7 +10,6 @@ import type { ProjectsViewMode } from "../../../data/workspace-projects";
 import {
   PROJECT_PRIORITY_FILTER_OPTIONS,
   PROJECT_STATUS_FILTER_OPTIONS,
-  PROJECT_TEAM_FILTER_OPTIONS,
 } from "../../../data/workspace-projects";
 import { cn } from "../../../lib/utils";
 
@@ -24,6 +23,7 @@ type ProjectsToolbarProps = {
   statusFilter: string;
   priorityFilter: string;
   teamFilter: string;
+  teamFilterOptions: Array<{ value: string; label: string }>;
   viewMode: ProjectsViewMode;
   totalProjects: number;
   selectedCount: number;
@@ -41,6 +41,7 @@ function ProjectsToolbar({
   statusFilter,
   priorityFilter,
   teamFilter,
+  teamFilterOptions,
   viewMode,
   totalProjects,
   selectedCount,
@@ -106,7 +107,7 @@ function ProjectsToolbar({
           value={teamFilter}
           onChange={onTeamChange}
           className={cn("min-w-[170px]", TOOLBAR_SELECT_CLASS)}
-          options={PROJECT_TEAM_FILTER_OPTIONS.map((option) => ({
+          options={teamFilterOptions.map((option) => ({
             value: option.value,
             label: `Team: ${option.label}`,
           }))}

@@ -4,36 +4,48 @@ import ProjectActivityFeed from "../../component/workspace/projects/project-acti
 import ProjectAttachmentsCard from "../../component/workspace/projects/project-attachments-card";
 import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
 import ProjectDiscussionCard from "../../component/workspace/projects/project-discussion-card";
-import ProjectNetworkPulseCard from "../../component/workspace/projects/project-network-pulse-card";
 import ProjectPhaseProgressCard from "../../component/workspace/projects/project-phase-progress-card";
 import ProjectTeamCard from "../../component/workspace/projects/project-team-card";
+import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import { AdminListPageSkeleton } from "../../component/skeletons";
 import { useProject } from "../../hooks/use-workspace-projects";
+import { useTasks } from "../../hooks/use-workspace-tasks";
 import { useAppContext } from "../../context/app-context";
 import type { WorkspaceProjectDetail } from "../../data/workspace-project-detail";
 import type { ApiWorkspaceProject } from "../../types/project.types";
 import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
+import { getWorkspaceHomePath } from "../../lib/workspace-routing";
+import {
+  computeRemainingDays,
+  formatProjectEstimatedHours,
+  mapProjectTasksToActivities,
+  mapProjectTasksToAttachments,
+  resolveProjectPhaseLabel,
+} from "../../lib/project-detail-utils";
 
-function mapProjectToDetail(apiProject: ApiWorkspaceProject): WorkspaceProjectDetail {
+function mapProjectToDetail(
+  apiProject: ApiWorkspaceProject,
+  projectTasks: import("../../types/task.types").ApiWorkspaceTask[],
+): WorkspaceProjectDetail {
   const project = mapApiProjectToWorkspaceProject(apiProject);
 
   return {
     ...project,
     projectCode: apiProject.key,
-    phaseLabel: project.status === "on_track" ? "Execution Phase" : "Planning Phase",
-    tasksCompleted: 0,
+    phaseLabel: resolveProjectPhaseLabel(project.status),
+    tasksCompleted: apiProject.completedTaskCount,
     tasksTotal: project.taskCount,
-    timeSpent: "0h",
-    remainingDays: 0,
+    timeSpent: formatProjectEstimatedHours(apiProject.totalEstimatedHours),
+    remainingDays: computeRemainingDays(apiProject.dueDate),
     teamMembers: apiProject.members.map((member) => ({
       id: member.id,
       name: member.name,
       role: member.projectRole ?? "member",
       avatarColor: member.avatarColor,
     })),
-    activities: [],
-    attachments: [],
+    activities: mapProjectTasksToActivities(projectTasks),
+    attachments: mapProjectTasksToAttachments(projectTasks),
     discussion: [],
   };
 }
@@ -41,51 +53,54 @@ function mapProjectToDetail(apiProject: ApiWorkspaceProject): WorkspaceProjectDe
 function WorkspaceProjectDetail() {
   const { projectId = "" } = useParams();
   const app = useAppContext();
-  const { data: apiProject, isLoading, isError } = useProject(projectId);
+  const projectQuery = useProject(projectId);
+  const tasksQuery = useTasks();
+  const { data: apiProject } = projectQuery;
 
-  const project = useMemo(
-    () => (apiProject ? mapProjectToDetail(apiProject) : null),
-    [apiProject],
+  const projectTasks = useMemo(
+    () => (tasksQuery.data ?? []).filter((task) => task.projectId === projectId),
+    [projectId, tasksQuery.data],
   );
 
-  if (isLoading) {
-    return <AdminListPageSkeleton tableColumns={3} />;
-  }
-
-  if (isError || !project) {
-    return (
-      <WorkspaceNotFound
-        title={isError ? "Unable to load project" : "Project not found"}
-        description={
-          isError
-            ? "We could not load this project. The server may be unavailable or this project may no longer exist."
-            : "This project does not exist or you do not have access to it."
-        }
-      />
-    );
-  }
+  const project = useMemo(
+    () => (apiProject ? mapProjectToDetail(apiProject, projectTasks) : null),
+    [apiProject, projectTasks],
+  );
 
   return (
-    <div className="mx-auto max-w-8xl">
-      <ProjectDetailHeader
-        project={project}
-        canDelete={apiProject!.viewerRole === "admin" || apiProject!.createdById === app?.user?.id}
-      />
+    <QueryPageGuard
+      query={projectQuery}
+      loading={<AdminListPageSkeleton tableColumns={3} />}
+      errorTitle="Unable to load project"
+      homePath={getWorkspaceHomePath(app?.user?.role)}
+    >
+      {!project ? (
+        <WorkspaceNotFound
+          title="Project not found"
+          description="This project does not exist or you do not have access to it."
+        />
+      ) : (
+        <div className="mx-auto max-w-8xl">
+          <ProjectDetailHeader
+            project={project}
+            canDelete={apiProject!.viewerRole === "admin" || apiProject!.createdById === app?.user?.id}
+          />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="space-y-6 xl:col-span-2">
-          <ProjectPhaseProgressCard project={project} />
-          <ProjectActivityFeed items={project.activities} />
-          <ProjectNetworkPulseCard />
-        </div>
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <div className="space-y-6 xl:col-span-2">
+              <ProjectPhaseProgressCard project={project} />
+              <ProjectActivityFeed items={project.activities} />
+            </div>
 
-        <div className="space-y-6">
-          <ProjectTeamCard members={project.teamMembers} />
-          <ProjectAttachmentsCard items={project.attachments} />
-          <ProjectDiscussionCard messages={project.discussion} />
+            <div className="space-y-6">
+              <ProjectTeamCard members={project.teamMembers} />
+              <ProjectAttachmentsCard items={project.attachments} />
+              <ProjectDiscussionCard messages={project.discussion} />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </QueryPageGuard>
   );
 }
 

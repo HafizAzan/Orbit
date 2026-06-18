@@ -64,88 +64,6 @@ export const PROJECT_ICON_MAP: Record<
   migration: ThunderboltOutlined,
 };
 
-export const WORKSPACE_PROJECTS: WorkspaceProject[] = [
-  {
-    id: "1",
-    title: "Nova UI System",
-    description: "Complete overhaul of the design system and component library for enterprise scale.",
-    status: "on_track",
-    priority: "high",
-    teamId: "design",
-    progress: 65,
-    dueDate: "2024-10-24",
-    taskCount: 24,
-    commentCount: 12,
-    icon: "design",
-    iconBg: "bg-indigo-50",
-    iconColor: "text-indigo-600",
-    members: [
-      { id: "1", name: "Sarah Jenkins", avatarColor: "bg-indigo-100 text-indigo-700" },
-      { id: "2", name: "Marcus Thorne", avatarColor: "bg-sky-100 text-sky-700" },
-      { id: "3", name: "Elena Rodriguez", avatarColor: "bg-violet-100 text-violet-700" },
-    ],
-  },
-  {
-    id: "2",
-    title: "Mars Landing App",
-    description: "Mobile application for the upcoming Mars mission simulation and telemetry tracking.",
-    status: "in_progress",
-    priority: "high",
-    teamId: "mobile",
-    progress: 42,
-    dueDate: "2024-11-15",
-    taskCount: 18,
-    commentCount: 8,
-    icon: "mobile",
-    iconBg: "bg-sky-50",
-    iconColor: "text-sky-600",
-    members: [
-      { id: "4", name: "James Wu", avatarColor: "bg-emerald-100 text-emerald-700" },
-      { id: "5", name: "Aisha Khan", avatarColor: "bg-amber-100 text-amber-700" },
-    ],
-  },
-  {
-    id: "3",
-    title: "Security Audit 2024",
-    description: "Annual security compliance review and penetration testing for all cloud infrastructure.",
-    status: "delayed",
-    priority: "medium",
-    teamId: "security",
-    progress: 28,
-    dueDate: "2024-09-30",
-    taskCount: 32,
-    commentCount: 15,
-    icon: "security",
-    iconBg: "bg-red-50",
-    iconColor: "text-red-600",
-    members: [
-      { id: "6", name: "David Chen", avatarColor: "bg-red-100 text-red-700" },
-      { id: "7", name: "Priya Patel", avatarColor: "bg-orange-100 text-orange-700" },
-      { id: "8", name: "Tom Baker", avatarColor: "bg-slate-100 text-slate-700" },
-      { id: "9", name: "Lisa Park", avatarColor: "bg-pink-100 text-pink-700" },
-    ],
-  },
-  {
-    id: "4",
-    title: "Legacy Migration",
-    description: "Migrating on-premise legacy databases to the new cloud-native architecture.",
-    status: "on_track",
-    priority: "low",
-    teamId: "platform",
-    progress: 88,
-    dueDate: "2024-12-01",
-    taskCount: 45,
-    commentCount: 6,
-    icon: "migration",
-    iconBg: "bg-violet-50",
-    iconColor: "text-violet-600",
-    members: [
-      { id: "10", name: "Chris Lee", avatarColor: "bg-violet-100 text-violet-700" },
-      { id: "11", name: "Nina Ortiz", avatarColor: "bg-indigo-100 text-indigo-700" },
-    ],
-  },
-];
-
 export const PROJECT_STATUS_FILTER_OPTIONS = [
   { value: "all", label: "All Projects" },
   { value: "on_track", label: "On Track" },
@@ -160,10 +78,14 @@ export const PROJECT_PRIORITY_FILTER_OPTIONS = [
   { value: "low", label: "Low" },
 ] as const;
 
-export const PROJECT_TEAM_FILTER_OPTIONS = [
-  { value: "all", label: "All Teams" },
-  { value: "design", label: "Design" },
-  { value: "mobile", label: "Mobile" },
-  { value: "security", label: "Security" },
-  { value: "platform", label: "Platform" },
-] as const;
+export function buildProjectTeamFilterOptions(teamIds: string[]) {
+  const uniqueTeamIds = [...new Set(teamIds.filter(Boolean))].sort();
+
+  return [
+    { value: "all", label: "All Teams" },
+    ...uniqueTeamIds.map((teamId) => ({
+      value: teamId,
+      label: teamId.charAt(0).toUpperCase() + teamId.slice(1),
+    })),
+  ];
+}

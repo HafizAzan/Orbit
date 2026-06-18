@@ -1,6 +1,6 @@
-import { FileSearchOutlined } from "@ant-design/icons";
 import React from "react";
 import { Link } from "react-router-dom";
+import { FileSearchOutlined } from "@ant-design/icons";
 import { Paragraph, Title } from "../component/ui/typography";
 import { UN_AUTH_ROUTES } from "../router/public-routes";
 

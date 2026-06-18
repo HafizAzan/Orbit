@@ -6,6 +6,7 @@ import { getTaskCreatePath } from "../../../data/workspace-task-form";
 import { TASK_PRIORITY_CONFIG } from "../../../data/workspace-tasks";
 import { formatDate } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
+import MarkdownContent from "../../common/markdown-content";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import MyTasksSectionHeader from "./my-tasks-section-header";
 
@@ -46,7 +47,7 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
               <h3 className="mt-3 text-lg font-semibold text-foreground">{task.title}</h3>
 
               {task.description ? (
-                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">{task.description}</p>
+                <MarkdownContent content={task.description} className="mt-2" lineClamp={2} interactive={false} />
               ) : null}
 
               <div className="mt-5 flex items-center justify-between gap-3">

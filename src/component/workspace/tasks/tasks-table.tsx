@@ -1,23 +1,22 @@
 import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import { Input, Select } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import createWorkspaceTaskTableColumns from "../../../columns/workspace-task-table-columns";
-import { getTaskEditPath } from "../../../data/workspace-task-form";
+import { getTaskDetailPath, getTaskEditPath } from "../../../data/workspace-task-form";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
 import { toast } from "../../../lib/toast";
+import { ConfirmModal } from "../../ui/modal";
 import {
   DEFAULT_TASK_TABLE_FILTERS,
-  TASK_ASSIGNEE_FILTER_OPTIONS,
   TASK_DUE_DATE_FILTER_OPTIONS,
   TASK_PRIORITY_CONFIG,
   TASK_PRIORITY_FILTER_OPTIONS,
-  TASK_PROJECT_FILTER_OPTIONS,
   TASK_STATUS_CONFIG,
   TASK_STATUS_FILTER_OPTIONS,
-  WORKSPACE_TASKS,
   WORKSPACE_TASKS_PAGE_SIZE,
   type TaskTableFilters,
   type WorkspaceTask,
@@ -73,12 +72,13 @@ function matchesTaskFilters(task: WorkspaceTask, filters: TaskTableFilters) {
 }
 
 type TasksTableProps = {
-  data?: WorkspaceTask[];
+  data: WorkspaceTask[];
   emptyAction?: React.ReactNode;
   onBulkDelete?: (taskIds: string[]) => Promise<void>;
+  onDeleteTask?: (taskId: string) => Promise<void>;
 };
 
-function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: TasksTableProps) {
+function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask }: TasksTableProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { can } = useWorkspacePermissions();
@@ -89,6 +89,8 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: Tasks
   const [filters, setFilters] = useState<TaskTableFilters>(DEFAULT_TASK_TABLE_FILTERS);
   const [page, setPage] = useState(1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [pendingDeleteTask, setPendingDeleteTask] = useState<WorkspaceTask | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     setTasks(data);
@@ -116,6 +118,13 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: Tasks
 
   const selectedCount = selectedRowKeys.length;
 
+  const handleView = useCallback(
+    (record: WorkspaceTask) => {
+      navigate(getTaskDetailPath(record.id), createWorkspaceNavState(location.pathname));
+    },
+    [location.pathname, navigate],
+  );
+
   const handleEdit = useCallback(
     (record: WorkspaceTask) => {
       navigate(getTaskEditPath(record.id), createWorkspaceNavState(location.pathname));
@@ -123,14 +132,40 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: Tasks
     [location.pathname, navigate],
   );
 
+  const handleDelete = useCallback((record: WorkspaceTask) => {
+    setPendingDeleteTask(record);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!pendingDeleteTask) return;
+
+    setDeleteLoading(true);
+
+    try {
+      if (onDeleteTask) {
+        await onDeleteTask(pendingDeleteTask.id);
+      } else {
+        setTasks((current) => current.filter((task) => task.id !== pendingDeleteTask.id));
+        toast.success(`Task ${pendingDeleteTask.taskCode} deleted successfully`);
+      }
+
+      setSelectedRowKeys((current) => current.filter((key) => key !== pendingDeleteTask.id));
+      setPendingDeleteTask(null);
+    } finally {
+      setDeleteLoading(false);
+    }
+  }, [onDeleteTask, pendingDeleteTask]);
+
   const columns = useMemo(
     () =>
       createWorkspaceTaskTableColumns({
+        onView: handleView,
         onEdit: canEditTask ? handleEdit : undefined,
+        onDelete: canDeleteAnyTask ? handleDelete : undefined,
         canEdit: canEditTask,
         canDelete: canDeleteAnyTask,
       }),
-    [canDeleteAnyTask, canEditTask, handleEdit],
+    [canDeleteAnyTask, canEditTask, handleDelete, handleEdit, handleView],
   );
   const activeFilterCount = countActiveTaskFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
@@ -282,12 +317,12 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: Tasks
             ) : null}
             {filters.assignee !== "all" ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-feature-sync px-3 py-1 text-xs font-medium text-primary">
-                Assignee: {TASK_ASSIGNEE_FILTER_OPTIONS.find((option) => option.value === filters.assignee)?.label}
+                Assignee: {assigneeFilterOptions.find((option) => option.value === filters.assignee)?.label}
               </span>
             ) : null}
             {filters.project !== "all" ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-feature-sync px-3 py-1 text-xs font-medium text-primary">
-                Project: {TASK_PROJECT_FILTER_OPTIONS.find((option) => option.value === filters.project)?.label}
+                Project: {projectFilterOptions.find((option) => option.value === filters.project)?.label}
               </span>
             ) : null}
           </div>
@@ -328,6 +363,26 @@ function TasksTable({ data = WORKSPACE_TASKS, emptyAction, onBulkDelete }: Tasks
           onChange={setPage}
         />
       ) : null}
+
+      <ConfirmModal
+        open={pendingDeleteTask !== null}
+        onClose={() => setPendingDeleteTask(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete task"
+        description={
+          pendingDeleteTask ? (
+            <>
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-foreground">{pendingDeleteTask.taskCode}</span> —{" "}
+              {pendingDeleteTask.title}? This action cannot be undone.
+            </>
+          ) : null
+        }
+        confirmText="Delete task"
+        confirmDanger
+        confirmLoading={deleteLoading}
+        icon={<DeleteOutlined />}
+      />
     </div>
   );
 }

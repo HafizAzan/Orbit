@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PricingCard from "../common/pricing-card";
 import AnimateOnScroll from "../common/animate-on-scroll";
+import QueryErrorState from "../common/query-error-state";
 import { PricingCardsGridSkeleton } from "../skeletons";
 import { Paragraph } from "../ui/typography";
 import { useBillingCatalog, useCreateCheckout, useSelectPlan } from "../../hooks/use-billing";
@@ -24,7 +25,8 @@ function PlanCatalogGrid({
   onContact,
   onRequireAuth,
 }: PlanCatalogGridProps) {
-  const { data, isLoading, isError } = useBillingCatalog();
+  const catalogQuery = useBillingCatalog();
+  const { data, isPending, isError, error, refetch, isFetching } = catalogQuery;
   const { mutateAsync: startCheckout } = useCreateCheckout();
   const { mutateAsync: activatePlan } = useSelectPlan();
   const app = useAppContext();
@@ -71,11 +73,24 @@ function PlanCatalogGrid({
     }
   };
 
-  if (isLoading) {
+  if (isPending) {
     return <PricingCardsGridSkeleton count={3} />;
   }
 
-  if (isError || plans.length === 0) {
+  if (isError) {
+    return (
+      <QueryErrorState
+        error={error}
+        title="Unable to load pricing plans"
+        onRetry={() => {
+          void refetch();
+        }}
+        isRetrying={isFetching}
+      />
+    );
+  }
+
+  if (plans.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
         <Paragraph color="muted">
