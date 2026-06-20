@@ -65,7 +65,10 @@ export type BillingInvoice = {
 };
 
 export type BillingInvoicesResponse = {
-  invoices: BillingInvoice[];
+  data: BillingInvoice[];
+  page: number;
+  limit: number;
+  total: number;
 };
 
 export type CreateCheckoutRequest = {

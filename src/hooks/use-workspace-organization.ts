@@ -35,7 +35,7 @@ export function useUpdateWorkspaceOrganization() {
 export function useOrganizationMembers() {
   return useQuery({
     queryKey: WORKSPACE_ORGANIZATION_MEMBERS_QUERY_KEY,
-    queryFn: getOrganizationMembers,
+    queryFn: () => getOrganizationMembers(),
   });
 }
 

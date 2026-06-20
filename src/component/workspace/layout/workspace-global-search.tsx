@@ -3,7 +3,7 @@ import { AutoComplete, Input } from "antd";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../context/app-context";
-import { useProjects } from "../../../hooks/use-workspace-projects";
+import { useProjectsForSelect } from "../../../hooks/use-workspace-projects";
 import { useTeamMembers } from "../../../hooks/use-workspace-team";
 import { useMyTasks, useTasks } from "../../../hooks/use-workspace-tasks";
 import {
@@ -19,7 +19,7 @@ function WorkspaceGlobalSearch() {
   const app = useAppContext();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const { data: projects = [] } = useProjects();
+  const { data: projects = [] } = useProjectsForSelect();
   const { data: allTasks = [] } = useTasks();
   const { data: myTasks = [] } = useMyTasks();
   const { data: teamMembers = [] } = useTeamMembers();

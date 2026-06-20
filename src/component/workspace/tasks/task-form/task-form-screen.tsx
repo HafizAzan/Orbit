@@ -7,10 +7,13 @@ import {
 } from "../../../../lib/workspace-routing";
 import { useWorkspaceReturnTo } from "../../../../lib/workspace-navigation";
 import useWorkspacePermissions from "../../../../hooks/use-workspace-permissions";
-import { useAssignableProjectMembers } from "../../../../hooks/use-workspace-projects";
-import { useProjects } from "../../../../hooks/use-workspace-projects";
+import { useProject, useProjectsForSelect } from "../../../../hooks/use-workspace-projects";
 import { getTask } from "../../../../api-services/task.service";
-import { useCreateTask, useUpdateTask, workspaceTaskQueryKey } from "../../../../hooks/use-workspace-tasks";
+import {
+  useCreateTask,
+  useUpdateTask,
+  workspaceTaskQueryKey,
+} from "../../../../hooks/use-workspace-tasks";
 import { useQueryClient } from "@tanstack/react-query";
 import { mapApiTaskToFormValues } from "../../../../types/task.types";
 import {
@@ -43,16 +46,18 @@ function TaskFormScreen({
   const queryClient = useQueryClient();
   const app = useAppContext();
   const { role } = useWorkspacePermissions();
-  const { data: projects = [] } = useProjects();
-  const { data: assignableMembers = [] } = useAssignableProjectMembers();
-  const { mutateAsync: createTask } = useCreateTask();
-  const { mutateAsync: updateTask } = useUpdateTask();
   const taskHubPath = getWorkspaceTaskHubPath(role);
   const taskHubLabel = role === "member" ? "My Tasks" : "Tasks";
+  const { data: projects = [] } = useProjectsForSelect();
   const { returnPath, returnLabel } = useWorkspaceReturnTo(taskHubPath, taskHubLabel);
   const [values, setValues] = useState<TaskFormValues>(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initialAttachmentsRef = useRef(initialValues.attachments);
+  const { data: selectedProject, isLoading: isProjectMembersLoading } = useProject(
+    values.projectId || null,
+  );
+  const { mutateAsync: createTask } = useCreateTask();
+  const { mutateAsync: updateTask } = useUpdateTask();
 
   const isEdit = mode === "edit";
   const reporterName = app?.user?.name?.trim() || "You";
@@ -63,20 +68,20 @@ function TaskFormScreen({
     [projects],
   );
 
-  const assigneeOptions = useMemo<TaskAssigneeOption[]>(
-    () =>
-      assignableMembers.map((member) => ({
-        id: member.id,
-        name: member.name,
-        initials: member.name
-          .split(" ")
-          .map((part) => part.charAt(0))
-          .join("")
-          .slice(0, 2)
-          .toUpperCase(),
-      })),
-    [assignableMembers],
-  );
+  const assigneeOptions = useMemo<TaskAssigneeOption[]>(() => {
+    const members = selectedProject?.members ?? [];
+
+    return members.map((member) => ({
+      id: member.id,
+      name: member.name,
+      initials: member.name
+        .split(" ")
+        .map((part) => part.charAt(0))
+        .join("")
+        .slice(0, 2)
+        .toUpperCase(),
+    }));
+  }, [selectedProject?.members]);
 
   const projectLabel = useMemo(() => {
     return (
@@ -97,6 +102,15 @@ function TaskFormScreen({
     if (isEdit || values.projectId || projectOptions.length === 0) return;
     setValues((current) => ({ ...current, projectId: projectOptions[0].value }));
   }, [isEdit, projectOptions, values.projectId]);
+
+  useEffect(() => {
+    if (!values.assigneeId) return;
+
+    const isValidAssignee = assigneeOptions.some((option) => option.id === values.assigneeId);
+    if (!isValidAssignee) {
+      setValues((current) => ({ ...current, assigneeId: "" }));
+    }
+  }, [assigneeOptions, values.assigneeId]);
 
   const breadcrumbs = useMemo(
     () => [
@@ -280,6 +294,8 @@ function TaskFormScreen({
           reporterName={reporterName}
           onChange={setValues}
           assigneeOptions={assigneeOptions}
+          assigneeLoading={isProjectMembersLoading}
+          hasSelectedProject={Boolean(values.projectId)}
         />
       </div>
 

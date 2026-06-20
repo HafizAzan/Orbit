@@ -4,11 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../../context/app-context";
 import { DEFAULT_PROJECT_FORM_VALUES, type ProjectFormValues } from "../../../../data/workspace-project-form";
 import { getProjectDetailPath } from "../../../../data/workspace-project-detail";
-import {
-  useCreateProject,
-  useDeleteProject,
-  useUpdateProject,
-} from "../../../../hooks/use-workspace-projects";
+import { useAssignableProjectMembers, useCreateProject, useDeleteProject, useUpdateProject } from "../../../../hooks/use-workspace-projects";
 import useWorkspacePermissions from "../../../../hooks/use-workspace-permissions";
 import { showApiErrorToast, showApiSuccessToast } from "../../../../lib/api-error";
 import { useWorkspaceReturnTo } from "../../../../lib/workspace-navigation";
@@ -28,25 +24,27 @@ type ProjectFormScreenProps = {
   canDelete?: boolean;
 };
 
-function ProjectFormScreen({
-  mode,
-  projectId,
-  initialValues = DEFAULT_PROJECT_FORM_VALUES,
-  canDelete = false,
-}: ProjectFormScreenProps) {
+function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FORM_VALUES, canDelete = false }: ProjectFormScreenProps) {
   const navigate = useNavigate();
   const app = useAppContext();
   const { can } = useWorkspacePermissions();
   const { mutateAsync: createProject } = useCreateProject();
   const { mutateAsync: updateProject } = useUpdateProject();
   const { mutateAsync: deleteProject } = useDeleteProject();
+  const { data: assignableMembers = [] } = useAssignableProjectMembers();
   const { returnPath, returnLabel } = useWorkspaceReturnTo(WORKSPACE_ROUTES.PROJECTS, "Projects");
   const [values, setValues] = useState<ProjectFormValues>(initialValues);
   const [isKeyManual, setIsKeyManual] = useState(mode === "edit");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEdit = mode === "edit";
-  const leadName = app?.user?.name?.trim() || "You";
+  const userId = app?.user?.id;
+  const userName = app?.user?.name?.trim() || "You";
+  const userRole = app?.user?.role;
+  const canAssignLead = userRole === "owner" || userRole === "admin";
+  const requiresDeliveryLead = userRole === "owner";
+  const resolvedLeadName =
+    assignableMembers?.find((member) => member.id === values.leadUserId)?.name ?? (canAssignLead ? "Select delivery lead" : userName);
   const pageTitle = isEdit ? "Edit Project" : "Create New Project";
   const submitLabel = isEdit ? "Save Changes" : "Create Project";
   const showDelete = isEdit && (can("project.delete") || canDelete);
@@ -56,6 +54,14 @@ function ProjectFormScreen({
     setIsKeyManual(mode === "edit");
   }, [initialValues, mode]);
 
+  useEffect(() => {
+    if (isEdit || !userId || !userRole) return;
+
+    if (userRole === "admin" && !values.leadUserId) {
+      setValues((current) => ({ ...current, leadUserId: userId }));
+    }
+  }, [isEdit, userId, userRole, values.leadUserId]);
+
   const handleSubmit = useCallback(async () => {
     if (!values.name.trim()) {
       toast.error("Project name is required");
@@ -64,6 +70,11 @@ function ProjectFormScreen({
 
     if (!values.key.trim()) {
       toast.error("Project key is required");
+      return;
+    }
+
+    if (requiresDeliveryLead && !values.leadUserId) {
+      toast.error("Select a delivery lead (manager) for this project");
       return;
     }
 
@@ -87,7 +98,7 @@ function ProjectFormScreen({
     } finally {
       setIsSubmitting(false);
     }
-  }, [createProject, isEdit, navigate, projectId, updateProject, values]);
+  }, [createProject, isEdit, navigate, projectId, requiresDeliveryLead, updateProject, values]);
 
   const handleDeleteProject = useCallback(async () => {
     if (!projectId) return;
@@ -135,14 +146,27 @@ function ProjectFormScreen({
         </Title>
         <Paragraph size="sm" className="mt-1 text-muted">
           {isEdit
-            ? "Update your project details, timeline, and squad assignments."
-            : "Create a project for your squad. Managers only see projects they belong to."}
+            ? "Update project details, delivery lead, timeline, and execution squad."
+            : userRole === "owner"
+              ? "Set up a new client or initiative and assign a manager to run delivery."
+              : userRole === "manager"
+                ? "Create a project for your execution team and start assigning work."
+                : "Create a project and assign the team who will deliver it."}
         </Paragraph>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div>
-          <ProjectFormFields values={values} isKeyManual={isKeyManual} onChange={setValues} onKeyManualChange={setIsKeyManual} />
+          <ProjectFormFields
+            values={values}
+            isKeyManual={isKeyManual}
+            onChange={setValues}
+            onKeyManualChange={setIsKeyManual}
+            canAssignLead={canAssignLead}
+            requiresDeliveryLead={requiresDeliveryLead}
+            currentUserId={userId}
+            currentUserName={userName}
+          />
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {showDelete && projectId ? (
@@ -182,7 +206,7 @@ function ProjectFormScreen({
           </div>
         </div>
 
-        <ProjectFormPreview values={values} leadName={leadName} />
+        <ProjectFormPreview values={values} leadName={resolvedLeadName} />
       </div>
     </div>
   );

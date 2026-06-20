@@ -10,12 +10,19 @@ import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import { AdminListPageSkeleton } from "../../component/skeletons";
 import { useProject } from "../../hooks/use-workspace-projects";
+import {
+  useCreateProjectComment,
+  useDeleteProjectComment,
+  useProjectComments,
+} from "../../hooks/use-project-comments";
 import { useTasks } from "../../hooks/use-workspace-tasks";
 import { useAppContext } from "../../context/app-context";
 import type { WorkspaceProjectDetail } from "../../data/workspace-project-detail";
 import type { ApiWorkspaceProject } from "../../types/project.types";
 import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
+import { mapApiProjectCommentToMessage } from "../../types/project-comment.types";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
+import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import {
   computeRemainingDays,
   formatProjectEstimatedHours,
@@ -54,7 +61,10 @@ function WorkspaceProjectDetail() {
   const { projectId = "" } = useParams();
   const app = useAppContext();
   const projectQuery = useProject(projectId);
+  const commentsQuery = useProjectComments(projectId);
   const tasksQuery = useTasks();
+  const { mutateAsync: createComment, isPending: isCreatingComment } = useCreateProjectComment(projectId);
+  const { mutateAsync: deleteComment } = useDeleteProjectComment(projectId);
   const { data: apiProject } = projectQuery;
 
   const projectTasks = useMemo(
@@ -66,6 +76,29 @@ function WorkspaceProjectDetail() {
     () => (apiProject ? mapProjectToDetail(apiProject, projectTasks) : null),
     [apiProject, projectTasks],
   );
+
+  const discussionMessages = useMemo(
+    () => (commentsQuery.data ?? []).map(mapApiProjectCommentToMessage),
+    [commentsQuery.data],
+  );
+
+  const handleSubmitComment = async (message: string) => {
+    try {
+      await createComment({ body: message });
+      showApiSuccessToast("Comment posted.");
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment(commentId);
+      showApiSuccessToast("Comment deleted.");
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  };
 
   return (
     <QueryPageGuard
@@ -95,7 +128,14 @@ function WorkspaceProjectDetail() {
             <div className="space-y-6">
               <ProjectTeamCard members={project.teamMembers} />
               <ProjectAttachmentsCard items={project.attachments} />
-              <ProjectDiscussionCard messages={project.discussion} />
+              <ProjectDiscussionCard
+                messages={discussionMessages}
+                currentUserId={app?.user?.id}
+                loading={commentsQuery.isLoading}
+                submitting={isCreatingComment}
+                onSubmit={handleSubmitComment}
+                onDelete={handleDeleteComment}
+              />
             </div>
           </div>
         </div>

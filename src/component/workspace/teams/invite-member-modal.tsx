@@ -9,16 +9,16 @@ import { Button, Checkbox, Form, Input, Select } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   findTeamMemberByEmail,
+  getDuplicateInviteMessage,
   TEAM_DEPARTMENT_OPTIONS,
   TEAM_INVITE_ROLE_OPTIONS,
   TEAM_ROLE_PERMISSIONS,
   type TeamInvitePayload,
   type TeamInviteRole,
-  type TeamMember,
   type TeamMemberDepartment,
 } from "../../../data/workspace-teams";
-import { useInviteTeamMember, useTeamStats } from "../../../hooks/use-workspace-team";
-import { mapTeamInvitePayloadToRequest } from "../../../types/team.types";
+import { useInviteTeamMember, useTeamMembers, useTeamStats } from "../../../hooks/use-workspace-team";
+import { mapApiTeamMemberToTeamMember, mapTeamInvitePayloadToRequest } from "../../../types/team.types";
 import { normalizeEmail } from "../../../lib/helper";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
@@ -28,7 +28,6 @@ import { Label, Paragraph, Text, Title } from "../../ui/typography";
 type InviteMemberModalProps = {
   open: boolean;
   onClose: () => void;
-  members?: TeamMember[];
 };
 
 type InviteMemberFormValues = {
@@ -132,13 +131,19 @@ function InviteSuccessContent({ email, role }: { email: string; role: TeamInvite
   );
 }
 
-function InviteMemberModal({ open, onClose, members = [] }: InviteMemberModalProps) {
+function InviteMemberModal({ open, onClose }: InviteMemberModalProps) {
   const [form] = Form.useForm<InviteMemberFormValues>();
   const { data: stats } = useTeamStats();
+  const { data: apiMembers = [] } = useTeamMembers();
   const { mutateAsync: inviteMember, isPending } = useInviteTeamMember();
   const [step, setStep] = useState<InviteModalStep>("form");
   const [invitedEmail, setInvitedEmail] = useState("");
   const [invitedRole, setInvitedRole] = useState<TeamInviteRole>(DEFAULT_FORM_VALUES.role);
+
+  const members = useMemo(
+    () => apiMembers.map(mapApiTeamMemberToTeamMember),
+    [apiMembers],
+  );
 
   const selectedRole = Form.useWatch("role", form) ?? DEFAULT_FORM_VALUES.role;
   const permissions = TEAM_ROLE_PERMISSIONS[selectedRole];
@@ -146,11 +151,6 @@ function InviteMemberModal({ open, onClose, members = [] }: InviteMemberModalPro
   const totalSeats = stats?.totalSeats ?? { used: 0, total: 0 };
   const remainingSeats = totalSeats.total - totalSeats.used;
   const seatsAvailable = remainingSeats > 0;
-
-  const memberEmails = useMemo(
-    () => new Set(members.map((member) => normalizeEmail(member.email))),
-    [members],
-  );
 
   useEffect(() => {
     if (!open) {
@@ -169,17 +169,7 @@ function InviteMemberModal({ open, onClose, members = [] }: InviteMemberModalPro
 
     if (!existing) return;
 
-    if (existing.status === "invited") {
-      throw new Error("This email already has a pending invitation.");
-    }
-
-    if (existing.status === "active") {
-      throw new Error("This person is already an active team member.");
-    }
-
-    if (existing.status === "deactivated") {
-      throw new Error("This member is deactivated. Reactivate them from the members table instead.");
-    }
+    throw new Error(getDuplicateInviteMessage(existing));
   };
 
   const resetToForm = () => {
@@ -196,7 +186,10 @@ function InviteMemberModal({ open, onClose, members = [] }: InviteMemberModalPro
     }
 
     const normalizedEmail = normalizeEmail(values.email);
-    if (memberEmails.has(normalizedEmail)) {
+    const existingMember = findTeamMemberByEmail(normalizedEmail, members);
+
+    if (existingMember) {
+      showApiErrorToast(new Error(getDuplicateInviteMessage(existingMember)));
       return;
     }
 
@@ -303,6 +296,7 @@ function InviteMemberModal({ open, onClose, members = [] }: InviteMemberModalPro
                       { type: "email", message: "Please enter a valid email address" },
                       { validator: validateEmailAvailability },
                     ]}
+                    validateTrigger={["onBlur", "onChange"]}
                   >
                     <Input
                       size="large"

@@ -1,33 +1,50 @@
 import React, { useCallback, useMemo, useState } from "react";
 import CalendarDayView from "../../component/workspace/calendar/calendar-day-view";
+import CalendarEventModal, {
+  type CalendarEventFormValues,
+} from "../../component/workspace/calendar/calendar-event-modal";
 import CalendarMonthGrid from "../../component/workspace/calendar/calendar-month-grid";
 import CalendarPageHeader from "../../component/workspace/calendar/calendar-page-header";
 import CalendarSidebar from "../../component/workspace/calendar/calendar-sidebar";
 import CalendarWeekView from "../../component/workspace/calendar/calendar-week-view";
+import QueryPageGuard from "../../component/common/query-page-guard";
+import { AdminListPageSkeleton } from "../../component/skeletons";
 import {
-  CALENDAR_EVENTS,
   DEFAULT_CALENDAR_FILTERS,
   type CalendarFilters,
   type CalendarViewMode,
 } from "../../data/workspace-calendar";
 import {
+  useCalendarEvents,
+  useCalendarProjects,
+  useCreateCalendarEvent,
+} from "../../hooks/use-workspace-calendar";
+import {
   countEventsInMonth,
   filterCalendarEvents,
+  formatCalendarIsoDate,
+  getCalendarRange,
   getEventsForIso,
   getWeekDays,
   shiftCalendarDate,
 } from "../../lib/calendar-utils";
-import { toast } from "../../lib/toast";
+import { mapApiCalendarEvent } from "../../types/calendar.types";
 
 function WorkspaceCalendar() {
-  const [activeDate, setActiveDate] = useState(() => new Date(2024, 9, 1));
+  const [activeDate, setActiveDate] = useState(() => new Date());
   const [view, setView] = useState<CalendarViewMode>("month");
   const [filters, setFilters] = useState<CalendarFilters>(DEFAULT_CALENDAR_FILTERS);
+  const [eventModalOpen, setEventModalOpen] = useState(false);
 
-  const filteredEvents = useMemo(
-    () => filterCalendarEvents(CALENDAR_EVENTS, filters),
-    [filters],
-  );
+  const range = useMemo(() => getCalendarRange(activeDate, view), [activeDate, view]);
+  const eventsQuery = useCalendarEvents(range);
+  const projectsQuery = useCalendarProjects();
+  const { mutateAsync: createEvent, isPending: isCreatingEvent } = useCreateCalendarEvent();
+
+  const filteredEvents = useMemo(() => {
+    const events = (eventsQuery.data ?? []).map(mapApiCalendarEvent);
+    return filterCalendarEvents(events, filters);
+  }, [eventsQuery.data, filters]);
 
   const eventCount = useMemo(() => {
     if (view === "month") {
@@ -39,8 +56,7 @@ function WorkspaceCalendar() {
       return weekDays.reduce((total, day) => total + getEventsForIso(filteredEvents, day.iso).length, 0);
     }
 
-    const iso = `${activeDate.getFullYear()}-${String(activeDate.getMonth() + 1).padStart(2, "0")}-${String(activeDate.getDate()).padStart(2, "0")}`;
-    return getEventsForIso(filteredEvents, iso).length;
+    return getEventsForIso(filteredEvents, formatCalendarIsoDate(activeDate)).length;
   }, [activeDate, filteredEvents, view]);
 
   const eventCountLabel = view === "month" ? "for this month" : view === "week" ? "this week" : "today";
@@ -56,9 +72,12 @@ function WorkspaceCalendar() {
     setActiveDate(new Date());
   }, []);
 
-  const handleNewEvent = useCallback(() => {
-    toast.info("New event — coming soon");
-  }, []);
+  const handleCreateEvent = useCallback(
+    async (values: CalendarEventFormValues) => {
+      await createEvent(values);
+    },
+    [createEvent],
+  );
 
   const calendarView = useMemo(() => {
     if (view === "week") {
@@ -73,23 +92,42 @@ function WorkspaceCalendar() {
   }, [activeDate, filteredEvents, view]);
 
   return (
-    <div className="mx-auto max-w-8xl">
-      <CalendarPageHeader
-        activeDate={activeDate}
-        view={view}
-        eventCount={eventCount}
-        eventCountLabel={eventCountLabel}
-        onViewChange={setView}
-        onNavigate={handleNavigate}
-        onToday={handleToday}
-        onNewEvent={handleNewEvent}
-      />
+    <QueryPageGuard
+      query={eventsQuery}
+      loading={<AdminListPageSkeleton tableColumns={4} />}
+      errorTitle="Unable to load calendar"
+    >
+      <div className="mx-auto max-w-8xl">
+        <CalendarPageHeader
+          activeDate={activeDate}
+          view={view}
+          eventCount={eventCount}
+          eventCountLabel={eventCountLabel}
+          onViewChange={setView}
+          onNavigate={handleNavigate}
+          onToday={handleToday}
+          onNewEvent={() => setEventModalOpen(true)}
+        />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <CalendarSidebar filters={filters} onFiltersChange={setFilters} />
-        {calendarView}
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+          <CalendarSidebar
+            filters={filters}
+            onFiltersChange={setFilters}
+            projects={projectsQuery.data ?? []}
+            projectsLoading={projectsQuery.isLoading}
+          />
+          {calendarView}
+        </div>
+
+        <CalendarEventModal
+          open={eventModalOpen}
+          defaultDate={formatCalendarIsoDate(activeDate)}
+          onClose={() => setEventModalOpen(false)}
+          onSubmit={handleCreateEvent}
+          submitting={isCreatingEvent}
+        />
       </div>
-    </div>
+    </QueryPageGuard>
   );
 }
 

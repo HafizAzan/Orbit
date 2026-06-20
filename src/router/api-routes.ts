@@ -5,6 +5,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     REGISTER_RESEND_OTP: "/auth/register/resend-otp",
     REGISTER_VERIFY: "/auth/register/verify",
     ME: "/auth/me",
+    HEARTBEAT: "/auth/heartbeat",
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
     FORGOT_PASSWORD: "/auth/forgot-password",
@@ -33,6 +34,10 @@ const API_ROUTES: Record<string, Record<string, string>> = {
   PROJECTS: {
     LIST: "/projects",
     ASSIGNABLE_MEMBERS: "/projects/assignable-members",
+  },
+  CALENDAR: {
+    EVENTS: "/calendar/events",
+    PROJECTS: "/calendar/projects",
   },
   TASKS: {
     LIST: "/tasks",

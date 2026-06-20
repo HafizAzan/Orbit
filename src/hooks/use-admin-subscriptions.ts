@@ -10,7 +10,7 @@ import {
 export function useSubscriptions() {
   return useQuery({
     queryKey: ["admin-subscriptions"],
-    queryFn: listSubscriptions,
+    queryFn: () => listSubscriptions(),
   });
 }
 

@@ -64,7 +64,7 @@ function WorkspaceTeamsContent() {
         <TeamSummaryCards />
 
         {canInvite ? (
-          <InviteMemberModal open={inviteModalOpen} onClose={closeInviteModal} members={teamMembers} />
+          <InviteMemberModal open={inviteModalOpen} onClose={closeInviteModal} />
         ) : null}
       </div>
     </QueryPageGuard>

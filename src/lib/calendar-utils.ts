@@ -158,3 +158,27 @@ export function groupEventsByIso(events: CalendarEvent[]) {
     return groups;
   }, {});
 }
+
+export function formatCalendarIsoDate(date: Date) {
+  return toIsoDate(date);
+}
+
+export function getCalendarRange(activeDate: Date, view: "month" | "week" | "day") {
+  if (view === "day") {
+    const iso = toIsoDate(activeDate);
+    return { from: iso, to: iso };
+  }
+
+  if (view === "week") {
+    const weekStart = getWeekStart(activeDate);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    return { from: toIsoDate(weekStart), to: toIsoDate(weekEnd) };
+  }
+
+  const monthStart = new Date(activeDate.getFullYear(), activeDate.getMonth(), 1);
+  const gridStart = getWeekStart(monthStart);
+  const gridEnd = new Date(gridStart);
+  gridEnd.setDate(gridEnd.getDate() + 41);
+  return { from: toIsoDate(gridStart), to: toIsoDate(gridEnd) };
+}

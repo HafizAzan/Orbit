@@ -91,7 +91,6 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
       await updateBilling({
         id: record.id,
         data: {
-          contactEmail: values.contactEmail,
           plan: values.plan,
           billingCycle: values.billingCycle,
           renewalDate: values.renewalDate,
@@ -167,8 +166,15 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
                 { required: true, message: "Please enter a billing email" },
                 { type: "email", message: "Please enter a valid email" },
               ]}
+              extra={<span className="text-xs text-muted">Billing email cannot be changed from the admin console.</span>}
             >
-              <Input size="large" placeholder="billing@company.com" autoComplete="email" className="rounded-xl! border-border! bg-card!" />
+              <Input
+                size="large"
+                placeholder="billing@company.com"
+                autoComplete="email"
+                className="rounded-xl! border-border! bg-card!"
+                disabled
+              />
             </Form.Item>
           </FormSection>
 

@@ -176,7 +176,8 @@ export function mapApiTaskToFormValues(task: ApiWorkspaceTask): import("../data/
     priority: task.priority,
     estimatedHours: task.estimatedHours,
     description: task.description,
-    assigneeId: task.assignee?.id ?? "",
+    assigneeId:
+      task.assignee?.id && task.assignee.id !== "unassigned" ? task.assignee.id : "",
     dueDate: task.dueDate
       ? String(task.dueDate).slice(0, 10)
       : "",

@@ -18,6 +18,7 @@ import type {
   InviteValidationResponse,
   AcceptInviteRequest,
   AcceptInviteResponse,
+  ActivityHeartbeatResponse,
   VerifyRegisterRequest,
   VerifyRegisterResponse,
 } from "../types/auth.types";
@@ -105,9 +106,15 @@ const getMe = async (): Promise<AuthUser> => {
   return assertApiSuccess<AuthUser>(response);
 };
 
+const recordActivityHeartbeat = async (): Promise<ActivityHeartbeatResponse> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.HEARTBEAT, undefined, AUTH_REQUEST);
+  return assertApiSuccess<ActivityHeartbeatResponse>(response);
+};
+
 export {
   forgotPassword,
   getMe,
+  recordActivityHeartbeat,
   getRegisterPending,
   login,
   logout,

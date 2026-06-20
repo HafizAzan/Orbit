@@ -131,6 +131,18 @@ export function findTeamMemberByEmail(email: string, members: TeamMember[] = TEA
   return members.find((member) => member.email.trim().toLowerCase() === normalized) ?? null;
 }
 
+export function getDuplicateInviteMessage(member: TeamMember) {
+  if (member.status === "invited") {
+    return "This email already has a pending invitation.";
+  }
+
+  if (member.status === "active") {
+    return "This person is already an active team member.";
+  }
+
+  return "This member is deactivated. Reactivate them or permanently delete them before inviting this email again.";
+}
+
 export function createInvitedTeamMember(payload: TeamInvitePayload): TeamMember {
   const displayName = payload.name?.trim() || payload.email.split("@")[0].replace(/[._-]/g, " ");
   const formattedName = displayName

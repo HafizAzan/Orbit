@@ -21,6 +21,7 @@ type WorkspaceTeamTableColumnOptions = {
   onEditRole?: (record: TeamMember) => void;
   onResendInvite?: (record: TeamMember) => void;
   onDeactivate?: (record: TeamMember) => void;
+  onDeleteMember?: (record: TeamMember) => void;
   canChangeRole?: boolean;
   canManageInvites?: boolean;
 };
@@ -44,9 +45,18 @@ function getActionItems(
     items.push({
       key: "deactivate",
       label: record.status === "deactivated" ? "Reactivate member" : "Deactivate member",
-      icon: <DeleteOutlined />,
+      icon: <UserSwitchOutlined />,
       danger: record.status !== "deactivated",
     });
+
+    if (record.status === "deactivated") {
+      items.push({
+        key: "delete-member",
+        label: "Delete user",
+        icon: <DeleteOutlined />,
+        danger: true,
+      });
+    }
   }
 
   return items;
@@ -56,6 +66,7 @@ function createWorkspaceTeamTableColumns({
   onEditRole,
   onResendInvite,
   onDeactivate,
+  onDeleteMember,
   canChangeRole = false,
   canManageInvites = false,
 }: WorkspaceTeamTableColumnOptions = {}): ColumnsType<TeamMember> {
@@ -164,6 +175,7 @@ function createWorkspaceTeamTableColumns({
                     if (key === "edit-role") onEditRole?.(record);
                     if (key === "resend") onResendInvite?.(record);
                     if (key === "deactivate") onDeactivate?.(record);
+                    if (key === "delete-member") onDeleteMember?.(record);
                   },
                 }}
                 trigger={["click"]}

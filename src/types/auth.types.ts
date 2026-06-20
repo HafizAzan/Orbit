@@ -33,6 +33,10 @@ export type LogoutResponse = {
   message: string;
 };
 
+export type ActivityHeartbeatResponse = {
+  lastActiveAt: string;
+};
+
 export type ForgotPasswordFormValues = {
   email: string;
 };

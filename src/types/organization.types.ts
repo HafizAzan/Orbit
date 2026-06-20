@@ -34,7 +34,10 @@ export type OrganizationMember = {
 export type OrganizationMembersSummary = {
   occupiedSeats: number;
   totalSeats: number;
-  members: OrganizationMember[];
+  data: OrganizationMember[];
+  page: number;
+  limit: number;
+  total: number;
 };
 
 export type UpdateWorkspaceOrganizationRequest = {

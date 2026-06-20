@@ -1,8 +1,9 @@
-import { CloseOutlined, GlobalOutlined, LockOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, GlobalOutlined, LockOutlined, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { Input, Select } from "antd";
 import React, { useMemo, useState } from "react";
 import {
   PROJECT_CATEGORY_OPTIONS,
+  PROJECT_LEAD_ROLES,
   PROJECT_PRIORITY_OPTIONS,
   PROJECT_VISIBILITY_OPTIONS,
   generateProjectKey,
@@ -18,27 +19,72 @@ type ProjectFormFieldsProps = {
   isKeyManual: boolean;
   onChange: (values: ProjectFormValues) => void;
   onKeyManualChange: (manual: boolean) => void;
+  canAssignLead: boolean;
+  requiresDeliveryLead: boolean;
+  currentUserId?: string;
+  currentUserName?: string;
 };
 
-function ProjectFormFields({ values, isKeyManual, onChange, onKeyManualChange }: ProjectFormFieldsProps) {
+const ROLE_LABELS: Record<string, string> = {
+  manager: "Manager",
+  admin: "Admin",
+};
+
+function ProjectFormFields({
+  values,
+  isKeyManual,
+  onChange,
+  onKeyManualChange,
+  canAssignLead,
+  requiresDeliveryLead,
+  currentUserId,
+  currentUserName,
+}: ProjectFormFieldsProps) {
   const [memberSearch, setMemberSearch] = useState("");
   const { data: assignableMembers = [], isLoading: membersLoading } = useAssignableProjectMembers();
 
+  const leadOptions = useMemo(
+    () =>
+      assignableMembers
+        .filter((member) => PROJECT_LEAD_ROLES.includes(member.role))
+        .map((member) => ({
+          value: member.id,
+          label: `${member.name} (${ROLE_LABELS[member.role] ?? member.role})`,
+        })),
+    [assignableMembers],
+  );
+
+  const selectedLead = useMemo(() => {
+    if (canAssignLead) {
+      return assignableMembers.find((member) => member.id === values.leadUserId) ?? null;
+    }
+
+    if (currentUserId) {
+      return assignableMembers.find((member) => member.id === currentUserId) ?? null;
+    }
+
+    return null;
+  }, [assignableMembers, canAssignLead, currentUserId, values.leadUserId]);
+
   const selectedMembers = useMemo(
-    () => assignableMembers.filter((member) => values.memberIds.includes(member.id)),
-    [assignableMembers, values.memberIds],
+    () =>
+      assignableMembers.filter(
+        (member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId,
+      ),
+    [assignableMembers, values.leadUserId, values.memberIds],
   );
 
   const availableMembers = useMemo(() => {
     const query = memberSearch.trim().toLowerCase();
 
     return assignableMembers.filter((member) => {
+      if (member.id === values.leadUserId) return false;
       if (values.memberIds.includes(member.id)) return false;
       if (!query) return true;
 
       return member.name.toLowerCase().includes(query) || member.email.toLowerCase().includes(query);
     });
-  }, [assignableMembers, memberSearch, values.memberIds]);
+  }, [assignableMembers, memberSearch, values.leadUserId, values.memberIds]);
 
   const updateValues = (patch: Partial<ProjectFormValues>) => {
     onChange({ ...values, ...patch });
@@ -54,8 +100,15 @@ function ProjectFormFields({ values, isKeyManual, onChange, onKeyManualChange }:
     onChange(nextValues);
   };
 
+  const handleLeadChange = (leadUserId: string) => {
+    updateValues({
+      leadUserId,
+      memberIds: values.memberIds.filter((memberId) => memberId !== leadUserId),
+    });
+  };
+
   const handleAddMember = (memberId: string) => {
-    if (values.memberIds.includes(memberId)) return;
+    if (values.memberIds.includes(memberId) || memberId === values.leadUserId) return;
     updateValues({ memberIds: [...values.memberIds, memberId] });
     setMemberSearch("");
   };
@@ -115,6 +168,52 @@ function ProjectFormFields({ values, isKeyManual, onChange, onKeyManualChange }:
             className="rounded-xl!"
           />
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <h3 className="text-sm font-semibold text-foreground">Delivery Lead</h3>
+        <p className="mt-1 text-sm text-muted">
+          {canAssignLead
+            ? requiresDeliveryLead
+              ? "Assign a manager to run delivery. Owners oversee projects without joining the execution squad."
+              : "Choose who leads day-to-day delivery. You can assign another manager or keep yourself as lead."
+            : "You will lead this project and manage tasks for your execution team."}
+        </p>
+
+        {canAssignLead ? (
+          <div className="mt-4">
+            <label className="mb-2 block text-sm font-medium text-foreground" htmlFor="project-lead">
+              Delivery Lead {requiresDeliveryLead ? <span className="text-red-500">*</span> : null}
+            </label>
+            <Select
+              id="project-lead"
+              showSearch
+              optionFilterProp="label"
+              value={values.leadUserId ?? undefined}
+              onChange={handleLeadChange}
+              options={leadOptions}
+              placeholder="Select a manager or admin"
+              size="large"
+              className="w-full"
+            />
+          </div>
+        ) : (
+          <div className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <UserOutlined />
+            </span>
+            <span>
+              <span className="block text-sm font-semibold text-foreground">{currentUserName ?? "You"}</span>
+              <span className="block text-xs text-muted">Delivery lead on this project</span>
+            </span>
+          </div>
+        )}
+
+        {selectedLead ? (
+          <p className="mt-3 text-xs text-muted">
+            {selectedLead.name} will own task planning, assignments, and squad coordination.
+          </p>
+        ) : null}
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -197,9 +296,10 @@ function ProjectFormFields({ values, isKeyManual, onChange, onKeyManualChange }:
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Project Squad</h3>
+            <h3 className="text-sm font-semibold text-foreground">Execution Squad</h3>
             <p className="mt-1 text-sm text-muted">
-              Add members from your workspace squad. Managers only see people from their projects.
+              Add the people who will do the work. The delivery lead is added automatically and does not need to be
+              selected here.
             </p>
           </div>
         </div>
@@ -235,7 +335,7 @@ function ProjectFormFields({ values, isKeyManual, onChange, onKeyManualChange }:
           <Input
             allowClear
             prefix={<SearchOutlined className="text-muted" />}
-            placeholder="Search squad members..."
+            placeholder="Search team members..."
             value={memberSearch}
             onChange={(event) => setMemberSearch(event.target.value)}
             size="large"
@@ -245,9 +345,9 @@ function ProjectFormFields({ values, isKeyManual, onChange, onKeyManualChange }:
 
         <div className="mt-4 space-y-2">
           {membersLoading ? (
-            <p className="text-sm text-muted">Loading squad members...</p>
+            <p className="text-sm text-muted">Loading team members...</p>
           ) : availableMembers.length === 0 ? (
-            <p className="text-sm text-muted">No more squad members available.</p>
+            <p className="text-sm text-muted">No more team members available.</p>
           ) : (
             availableMembers.map((member) => (
               <button

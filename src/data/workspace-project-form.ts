@@ -1,3 +1,4 @@
+import type { RegisterAs } from "../types/auth.types";
 import type { ProjectPriority } from "./workspace-projects";
 
 export type ProjectVisibility = "private" | "public";
@@ -13,6 +14,7 @@ export type ProjectFormValues = {
   startDate: string;
   dueDate: string;
   visibility: ProjectVisibility;
+  leadUserId: string | null;
   memberIds: string[];
 };
 
@@ -20,8 +22,11 @@ export type AssignableProjectMember = {
   id: string;
   name: string;
   email: string;
+  role: RegisterAs;
   avatarColor: string;
 };
+
+export const PROJECT_LEAD_ROLES: RegisterAs[] = ["manager", "admin"];
 
 export const PROJECT_CATEGORY_OPTIONS: { value: ProjectCategory; label: string }[] = [
   { value: "marketing", label: "Marketing" },
@@ -63,6 +68,7 @@ export const DEFAULT_PROJECT_FORM_VALUES: ProjectFormValues = {
   startDate: "",
   dueDate: "",
   visibility: "private",
+  leadUserId: null,
   memberIds: [],
 };
 

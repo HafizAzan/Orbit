@@ -18,7 +18,7 @@ function WorkspaceBillingContent() {
   const { data, isLoading } = useBillingInvoices();
   const [selectedInvoice, setSelectedInvoice] = useState<BillingInvoice | null>(null);
 
-  const invoices = useMemo(() => resolveWorkspaceInvoices(data?.invoices), [data?.invoices]);
+  const invoices = useMemo(() => resolveWorkspaceInvoices(data?.data), [data?.data]);
 
   const openInvoice = useCallback(
     (invoice: BillingInvoice) => {

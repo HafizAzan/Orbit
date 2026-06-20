@@ -14,6 +14,11 @@ import type {
   RefundPaymentRequest,
   RefundPaymentResponse,
 } from "../types/billing.types";
+import {
+  buildPaginationSearchParams,
+  normalizePaginatedResponse,
+  type PaginationParams,
+} from "../types/pagination.types";
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
@@ -57,9 +62,15 @@ const refundPayment = async (data: RefundPaymentRequest = {}): Promise<RefundPay
   return assertApiSuccess<RefundPaymentResponse>(response);
 };
 
-const listInvoices = async (): Promise<BillingInvoicesResponse> => {
-  const response = await ApiService.get(API_ROUTES.BILLING.INVOICES, AUTH_REQUEST);
-  return assertApiSuccess<BillingInvoicesResponse>(response);
+const listInvoices = async (params: PaginationParams = {}): Promise<BillingInvoicesResponse> => {
+  const searchParams = buildPaginationSearchParams(params);
+  const response = await ApiService.get(
+    `${API_ROUTES.BILLING.INVOICES}?${searchParams.toString()}`,
+    AUTH_REQUEST,
+  );
+  return normalizePaginatedResponse<BillingInvoicesResponse["data"][number]>(
+    assertApiSuccess<unknown>(response),
+  );
 };
 
 export {

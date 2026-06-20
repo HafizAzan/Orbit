@@ -46,10 +46,11 @@ function TaskFormMain({
           <div>
             <label className="mb-2 block text-sm font-medium text-foreground">Project</label>
             <Select
-              value={values.projectId}
-              onChange={(projectId) => updateValues({ projectId })}
+              value={values.projectId || undefined}
+              onChange={(projectId) => updateValues({ projectId, assigneeId: "" })}
               options={projectOptions}
               disabled={disableProject}
+              placeholder="Select project"
               size="large"
               className="w-full"
             />

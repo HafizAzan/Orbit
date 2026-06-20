@@ -1,10 +1,6 @@
-import type {
-  ProjectPriority,
-  ProjectStatus,
-  ProjectTeamMember,
-  WorkspaceProject,
-} from "../data/workspace-projects";
+import type { ProjectPriority, ProjectStatus, ProjectTeamMember, WorkspaceProject } from "../data/workspace-projects";
 import type { ProjectCategory, ProjectFormValues, ProjectVisibility } from "../data/workspace-project-form";
+import type { RegisterAs } from "./auth.types";
 
 export type ApiWorkspaceProject = {
   id: string;
@@ -36,8 +32,29 @@ export type AssignableProjectMember = {
   id: string;
   name: string;
   email: string;
+  role: RegisterAs;
   avatarColor: string;
 };
+
+export type ListProjectsParams = {
+  page?: number;
+  limit?: number;
+};
+
+export type PaginatedProjectsResponse = {
+  data: ApiWorkspaceProject[];
+  page: number;
+  limit: number;
+  total: number;
+};
+
+export const DEFAULT_PROJECTS_PAGE = 1;
+export const DEFAULT_PROJECTS_PAGE_SIZE = 6;
+
+export const DEFAULT_PROJECTS_LIST_PARAMS = {
+  page: DEFAULT_PROJECTS_PAGE,
+  limit: DEFAULT_PROJECTS_PAGE_SIZE,
+} as const;
 
 export type CreateProjectRequest = {
   name: string;
@@ -50,6 +67,7 @@ export type CreateProjectRequest = {
   startDate?: string;
   dueDate?: string;
   memberIds?: string[];
+  leadUserId?: string;
 };
 
 export type UpdateProjectRequest = Partial<CreateProjectRequest> & {
@@ -90,6 +108,7 @@ export function mapFormValuesToCreateRequest(values: ProjectFormValues): CreateP
     startDate: values.startDate || undefined,
     dueDate: values.dueDate || undefined,
     memberIds: values.memberIds,
+    leadUserId: values.leadUserId ?? undefined,
   };
 }
 
@@ -103,6 +122,9 @@ export function mapApiProjectToFormValues(project: ApiWorkspaceProject): Project
     startDate: project.startDate ?? "",
     dueDate: project.dueDate ?? "",
     visibility: project.visibility,
-    memberIds: project.members.map((member) => member.id),
+    leadUserId: project.leadUserId,
+    memberIds: project.members
+      .map((member) => member.id)
+      .filter((memberId) => memberId !== project.leadUserId),
   };
 }

@@ -84,9 +84,9 @@ export const WORKSPACE_DASHBOARD_METRICS: WorkspaceMetric[] = [
   },
   {
     id: "team-members",
-    label: "Team Members",
+    label: "Total Members",
     value: "24",
-    trend: "Stable",
+    trend: "In workspace",
     trendType: "stable",
     icon: "team",
     iconBg: "bg-violet-50",

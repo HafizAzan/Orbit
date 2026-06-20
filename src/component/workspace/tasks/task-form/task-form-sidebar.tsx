@@ -1,12 +1,12 @@
-import { ClockCircleOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
-import { Avatar, Select } from "antd";
-import React, { useState } from "react";
+import { CheckOutlined, ClockCircleOutlined, CloseOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { Avatar, Input } from "antd";
+import React, { useMemo, useState } from "react";
 import {
-  getTaskAssigneeById,
   type TaskAssigneeOption,
   type TaskFormValues,
 } from "../../../../data/workspace-task-form";
 import { getInitial } from "../../../../lib/helper";
+import { cn } from "../../../../lib/utils";
 import DatePicker from "../../../ui/date-picker";
 import TaskLabelsModal from "./task-labels-modal";
 
@@ -15,6 +15,8 @@ type TaskFormSidebarProps = {
   reporterName: string;
   onChange: (values: TaskFormValues) => void;
   assigneeOptions: TaskAssigneeOption[];
+  assigneeLoading?: boolean;
+  hasSelectedProject?: boolean;
 };
 
 function TaskFormSidebar({
@@ -22,8 +24,26 @@ function TaskFormSidebar({
   reporterName,
   onChange,
   assigneeOptions,
+  assigneeLoading = false,
+  hasSelectedProject = false,
 }: TaskFormSidebarProps) {
   const [labelsModalOpen, setLabelsModalOpen] = useState(false);
+  const [assigneeSearch, setAssigneeSearch] = useState("");
+
+  const selectedAssignee = useMemo(
+    () =>
+      values.assigneeId
+        ? assigneeOptions.find((option) => option.id === values.assigneeId) ?? null
+        : null,
+    [assigneeOptions, values.assigneeId],
+  );
+
+  const filteredAssigneeOptions = useMemo(() => {
+    const query = assigneeSearch.trim().toLowerCase();
+    if (!query) return assigneeOptions;
+
+    return assigneeOptions.filter((option) => option.name.toLowerCase().includes(query));
+  }, [assigneeOptions, assigneeSearch]);
 
   const updateValues = (patch: Partial<TaskFormValues>) => {
     onChange({ ...values, ...patch });
@@ -42,11 +62,41 @@ function TaskFormSidebar({
           <div className="mt-4 space-y-4">
             <div>
               <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Assignee</p>
-              <SelectAssignee
-                value={values.assigneeId}
-                onChange={(assigneeId) => updateValues({ assigneeId })}
-                options={assigneeOptions}
-              />
+
+              {hasSelectedProject && assigneeOptions.length > 0 ? (
+                <Input
+                  allowClear
+                  prefix={<SearchOutlined className="text-muted" />}
+                  placeholder="Search members..."
+                  value={assigneeSearch}
+                  onChange={(event) => setAssigneeSearch(event.target.value)}
+                  disabled={assigneeLoading}
+                  size="large"
+                  className="rounded-xl! border-border! bg-background/50!"
+                />
+              ) : null}
+
+              <div className={hasSelectedProject && assigneeOptions.length > 0 ? "mt-3" : undefined}>
+                <AssigneeMemberList
+                options={filteredAssigneeOptions}
+                selectedAssignee={selectedAssignee}
+                loading={assigneeLoading}
+                disabled={!hasSelectedProject}
+                emptyHint={
+                  !hasSelectedProject
+                    ? "Select a project first"
+                    : assigneeOptions.length === 0
+                      ? "No members on this project"
+                      : "No matching members"
+                }
+                onSelect={(assigneeId) => updateValues({ assigneeId })}
+                onClear={() => updateValues({ assigneeId: "" })}
+                />
+              </div>
+
+              <p className="mt-2 text-xs text-muted">
+                Only members added to the selected project can be assigned.
+              </p>
             </div>
 
             <div>
@@ -130,42 +180,76 @@ function AssigneeOptionContent({ assignee }: { assignee: TaskAssigneeOption }) {
   );
 }
 
-type SelectAssigneeProps = {
-  value: string;
-  onChange: (value: string) => void;
+type AssigneeMemberListProps = {
   options: TaskAssigneeOption[];
+  selectedAssignee: TaskAssigneeOption | null;
+  loading?: boolean;
+  disabled?: boolean;
+  emptyHint?: string;
+  onSelect: (assigneeId: string) => void;
+  onClear: () => void;
 };
 
-function SelectAssignee({ value, onChange, options }: SelectAssigneeProps) {
-  const selectedAssignee = options.find((item) => item.id === value) ?? getTaskAssigneeById(value, options);
-
+function AssigneeMemberList({
+  options,
+  selectedAssignee,
+  loading = false,
+  disabled = false,
+  emptyHint = "No members found",
+  onSelect,
+  onClear,
+}: AssigneeMemberListProps) {
   return (
-    <Select
-      value={value || undefined}
-      onChange={onChange}
-      size="large"
-      showSearch
-      allowClear
-      optionFilterProp="label"
-      placeholder="Select assignee"
-      className="w-full [&_.ant-select-selector]:rounded-xl! [&_.ant-select-selector]:border-border! [&_.ant-select-selector]:bg-background/50!"
-      options={options.map((option) => ({
-        value: option.id,
-        label: option.name,
-      }))}
-      optionRender={(option) => {
-        const assignee = options.find((item) => item.id === option.value);
-        if (!assignee) return option.label;
-        return <AssigneeOptionContent assignee={assignee} />;
-      }}
-      labelRender={() => {
-        if (!selectedAssignee) {
-          return <span className="text-sm text-muted">Unassigned</span>;
-        }
+    <div className="space-y-2">
+      {selectedAssignee ? (
+        <div className="flex items-center justify-between gap-2 rounded-xl border border-primary/25 bg-feature-sync px-3 py-2.5">
+          <AssigneeOptionContent assignee={selectedAssignee} />
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={disabled}
+            className="shrink-0 rounded-lg p-1 text-muted transition-colors hover:bg-background hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={`Remove ${selectedAssignee.name}`}
+          >
+            <CloseOutlined className="text-xs" />
+          </button>
+        </div>
+      ) : null}
 
-        return <AssigneeOptionContent assignee={selectedAssignee} />;
-      }}
-    />
+      <div className="min-h-20 max-h-48 overflow-y-auto rounded-xl border border-border bg-background/50 p-1.5">
+        {loading ? (
+          <p className="px-3 py-4 text-sm text-muted">Loading project members...</p>
+        ) : options.length === 0 ? (
+          <p className="px-3 py-4 text-sm text-muted">{emptyHint}</p>
+        ) : (
+          <ul className="space-y-1">
+            {options.map((assignee) => {
+              const isSelected = assignee.id === selectedAssignee?.id;
+
+              return (
+                <li key={assignee.id}>
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => onSelect(isSelected ? "" : assignee.id)}
+                    className={cn(
+                      "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left transition-colors",
+                      isSelected
+                        ? "border border-primary/20 bg-feature-sync"
+                        : "border border-transparent hover:border-border hover:bg-background",
+                      disabled && "cursor-not-allowed opacity-50",
+                    )}
+                  >
+                    <AssigneeOptionContent assignee={assignee} />
+                    {isSelected ? <CheckOutlined className="shrink-0 text-xs text-primary" /> : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 

@@ -30,14 +30,14 @@ export function workspaceBoardQueryKey(projectId: string) {
 export function useTasks() {
   return useQuery({
     queryKey: WORKSPACE_TASKS_QUERY_KEY,
-    queryFn: listTasks,
+    queryFn: () => listTasks(),
   });
 }
 
 export function useMyTasks() {
   return useQuery({
     queryKey: WORKSPACE_MY_TASKS_QUERY_KEY,
-    queryFn: listMyTasks,
+    queryFn: () => listMyTasks(),
   });
 }
 

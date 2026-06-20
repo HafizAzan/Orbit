@@ -33,6 +33,7 @@ export type ProjectDiscussionMessage = {
   message: string;
   timeAgo: string;
   avatarColor: string;
+  authorId?: string;
 };
 
 export type WorkspaceProjectDetail = WorkspaceProject & {

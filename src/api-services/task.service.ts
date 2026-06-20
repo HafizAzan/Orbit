@@ -10,17 +10,30 @@ import type {
   WorkspaceKanbanBoardResponse,
   WorkspaceReportsResponse,
 } from "../types/task.types";
+import {
+  buildPaginationSearchParams,
+  normalizePaginatedResponse,
+  type PaginationParams,
+} from "../types/pagination.types";
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
-const listTasks = async (): Promise<ApiWorkspaceTask[]> => {
-  const response = await ApiService.get(API_ROUTES.TASKS.LIST, AUTH_REQUEST);
-  return assertApiSuccess<ApiWorkspaceTask[]>(response);
+const listTasks = async (params: PaginationParams = {}): Promise<ApiWorkspaceTask[]> => {
+  const searchParams = buildPaginationSearchParams(params);
+  const response = await ApiService.get(
+    `${API_ROUTES.TASKS.LIST}?${searchParams.toString()}`,
+    AUTH_REQUEST,
+  );
+  return normalizePaginatedResponse<ApiWorkspaceTask>(assertApiSuccess<unknown>(response)).data;
 };
 
-const listMyTasks = async (): Promise<ApiWorkspaceTask[]> => {
-  const response = await ApiService.get(API_ROUTES.TASKS.MY, AUTH_REQUEST);
-  return assertApiSuccess<ApiWorkspaceTask[]>(response);
+const listMyTasks = async (params: PaginationParams = {}): Promise<ApiWorkspaceTask[]> => {
+  const searchParams = buildPaginationSearchParams(params);
+  const response = await ApiService.get(
+    `${API_ROUTES.TASKS.MY}?${searchParams.toString()}`,
+    AUTH_REQUEST,
+  );
+  return normalizePaginatedResponse<ApiWorkspaceTask>(assertApiSuccess<unknown>(response)).data;
 };
 
 const getTask = async (taskId: string): Promise<ApiWorkspaceTask> => {

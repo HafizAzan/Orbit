@@ -20,7 +20,7 @@ function WorkspaceBillingSection({ expanded = false }: WorkspaceBillingSectionPr
   const navigate = useNavigate();
   const { data, isLoading } = useBillingInvoices();
   const [selectedInvoice, setSelectedInvoice] = React.useState<BillingInvoice | null>(null);
-  const invoices = useMemo(() => resolveWorkspaceInvoices(data?.invoices), [data?.invoices]);
+  const invoices = useMemo(() => resolveWorkspaceInvoices(data?.data), [data?.data]);
 
   const handleViewInvoices = () => {
     if (invoices[0]) {

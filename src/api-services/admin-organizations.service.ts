@@ -6,6 +6,11 @@ import type {
   OrganizationRecord,
   OrganizationStatus,
 } from "../data/admin-organizations";
+import {
+  buildPaginationSearchParams,
+  normalizePaginatedResponse,
+  type PaginationParams,
+} from "../types/pagination.types";
 
 export type StatMetric = {
   value: number;
@@ -39,9 +44,13 @@ export type UpdateOrganizationRequest = {
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
-const listOrganizations = async (): Promise<OrganizationRecord[]> => {
-  const response = await ApiService.get(API_ROUTES.ADMIN.ORGANIZATIONS, AUTH_REQUEST);
-  return assertApiSuccess<OrganizationRecord[]>(response);
+const listOrganizations = async (params: PaginationParams = {}): Promise<OrganizationRecord[]> => {
+  const searchParams = buildPaginationSearchParams(params);
+  const response = await ApiService.get(
+    `${API_ROUTES.ADMIN.ORGANIZATIONS}?${searchParams.toString()}`,
+    AUTH_REQUEST,
+  );
+  return normalizePaginatedResponse<OrganizationRecord>(assertApiSuccess<unknown>(response)).data;
 };
 
 const getOrganizationStats = async (): Promise<OrganizationStats> => {

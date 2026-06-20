@@ -54,7 +54,7 @@ export function useBillingInvoices() {
 
   return useQuery({
     queryKey: ["billing-invoices"],
-    queryFn: listInvoices,
+    queryFn: () => listInvoices(),
     enabled: isAuthenticated && canManage,
     staleTime: 30_000,
   });

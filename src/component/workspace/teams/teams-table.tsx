@@ -6,6 +6,7 @@ import ChangeMemberRoleModal from "./change-member-role-modal";
 import { ConfirmModal } from "../../ui/modal";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import {
+  useDeleteTeamMember,
   useResendTeamInvite,
   useUpdateTeamMemberStatus,
 } from "../../../hooks/use-workspace-team";
@@ -41,6 +42,7 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
   const { can } = useWorkspacePermissions();
   const { mutateAsync: updateStatus } = useUpdateTeamMemberStatus();
   const { mutateAsync: resendInvite } = useResendTeamInvite();
+  const { mutateAsync: deleteMember } = useDeleteTeamMember();
   const canChangeRole = can("team.change_role");
   const canManageInvites = can("team.invite");
   const [search, setSearch] = useState("");
@@ -49,8 +51,10 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
   const [roleChangeMember, setRoleChangeMember] = useState<TeamMember | null>(null);
   const [statusChangeMember, setStatusChangeMember] = useState<TeamMember | null>(null);
   const [resendInviteMember, setResendInviteMember] = useState<TeamMember | null>(null);
+  const [deleteMemberRecord, setDeleteMemberRecord] = useState<TeamMember | null>(null);
   const [statusChangeLoading, setStatusChangeLoading] = useState(false);
   const [resendInviteLoading, setResendInviteLoading] = useState(false);
+  const [deleteMemberLoading, setDeleteMemberLoading] = useState(false);
 
   const activeFilterCount = countActiveTeamFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
@@ -107,6 +111,26 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
     setStatusChangeMember(record);
   }, []);
 
+  const handleDeleteMember = useCallback((record: TeamMember) => {
+    setDeleteMemberRecord(record);
+  }, []);
+
+  const handleConfirmDeleteMember = useCallback(async () => {
+    if (!deleteMemberRecord) return;
+
+    setDeleteMemberLoading(true);
+
+    try {
+      const result = await deleteMember(deleteMemberRecord.id);
+      showApiSuccessToast(result.message);
+      setDeleteMemberRecord(null);
+    } catch (error) {
+      showApiErrorToast(error);
+    } finally {
+      setDeleteMemberLoading(false);
+    }
+  }, [deleteMember, deleteMemberRecord]);
+
   const handleConfirmStatusChange = useCallback(async () => {
     if (!statusChangeMember) return;
 
@@ -132,10 +156,11 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
         onEditRole: handleEditRole,
         onResendInvite: handleResendInvite,
         onDeactivate: handleDeactivate,
+        onDeleteMember: handleDeleteMember,
         canChangeRole,
         canManageInvites,
       }),
-    [canChangeRole, canManageInvites, handleDeactivate, handleEditRole, handleResendInvite],
+    [canChangeRole, canManageInvites, handleDeactivate, handleDeleteMember, handleEditRole, handleResendInvite],
   );
 
   const resultsSummary = (
@@ -257,6 +282,25 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
         confirmText="Resend invite"
         confirmLoading={resendInviteLoading}
         icon={<MailOutlined />}
+      />
+
+      <ConfirmModal
+        open={deleteMemberRecord !== null}
+        onClose={() => setDeleteMemberRecord(null)}
+        onConfirm={handleConfirmDeleteMember}
+        title="Delete user"
+        description={
+          deleteMemberRecord ? (
+            <>
+              Permanently delete <span className="font-semibold text-foreground">{deleteMemberRecord.name}</span>? This
+              removes their workspace account and frees their seat. This action cannot be undone.
+            </>
+          ) : null
+        }
+        confirmText="Delete user"
+        confirmDanger
+        confirmLoading={deleteMemberLoading}
+        icon={<UserSwitchOutlined />}
       />
     </>
   );

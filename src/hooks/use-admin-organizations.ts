@@ -12,7 +12,7 @@ import {
 export function useOrganizations() {
   return useQuery({
     queryKey: ["admin-organizations"],
-    queryFn: listOrganizations,
+    queryFn: () => listOrganizations(),
   });
 }
 

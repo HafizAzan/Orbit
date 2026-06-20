@@ -7,6 +7,11 @@ import type {
   SubscriptionRecord,
   SubscriptionStatus,
 } from "../data/admin-subscriptions";
+import {
+  buildPaginationSearchParams,
+  normalizePaginatedResponse,
+  type PaginationParams,
+} from "../types/pagination.types";
 
 export type StatMetric = {
   value: number;
@@ -38,9 +43,13 @@ export type UpdateSubscriptionBillingRequest = {
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
-const listSubscriptions = async (): Promise<SubscriptionRecord[]> => {
-  const response = await ApiService.get(API_ROUTES.ADMIN.SUBSCRIPTIONS, AUTH_REQUEST);
-  return assertApiSuccess<SubscriptionRecord[]>(response);
+const listSubscriptions = async (params: PaginationParams = {}): Promise<SubscriptionRecord[]> => {
+  const searchParams = buildPaginationSearchParams(params);
+  const response = await ApiService.get(
+    `${API_ROUTES.ADMIN.SUBSCRIPTIONS}?${searchParams.toString()}`,
+    AUTH_REQUEST,
+  );
+  return normalizePaginatedResponse<SubscriptionRecord>(assertApiSuccess<unknown>(response)).data;
 };
 
 const getSubscriptionStats = async (): Promise<SubscriptionStats> => {

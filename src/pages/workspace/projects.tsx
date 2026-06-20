@@ -4,11 +4,13 @@ import ProjectTemplateCard from "../../component/workspace/projects/project-temp
 import ProjectsPageHeader from "../../component/workspace/projects/projects-page-header";
 import ProjectsToolbar from "../../component/workspace/projects/projects-toolbar";
 import QueryPageGuard from "../../component/common/query-page-guard";
+import TablePaginationFooter from "../../component/ui/table-pagination-footer";
 import { AdminListPageSkeleton } from "../../component/skeletons";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useDeleteProject, useProjects } from "../../hooks/use-workspace-projects";
 import type { ProjectsViewMode } from "../../data/workspace-projects";
 import { buildProjectTeamFilterOptions } from "../../data/workspace-projects";
+import { DEFAULT_PROJECTS_LIST_PARAMS, DEFAULT_PROJECTS_PAGE_SIZE } from "../../types/project.types";
 import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { pluralize } from "../../lib/helper";
@@ -16,8 +18,14 @@ import { cn } from "../../lib/utils";
 
 function WorkspaceProjects() {
   const { can } = useWorkspacePermissions();
-  const projectsQuery = useProjects();
-  const { data: projects = [] } = projectsQuery;
+  const [page, setPage] = useState<number>(DEFAULT_PROJECTS_LIST_PARAMS.page);
+  const projectsQuery = useProjects({
+    page,
+    limit: DEFAULT_PROJECTS_LIST_PARAMS.limit,
+  });
+  const { data: projectsPage } = projectsQuery;
+  const projects = projectsPage?.data ?? [];
+  const totalProjects = projectsPage?.total ?? 0;
   const { mutateAsync: deleteProject } = useDeleteProject();
   const canDeleteProject = can("project.delete");
   const canCreateProject = can("project.create");
@@ -61,8 +69,26 @@ function WorkspaceProjects() {
   );
 
   useEffect(() => {
+    setPage(1);
+  }, [statusFilter, priorityFilter, teamFilter]);
+
+  useEffect(() => {
     setSelectedProjectIds([]);
-  }, [statusFilter, priorityFilter, teamFilter, workspaceProjects]);
+  }, [statusFilter, priorityFilter, teamFilter, page, workspaceProjects]);
+
+  const pageSize = projectsPage?.limit ?? DEFAULT_PROJECTS_PAGE_SIZE;
+  const currentPage = projectsPage?.page ?? page;
+
+  useEffect(() => {
+    if (totalProjects > 0 && projects.length === 0 && page > 1) {
+      setPage((current) => Math.max(1, current - 1));
+    }
+  }, [totalProjects, projects.length, page]);
+
+  const handlePageChange = useCallback((nextPage: number) => {
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const selectedCount = selectedProjectIds.length;
   const allSelected = filteredProjects.length > 0 && filteredProjectIds.every((id) => selectedProjectIds.includes(id));
@@ -99,6 +125,17 @@ function WorkspaceProjects() {
       showApiErrorToast(error);
     }
   }, [deleteProject, selectedCount, selectedProjectIds]);
+
+  const resultsSummary = (
+    <span className="text-sm text-muted">
+      Showing{" "}
+      <span className="font-semibold text-foreground">
+        {totalProjects === 0 ? 0 : (currentPage - 1) * pageSize + 1}-
+        {Math.min(currentPage * pageSize, totalProjects)}
+      </span>{" "}
+      of <span className="font-semibold text-foreground">{totalProjects}</span> projects
+    </span>
+  );
 
   return (
     <QueryPageGuard
@@ -148,6 +185,18 @@ function WorkspaceProjects() {
           ))}
           {viewMode === "grid" && canCreateProject ? <ProjectTemplateCard /> : null}
         </div>
+
+        {totalProjects > 0 ? (
+          <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+            <TablePaginationFooter
+              summary={resultsSummary}
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalProjects}
+              onChange={handlePageChange}
+            />
+          </div>
+        ) : null}
       </div>
     </QueryPageGuard>
   );

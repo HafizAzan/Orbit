@@ -7,6 +7,11 @@ import type {
   UpdateWorkspaceOrganizationRequest,
   WorkspaceOrganization,
 } from "../types/organization.types";
+import {
+  buildPaginationSearchParams,
+  normalizePaginatedResponse,
+  type PaginationParams,
+} from "../types/pagination.types";
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
@@ -22,21 +27,39 @@ const updateCurrentOrganization = async (
   return assertApiSuccess<WorkspaceOrganization>(response);
 };
 
-const getOrganizationMembers = async (): Promise<OrganizationMembersSummary> => {
-  const response = await ApiService.get(API_ROUTES.ORGANIZATIONS.MEMBERS, AUTH_REQUEST);
-  return assertApiSuccess<OrganizationMembersSummary>(response);
+const getOrganizationMembers = async (
+  params: PaginationParams = {},
+): Promise<OrganizationMembersSummary> => {
+  const searchParams = buildPaginationSearchParams(params);
+  const response = await ApiService.get(
+    `${API_ROUTES.ORGANIZATIONS.MEMBERS}?${searchParams.toString()}`,
+    AUTH_REQUEST,
+  );
+  const payload = assertApiSuccess<OrganizationMembersSummary & { members?: OrganizationMembersSummary["data"] }>(
+    response,
+  );
+  const normalized = normalizePaginatedResponse<OrganizationMembersSummary["data"][number]>(payload);
+
+  return {
+    occupiedSeats: payload.occupiedSeats,
+    totalSeats: payload.totalSeats,
+    data: normalized.data.length > 0 ? normalized.data : payload.members ?? [],
+    page: normalized.page,
+    limit: normalized.limit,
+    total: normalized.total,
+  };
 };
 
 const updateOrganizationMemberRole = async (
   memberId: string,
   data: UpdateOrganizationMemberRoleRequest,
-): Promise<OrganizationMembersSummary["members"][number]> => {
+): Promise<OrganizationMembersSummary["data"][number]> => {
   const response = await ApiService.patch(
     `${API_ROUTES.ORGANIZATIONS.MEMBERS}/${memberId}`,
     data,
     AUTH_REQUEST,
   );
-  return assertApiSuccess<OrganizationMembersSummary["members"][number]>(response);
+  return assertApiSuccess<OrganizationMembersSummary["data"][number]>(response);
 };
 
 const removeOrganizationMember = async (memberId: string): Promise<{ message: string }> => {

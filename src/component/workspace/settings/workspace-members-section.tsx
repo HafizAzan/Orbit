@@ -78,7 +78,7 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
   const [pendingRemoveMember, setPendingRemoveMember] = useState<OrganizationMember | null>(null);
 
   const summary: OrganizationMembersSummary | undefined = data;
-  const previewMembers = summary?.members.slice(0, 3) ?? [];
+  const previewMembers = summary?.data.slice(0, 3) ?? [];
 
   const columns = useMemo(
     () => [
@@ -214,7 +214,7 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
             rowKey="id"
             loading={membersQuery.isPending}
             columns={columns}
-            dataSource={summary?.members ?? []}
+            dataSource={summary?.data ?? []}
             pagination={false}
             scroll={{ x: 720 }}
           />

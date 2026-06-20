@@ -113,7 +113,6 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
             name: values.name,
             status: values.status,
             plan: values.plan,
-            billingEmail: values.ownerEmail,
           },
         });
       } else {
@@ -208,8 +207,15 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
                 { required: true, message: "Please enter the owner email" },
                 { type: "email", message: "Please enter a valid email" },
               ]}
+              extra={isEditMode ? <span className="text-xs text-muted">Owner email cannot be changed from the admin console.</span> : undefined}
             >
-              <Input size="large" placeholder="owner@company.com" autoComplete="email" className="rounded-xl! border-border! bg-card!" />
+              <Input
+                size="large"
+                placeholder="owner@company.com"
+                autoComplete="email"
+                className="rounded-xl! border-border! bg-card!"
+                disabled={isEditMode}
+              />
             </Form.Item>
           </div>
         </FormSection>

@@ -17,8 +17,11 @@ type ProjectFormPreviewProps = {
 function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
   const { data: assignableMembers = [] } = useAssignableProjectMembers();
   const selectedMembers = useMemo(
-    () => assignableMembers.filter((member) => values.memberIds.includes(member.id)),
-    [assignableMembers, values.memberIds],
+    () =>
+      assignableMembers.filter(
+        (member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId,
+      ),
+    [assignableMembers, values.leadUserId, values.memberIds],
   );
 
   const priorityLabel = PROJECT_PRIORITY_OPTIONS.find((option) => option.value === values.priority)?.label ?? "Medium";
@@ -42,6 +45,9 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
     name: member.name,
     avatarColor: member.avatarColor,
   }));
+
+  const squadCount = selectedMembers.length + (values.leadUserId ? 1 : 0);
+  const leadInitial = leadName.trim().charAt(0).toUpperCase() || "?";
 
   return (
     <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
@@ -69,7 +75,7 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
               <dt className="text-muted">Lead</dt>
               <dd className="flex items-center gap-2 font-medium text-foreground">
                 <Avatar size={24} className="bg-primary/10! text-[11px]! text-primary! font-semibold!">
-                  {leadName.charAt(0)}
+                  {leadInitial}
                 </Avatar>
                 {leadName}
               </dd>
@@ -79,7 +85,7 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
               <dd className="flex items-center gap-2">
                 {previewMembers.length > 0 ? <ProjectTeamAvatars members={previewMembers} maxVisible={3} /> : null}
                 <span className="text-sm font-medium text-foreground">
-                  {selectedMembers.length} {selectedMembers.length === 1 ? "Member" : "Members"}
+                  {squadCount} {squadCount === 1 ? "Member" : "Members"}
                 </span>
               </dd>
             </div>
@@ -105,9 +111,8 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
           <div>
             <p className="text-sm font-semibold text-foreground">Pro Tip</p>
             <p className="mt-1 text-sm leading-6 text-muted">
-              Press <kbd className="rounded border border-border bg-card px-1.5 py-0.5 text-xs font-semibold">Cmd</kbd>{" "}
-              + <kbd className="rounded border border-border bg-card px-1.5 py-0.5 text-xs font-semibold">Enter</kbd> to
-              save your project quickly.
+              Owners assign a delivery lead and execution squad. Managers run day-to-day tasks after the project is
+              created.
             </p>
           </div>
         </div>
