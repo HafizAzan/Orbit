@@ -3,7 +3,7 @@ import { getProjectBoardPath } from "../../data/workspace-project-detail";
 import ProjectTeamAvatars from "../../component/workspace/projects/project-team-avatars";
 import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-link";
 import QueryPageGuard from "../../component/common/query-page-guard";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { BoardsPageSkeleton } from "../../component/skeletons";
 import { useBoards } from "../../hooks/use-workspace-tasks";
 import { Paragraph, Title } from "../../component/ui/typography";
 
@@ -14,7 +14,7 @@ function WorkspaceBoards() {
   return (
     <QueryPageGuard
       query={boardsQuery}
-      loading={<AdminListPageSkeleton tableColumns={2} />}
+      loading={<BoardsPageSkeleton />}
       errorTitle="Unable to load boards"
     >
       <div className="mx-auto max-w-8xl">

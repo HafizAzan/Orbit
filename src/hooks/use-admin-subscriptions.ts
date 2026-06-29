@@ -2,18 +2,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getPlanDistribution,
   getSubscriptionStats,
-  listSubscriptions,
+  listSubscriptionsPage,
   updateSubscriptionBilling,
   type UpdateSubscriptionBillingRequest,
 } from "../api-services/admin-subscriptions.service";
+import type { PaginationParams } from "../types/pagination.types";
 
-export function useSubscriptions() {
+export function useSubscriptions(params: PaginationParams = {}) {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 25;
+
   return useQuery({
-    queryKey: ["admin-subscriptions"],
-    queryFn: () => listSubscriptions(),
+    queryKey: ["admin-subscriptions", page, limit],
+    queryFn: () => listSubscriptionsPage({ page, limit }),
   });
 }
-
 export function useSubscriptionStats() {
   return useQuery({
     queryKey: ["admin-subscriptions-stats"],

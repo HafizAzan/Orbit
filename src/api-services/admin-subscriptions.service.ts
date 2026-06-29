@@ -10,6 +10,7 @@ import type {
 import {
   buildPaginationSearchParams,
   normalizePaginatedResponse,
+  type PaginatedResponse,
   type PaginationParams,
 } from "../types/pagination.types";
 
@@ -43,13 +44,20 @@ export type UpdateSubscriptionBillingRequest = {
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
-const listSubscriptions = async (params: PaginationParams = {}): Promise<SubscriptionRecord[]> => {
+const listSubscriptionsPage = async (
+  params: PaginationParams = {},
+): Promise<PaginatedResponse<SubscriptionRecord>> => {
   const searchParams = buildPaginationSearchParams(params);
   const response = await ApiService.get(
     `${API_ROUTES.ADMIN.SUBSCRIPTIONS}?${searchParams.toString()}`,
     AUTH_REQUEST,
   );
-  return normalizePaginatedResponse<SubscriptionRecord>(assertApiSuccess<unknown>(response)).data;
+  return normalizePaginatedResponse<SubscriptionRecord>(assertApiSuccess<unknown>(response));
+};
+
+const listSubscriptions = async (params: PaginationParams = {}): Promise<SubscriptionRecord[]> => {
+  const page = await listSubscriptionsPage(params);
+  return page.data;
 };
 
 const getSubscriptionStats = async (): Promise<SubscriptionStats> => {
@@ -78,5 +86,6 @@ export {
   getPlanDistribution,
   getSubscriptionStats,
   listSubscriptions,
+  listSubscriptionsPage,
   updateSubscriptionBilling,
 };

@@ -226,7 +226,7 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     topicId: "team",
     question: "What is the difference between Admin and Manager roles?",
     answer:
-      "Admins can manage billing, organization settings, and all workspaces. Managers can create boards and manage members within assigned workspaces but cannot change billing or org-wide policies.",
+      "Admins manage billing, organization settings, invites, and all workspace members. Managers create projects, add invited members to their project squads, assign tasks, and can remove members from projects they lead. They cannot invite users, change org roles, or access billing and settings.",
   },
   {
     id: "sso",

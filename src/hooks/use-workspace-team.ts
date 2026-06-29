@@ -1,37 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteTeamMember,
-  getTeamMembers,
+  getTeamMembersPage,
   getTeamStats,
   inviteTeamMember,
+  removeTeamMemberFromSquad,
   resendAllPendingInvites,
   resendTeamInvite,
   updateTeamMemberRole,
   updateTeamMemberStatus,
 } from "../api-services/team.service";
 import { ACTIVITY_HEARTBEAT_INTERVAL_MS } from "../lib/activity-heartbeat.constants";
+import type { PaginationParams } from "../types/pagination.types";
 import type {
   InviteTeamMemberRequest,
   UpdateTeamMemberRoleRequest,
   UpdateTeamMemberStatusRequest,
 } from "../types/team.types";
 
-export const WORKSPACE_TEAM_MEMBERS_QUERY_KEY = ["workspace-team-members"] as const;
+export const WORKSPACE_TEAM_MEMBERS_QUERY_KEY = "workspace-team-members";
 export const WORKSPACE_TEAM_STATS_QUERY_KEY = ["workspace-team-stats"] as const;
 
 const TEAM_PRESENCE_REFETCH_INTERVAL_MS = ACTIVITY_HEARTBEAT_INTERVAL_MS;
 
 function invalidateTeamQueries(queryClient: ReturnType<typeof useQueryClient>) {
-  queryClient.invalidateQueries({ queryKey: WORKSPACE_TEAM_MEMBERS_QUERY_KEY });
+  queryClient.invalidateQueries({ queryKey: [WORKSPACE_TEAM_MEMBERS_QUERY_KEY] });
   queryClient.invalidateQueries({ queryKey: WORKSPACE_TEAM_STATS_QUERY_KEY });
   queryClient.invalidateQueries({ queryKey: ["workspace-organization-members"] });
   queryClient.invalidateQueries({ queryKey: ["workspace-organization"] });
+  queryClient.invalidateQueries({ queryKey: ["workspace-projects"] });
 }
 
-export function useTeamMembers() {
+export function useTeamMembers(params: PaginationParams = {}) {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 20;
+
   return useQuery({
-    queryKey: WORKSPACE_TEAM_MEMBERS_QUERY_KEY,
-    queryFn: () => getTeamMembers(),
+    queryKey: [WORKSPACE_TEAM_MEMBERS_QUERY_KEY, page, limit],
+    queryFn: () => getTeamMembersPage({ page, limit }),
     refetchInterval: TEAM_PRESENCE_REFETCH_INTERVAL_MS,
   });
 }
@@ -106,6 +112,15 @@ export function useDeleteTeamMember() {
 
   return useMutation({
     mutationFn: (memberId: string) => deleteTeamMember(memberId),
+    onSuccess: () => invalidateTeamQueries(queryClient),
+  });
+}
+
+export function useRemoveTeamMemberFromSquad() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (memberId: string) => removeTeamMemberFromSquad(memberId),
     onSuccess: () => invalidateTeamQueries(queryClient),
   });
 }

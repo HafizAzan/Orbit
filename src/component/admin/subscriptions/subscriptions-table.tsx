@@ -28,9 +28,19 @@ import SubscriptionViewModal from "./subscription-view-modal";
 type SubscriptionsTableProps = {
   data?: SubscriptionRecord[];
   onEditBilling?: (record: SubscriptionRecord) => void;
+  serverPagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    onChange: (page: number) => void;
+  };
 };
 
-function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA, onEditBilling }: SubscriptionsTableProps) {
+function SubscriptionsTable({
+  data = SUBSCRIPTIONS_DATA,
+  onEditBilling,
+  serverPagination,
+}: SubscriptionsTableProps) {
   const [rows, setRows] = useState(data);
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useSubscriptionFilters();
@@ -82,7 +92,18 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA, onEditBilling }: Subscr
     setSelectedRowKeys([]);
   }, [activeTab, rows, search, filters]);
 
-  const paginatedData = useMemo(() => paginateItems(filteredData, page, SUBSCRIPTIONS_PAGE_SIZE), [filteredData, page]);
+  const paginatedData = useMemo(() => {
+    if (serverPagination) {
+      return filteredData;
+    }
+
+    return paginateItems(filteredData, page, SUBSCRIPTIONS_PAGE_SIZE);
+  }, [filteredData, page, serverPagination]);
+
+  const paginationPage = serverPagination?.page ?? page;
+  const paginationPageSize = serverPagination?.pageSize ?? SUBSCRIPTIONS_PAGE_SIZE;
+  const paginationTotal = serverPagination?.total ?? filteredData.length;
+  const handlePageChange = serverPagination?.onChange ?? setPage;
 
   const selectedCount = selectedRowKeys.length;
   const hasSelection = selectedCount > 0;
@@ -115,8 +136,12 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA, onEditBilling }: Subscr
 
   const resultsSummary = (
     <span className="text-sm text-muted">
-      Displaying <span className="font-semibold text-foreground">{filteredData.length}</span> of{" "}
-      <span className="font-semibold text-foreground">{rows.length}</span> results
+      Displaying{" "}
+      <span className="font-semibold text-foreground">
+        {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
+        {Math.min(paginationPage * paginationPageSize, paginationTotal)}
+      </span>{" "}
+      of <span className="font-semibold text-foreground">{paginationTotal}</span> results
     </span>
   );
 
@@ -211,13 +236,13 @@ function SubscriptionsTable({ data = SUBSCRIPTIONS_DATA, onEditBilling }: Subscr
           }
         />
 
-        {filteredData.length > 0 ? (
+        {paginationTotal > 0 ? (
           <TablePaginationFooter
             summary={resultsSummary}
-            current={page}
-            pageSize={SUBSCRIPTIONS_PAGE_SIZE}
-            total={filteredData.length}
-            onChange={setPage}
+            current={paginationPage}
+            pageSize={paginationPageSize}
+            total={paginationTotal}
+            onChange={handlePageChange}
           />
         ) : null}
       </div>

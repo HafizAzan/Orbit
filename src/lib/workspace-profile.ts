@@ -1,35 +1,10 @@
-import { delay, generateOtpCode, normalizeEmail } from "./helper";
+import { confirmEmailChange, initiateEmailChange } from "../api-services/auth.service";
+import { delay } from "./helper";
 import type { WorkspaceProfile } from "../data/workspace-profile";
+import type { AuthUser } from "../types/auth.types";
 
-/** Mock credential for local development until API is wired. */
+/** Mock credential for local development until password API is wired. */
 const MOCK_CURRENT_PASSWORD = "Owner@123";
-const OTP_TTL_MS = 10 * 60 * 1000;
-const workspaceEmailOtpStore = new Map<string, { code: string; expiresAt: number }>();
-
-async function sendWorkspaceEmailOtp(email: string) {
-  await delay(300);
-  workspaceEmailOtpStore.set(email, {
-    code: generateOtpCode(),
-    expiresAt: Date.now() + OTP_TTL_MS,
-  });
-}
-
-async function verifyWorkspaceEmailOtp(email: string, otp: string) {
-  await delay(300);
-  const entry = workspaceEmailOtpStore.get(email);
-
-  if (!entry || entry.expiresAt < Date.now()) {
-    workspaceEmailOtpStore.delete(email);
-    return false;
-  }
-
-  const isValid = entry.code === otp.trim();
-  if (isValid) {
-    workspaceEmailOtpStore.delete(email);
-  }
-
-  return isValid;
-}
 
 export type ChangeWorkspacePasswordInput = {
   currentPassword: string;
@@ -44,6 +19,11 @@ export type InitiateWorkspaceEmailChangeInput = {
 export type CompleteWorkspaceEmailChangeInput = {
   newEmail: string;
   otp: string;
+};
+
+export type CompleteWorkspaceEmailChangeResult = {
+  email: string;
+  user: AuthUser;
 };
 
 export async function updateWorkspaceProfile(profile: WorkspaceProfile): Promise<WorkspaceProfile> {
@@ -63,39 +43,28 @@ export async function changeWorkspacePassword(input: ChangeWorkspacePasswordInpu
   }
 }
 
-export async function initiateWorkspaceEmailChange(
-  input: InitiateWorkspaceEmailChangeInput,
-  currentEmail: string,
-) {
-  await delay(400);
-
-  if (input.currentPassword !== MOCK_CURRENT_PASSWORD) {
-    throw new Error("Current password is incorrect");
-  }
-
-  const normalizedNewEmail = normalizeEmail(input.newEmail);
-
-  if (normalizedNewEmail === normalizeEmail(currentEmail)) {
-    throw new Error("New email must be different from your current email");
-  }
-
-  await sendWorkspaceEmailOtp(normalizedNewEmail);
+export async function initiateWorkspaceEmailChange(input: InitiateWorkspaceEmailChangeInput) {
+  await initiateEmailChange({
+    newEmail: input.newEmail,
+    currentPassword: input.currentPassword,
+  });
 }
 
-export async function completeWorkspaceEmailChange(input: CompleteWorkspaceEmailChangeInput) {
-  await delay(500);
+export async function completeWorkspaceEmailChange(
+  input: CompleteWorkspaceEmailChangeInput,
+): Promise<CompleteWorkspaceEmailChangeResult> {
+  const result = await confirmEmailChange({
+    newEmail: input.newEmail,
+    otp: input.otp,
+  });
 
-  const normalizedNewEmail = normalizeEmail(input.newEmail);
-  const isValid = await verifyWorkspaceEmailOtp(normalizedNewEmail, input.otp);
-
-  if (!isValid) {
-    throw new Error("Invalid or expired OTP. Please try again.");
-  }
-
-  return normalizedNewEmail;
+  return {
+    email: result.email,
+    user: result.user,
+  };
 }
 
 export async function sendWorkspacePasswordResetLink(email: string) {
   await delay(500);
-  return normalizeEmail(email);
+  return email.trim().toLowerCase();
 }

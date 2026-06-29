@@ -21,9 +21,22 @@ type OrganizationsTableProps = {
   onEdit?: (record: OrganizationRecord) => void;
   onDelete?: (record: OrganizationRecord) => Promise<void>;
   onBulkDelete?: (records: OrganizationRecord[]) => Promise<void>;
+  serverPagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    onChange: (page: number) => void;
+  };
 };
 
-function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete, onBulkDelete }: OrganizationsTableProps) {
+function OrganizationsTable({
+  data = [],
+  emptyAction,
+  onEdit,
+  onDelete,
+  onBulkDelete,
+  serverPagination,
+}: OrganizationsTableProps) {
   const [rows, setRows] = useState(data);
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useOrganizationFilters();
@@ -75,7 +88,18 @@ function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete, onBulkDe
     setSelectedRowKeys([]);
   }, [search, filters, rows]);
 
-  const paginatedData = useMemo(() => paginateItems(filteredData, page, ORGANIZATIONS_PAGE_SIZE), [filteredData, page]);
+  const paginatedData = useMemo(() => {
+    if (serverPagination) {
+      return filteredData;
+    }
+
+    return paginateItems(filteredData, page, ORGANIZATIONS_PAGE_SIZE);
+  }, [filteredData, page, serverPagination]);
+
+  const paginationPage = serverPagination?.page ?? page;
+  const paginationPageSize = serverPagination?.pageSize ?? ORGANIZATIONS_PAGE_SIZE;
+  const paginationTotal = serverPagination?.total ?? filteredData.length;
+  const handlePageChange = serverPagination?.onChange ?? setPage;
 
   const selectedCount = selectedRowKeys.length;
   const hasSelection = selectedCount > 0;
@@ -130,8 +154,12 @@ function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete, onBulkDe
 
   const resultsSummary = (
     <span className="text-sm text-muted">
-      Displaying <span className="font-semibold text-foreground">{filteredData.length}</span> of{" "}
-      <span className="font-semibold text-foreground">{rows.length}</span> results
+      Displaying{" "}
+      <span className="font-semibold text-foreground">
+        {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
+        {Math.min(paginationPage * paginationPageSize, paginationTotal)}
+      </span>{" "}
+      of <span className="font-semibold text-foreground">{paginationTotal}</span> results
     </span>
   );
 
@@ -210,13 +238,13 @@ function OrganizationsTable({ data = [], emptyAction, onEdit, onDelete, onBulkDe
           emptyAction={emptyAction}
         />
 
-        {filteredData.length > 0 ? (
+        {paginationTotal > 0 ? (
           <TablePaginationFooter
             summary={resultsSummary}
-            current={page}
-            pageSize={ORGANIZATIONS_PAGE_SIZE}
-            total={filteredData.length}
-            onChange={setPage}
+            current={paginationPage}
+            pageSize={paginationPageSize}
+            total={paginationTotal}
+            onChange={handlePageChange}
           />
         ) : null}
       </div>

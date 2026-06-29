@@ -10,7 +10,7 @@ import type { MyTasksViewMode } from "../../component/workspace/my-tasks/my-task
 import MyTasksUpcomingSection from "../../component/workspace/my-tasks/my-tasks-upcoming-section";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { MyTasksPageSkeleton } from "../../component/skeletons";
 import {
   buildMyTasksProjectFilterOptions,
   DEFAULT_MY_TASKS_FILTERS,
@@ -80,7 +80,7 @@ function WorkspaceMyTasksContent() {
   return (
     <QueryPageGuard
       query={myTasksQuery}
-      loading={<AdminListPageSkeleton tableColumns={4} />}
+      loading={<MyTasksPageSkeleton />}
       errorTitle="Unable to load your tasks"
     >
       <div className="mx-auto max-w-8xl">

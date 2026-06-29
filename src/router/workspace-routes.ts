@@ -25,6 +25,7 @@ export const WORKSPACE_ROUTES = {
   BILLING: "/billing",
   SETTINGS: "/settings",
   PROFILE: "/profile",
+  ACTIVITY_LOGS: "/activity-logs",
 } as const;
 
 const WORKSPACE_ROUTE_KEYS = [
@@ -39,6 +40,7 @@ const WORKSPACE_ROUTE_KEYS = [
   "BILLING",
   "SETTINGS",
   "PROFILE",
+  "ACTIVITY_LOGS",
 ] as const;
 
 function resolveWorkspacePageImport(key: string) {

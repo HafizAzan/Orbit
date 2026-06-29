@@ -1,0 +1,168 @@
+import { DeleteOutlined } from "@ant-design/icons";
+import { Button, Table, Tag } from "antd";
+import React, { useMemo, useState } from "react";
+import type { ActivityEvent } from "../../../types/activity.types";
+import { formatDate } from "../../../lib/helper";
+import { getWorkspaceRoleLabel } from "../../../lib/workspace-routing";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
+import {
+  useDeleteWorkspaceActivity,
+  useWorkspaceActivities,
+} from "../../../hooks/use-workspace-activity";
+import QueryErrorState from "../../common/query-error-state";
+import { ConfirmModal } from "../../ui/modal";
+import TablePaginationFooter from "../../ui/table-pagination-footer";
+
+const MODULE_LABELS: Record<ActivityEvent["module"], string> = {
+  tasks: "Tasks",
+  projects: "Projects",
+  teams: "Teams",
+  members: "Members",
+  organization: "Organization",
+  security: "Security",
+  billing: "Billing",
+};
+
+type WorkspaceActivityLogsSectionProps = {
+  compact?: boolean;
+  pageSize?: number;
+};
+
+function WorkspaceActivityLogsSection({
+  compact = false,
+  pageSize = compact ? 10 : 20,
+}: WorkspaceActivityLogsSectionProps) {
+  const [page, setPage] = useState(1);
+  const [pendingDelete, setPendingDelete] = useState<ActivityEvent | null>(null);
+  const activitiesQuery = useWorkspaceActivities({ page, limit: pageSize });
+  const { mutateAsync: deleteActivityLog, isPending: deleting } = useDeleteWorkspaceActivity();
+
+  const columns = useMemo(
+    () => [
+      {
+        title: "When",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        width: 160,
+        render: (value: string) => (
+          <span className="text-sm text-muted">{formatDate(value, { month: "short" })}</span>
+        ),
+      },
+      {
+        title: "Module",
+        dataIndex: "module",
+        key: "module",
+        width: 120,
+        render: (module: ActivityEvent["module"]) => (
+          <Tag className="rounded-full!">{MODULE_LABELS[module] ?? module}</Tag>
+        ),
+      },
+      {
+        title: "Actor",
+        key: "actor",
+        render: (_: unknown, record: ActivityEvent) => (
+          <div>
+            <p className="font-medium text-foreground">{record.actorName}</p>
+            <p className="text-xs text-muted">{getWorkspaceRoleLabel(record.actorRole)}</p>
+          </div>
+        ),
+      },
+      {
+        title: "Activity",
+        dataIndex: "summary",
+        key: "summary",
+        render: (summary: string) => <span className="text-sm text-foreground">{summary}</span>,
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        width: 80,
+        align: "center" as const,
+        render: (_: unknown, record: ActivityEvent) =>
+          record.canDelete ? (
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              aria-label="Delete activity log"
+              onClick={() => setPendingDelete(record)}
+            />
+          ) : null,
+      },
+    ],
+    [],
+  );
+
+  if (activitiesQuery.isError) {
+    return (
+      <QueryErrorState
+        error={activitiesQuery.error}
+        title="Unable to load activity logs"
+        onRetry={() => {
+          void activitiesQuery.refetch();
+        }}
+        isRetrying={activitiesQuery.isFetching}
+      />
+    );
+  }
+
+  const summary = activitiesQuery.data;
+
+  return (
+    <>
+      <Table
+        rowKey="id"
+        loading={activitiesQuery.isPending}
+        columns={columns}
+        dataSource={summary?.data ?? []}
+        pagination={false}
+        scroll={{ x: 760 }}
+      />
+
+      {!compact && summary ? (
+        <TablePaginationFooter
+          summary={
+            <span className="text-sm text-muted">
+              Showing {summary.data.length} of {summary.total} activity logs
+            </span>
+          }
+          current={summary.page}
+          pageSize={pageSize}
+          total={summary.total}
+          onChange={setPage}
+        />
+      ) : null}
+
+      <ConfirmModal
+        open={pendingDelete !== null}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={async () => {
+          if (!pendingDelete) return;
+
+          try {
+            const result = await deleteActivityLog(pendingDelete.id);
+            showApiSuccessToast(result.message);
+            setPendingDelete(null);
+          } catch (error) {
+            showApiErrorToast(error);
+          }
+        }}
+        title="Remove activity log"
+        description={
+          pendingDelete ? (
+            <>
+              Remove this audit entry for{" "}
+              <span className="font-semibold text-foreground">{pendingDelete.summary}</span>?
+            </>
+          ) : null
+        }
+        confirmText="Remove"
+        confirmDanger
+        confirmLoading={deleting}
+        icon={<DeleteOutlined />}
+      />
+    </>
+  );
+}
+
+export default React.memo(WorkspaceActivityLogsSection);

@@ -7,7 +7,7 @@ import TaskStatusChart from "../../component/workspace/dashboard/task-status-cha
 import TeamVelocityChart from "../../component/workspace/dashboard/team-velocity-chart";
 import WorkspaceMetricCard from "../../component/workspace/dashboard/workspace-metric-card";
 import QueryPageGuard from "../../component/common/query-page-guard";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { DashboardPageSkeleton } from "../../component/skeletons";
 import { useWorkspaceDashboard } from "../../hooks/use-workspace-tasks";
 
 function WorkspaceDashboard() {
@@ -17,7 +17,7 @@ function WorkspaceDashboard() {
   return (
     <QueryPageGuard
       query={dashboardQuery}
-      loading={<AdminListPageSkeleton tableColumns={4} />}
+      loading={<DashboardPageSkeleton />}
       errorTitle="Unable to load dashboard"
     >
       {data ? (

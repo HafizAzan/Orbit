@@ -8,7 +8,7 @@ import SubscriptionStatCard from "../../component/admin/subscriptions/subscripti
 import SubscriptionsTable from "../../component/admin/subscriptions/subscriptions-table";
 import { AdminSubscriptionsPageSkeleton } from "../../component/skeletons";
 import { Paragraph, Title } from "../../component/ui/typography";
-import { SUBSCRIPTION_REVENUE_DATA, type SubscriptionRecord } from "../../data/admin-subscriptions";
+import { SUBSCRIPTION_REVENUE_DATA, SUBSCRIPTIONS_PAGE_SIZE, type SubscriptionRecord } from "../../data/admin-subscriptions";
 import {
   usePlanDistribution,
   useSubscriptionStats,
@@ -17,7 +17,10 @@ import {
 import { mapPlanDistribution, mapSubscriptionStats } from "../../lib/admin-billing-mappers";
 
 function AdminSubscriptions() {
-  const { data: subscriptions = [], isLoading } = useSubscriptions();
+  const [page, setPage] = useState(1);
+  const { data: subscriptionsPage, isLoading } = useSubscriptions({ page, limit: SUBSCRIPTIONS_PAGE_SIZE });
+  const subscriptions = subscriptionsPage?.data ?? [];
+  const totalSubscriptions = subscriptionsPage?.total ?? 0;
   const { data: stats } = useSubscriptionStats();
   const { data: planDistribution = [] } = usePlanDistribution();
   const [editBillingOpen, setEditBillingOpen] = useState(false);
@@ -34,6 +37,11 @@ function AdminSubscriptions() {
   const handleCloseEditBilling = useCallback(() => {
     setEditBillingOpen(false);
     setEditingSubscription(null);
+  }, []);
+
+  const handlePageChange = useCallback((nextPage: number) => {
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   if (isLoading) {
@@ -70,7 +78,16 @@ function AdminSubscriptions() {
         <PlanDistributionCard items={planDistributionItems} />
       </div>
 
-      <SubscriptionsTable data={subscriptions} onEditBilling={handleOpenEditBilling} />
+      <SubscriptionsTable
+        data={subscriptions}
+        onEditBilling={handleOpenEditBilling}
+        serverPagination={{
+          page: subscriptionsPage?.page ?? page,
+          pageSize: subscriptionsPage?.limit ?? SUBSCRIPTIONS_PAGE_SIZE,
+          total: totalSubscriptions,
+          onChange: handlePageChange,
+        }}
+      />
 
       <SubscriptionEditBillingModal
         open={editBillingOpen}

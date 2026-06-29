@@ -22,13 +22,22 @@ type WorkspaceTeamTableColumnOptions = {
   onResendInvite?: (record: TeamMember) => void;
   onDeactivate?: (record: TeamMember) => void;
   onDeleteMember?: (record: TeamMember) => void;
+  onRemoveFromSquad?: (record: TeamMember) => void;
   canChangeRole?: boolean;
   canManageInvites?: boolean;
+  canRemoveFromSquad?: boolean;
 };
 
 function getActionItems(
   record: TeamMember,
-  { canChangeRole = false, canManageInvites = false }: Pick<WorkspaceTeamTableColumnOptions, "canChangeRole" | "canManageInvites">,
+  {
+    canChangeRole = false,
+    canManageInvites = false,
+    canRemoveFromSquad = false,
+  }: Pick<
+    WorkspaceTeamTableColumnOptions,
+    "canChangeRole" | "canManageInvites" | "canRemoveFromSquad"
+  >,
 ): MenuProps["items"] {
   const items: MenuProps["items"] = [];
 
@@ -38,6 +47,16 @@ function getActionItems(
 
   if (canManageInvites && record.status === "invited") {
     items.push({ key: "resend", label: "Resend invite", icon: <MailOutlined /> });
+  }
+
+  if (canRemoveFromSquad && record.role === "member") {
+    items.push({ type: "divider" });
+    items.push({
+      key: "remove-from-squad",
+      label: "Remove from team",
+      icon: <UserSwitchOutlined />,
+      danger: true,
+    });
   }
 
   if (canChangeRole && record.role !== "owner") {
@@ -67,10 +86,12 @@ function createWorkspaceTeamTableColumns({
   onResendInvite,
   onDeactivate,
   onDeleteMember,
+  onRemoveFromSquad,
   canChangeRole = false,
   canManageInvites = false,
+  canRemoveFromSquad = false,
 }: WorkspaceTeamTableColumnOptions = {}): ColumnsType<TeamMember> {
-  const showActions = canChangeRole || canManageInvites;
+  const showActions = canChangeRole || canManageInvites || canRemoveFromSquad;
 
   return [
     {
@@ -170,12 +191,13 @@ function createWorkspaceTeamTableColumns({
             render: (_: unknown, record: TeamMember) => (
               <Dropdown
                 menu={{
-                  items: getActionItems(record, { canChangeRole, canManageInvites }),
+                  items: getActionItems(record, { canChangeRole, canManageInvites, canRemoveFromSquad }),
                   onClick: ({ key }) => {
                     if (key === "edit-role") onEditRole?.(record);
                     if (key === "resend") onResendInvite?.(record);
                     if (key === "deactivate") onDeactivate?.(record);
                     if (key === "delete-member") onDeleteMember?.(record);
+                    if (key === "remove-from-squad") onRemoveFromSquad?.(record);
                   },
                 }}
                 trigger={["click"]}

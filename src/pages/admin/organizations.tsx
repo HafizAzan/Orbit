@@ -7,12 +7,16 @@ import OrganizationsTable from "../../component/admin/organizations/organization
 import { AdminListPageSkeleton } from "../../component/skeletons";
 import { Paragraph, Title } from "../../component/ui/typography";
 import type { OrganizationRecord } from "../../data/admin-organizations";
+import { ORGANIZATIONS_PAGE_SIZE } from "../../data/admin-organizations";
 import { useDeleteOrganization, useOrganizationStats, useOrganizations } from "../../hooks/use-admin-organizations";
 import { mapOrganizationStats } from "../../lib/admin-billing-mappers";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 
 function AdminOrganizations() {
-  const { data: organizations = [], isLoading } = useOrganizations();
+  const [page, setPage] = useState(1);
+  const { data: organizationsPage, isLoading } = useOrganizations({ page, limit: ORGANIZATIONS_PAGE_SIZE });
+  const organizations = organizationsPage?.data ?? [];
+  const totalOrganizations = organizationsPage?.total ?? 0;
   const { data: stats } = useOrganizationStats();
   const { mutateAsync: deleteOrganization } = useDeleteOrganization();
   const [formModalOpen, setFormModalOpen] = useState(false);
@@ -66,6 +70,11 @@ function AdminOrganizations() {
     [deleteOrganization],
   );
 
+  const handlePageChange = useCallback((nextPage: number) => {
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const createButton = (
     <Button type="primary" icon={<PlusOutlined />} size="large" className="font-semibold!" onClick={handleOpenCreate}>
       Create Organization
@@ -103,6 +112,12 @@ function AdminOrganizations() {
         onEdit={handleOpenEdit}
         onDelete={handleDelete}
         onBulkDelete={handleBulkDelete}
+        serverPagination={{
+          page: organizationsPage?.page ?? page,
+          pageSize: organizationsPage?.limit ?? ORGANIZATIONS_PAGE_SIZE,
+          total: totalOrganizations,
+          onChange: handlePageChange,
+        }}
       />
 
       <OrganizationCreateModal open={formModalOpen} record={editingOrganization} onClose={handleCloseFormModal} />

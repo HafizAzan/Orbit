@@ -6,20 +6,29 @@ import TeamSummaryCards from "../../component/workspace/teams/team-summary-cards
 import TeamsTable from "../../component/workspace/teams/teams-table";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { TeamsPageSkeleton } from "../../component/skeletons";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useTeamMembers } from "../../hooks/use-workspace-team";
+import { TEAM_MEMBERS_PAGE_SIZE } from "../../data/workspace-teams";
 import { mapApiTeamMemberToTeamMember } from "../../types/team.types";
 import { Paragraph, Title } from "../../component/ui/typography";
 
 function WorkspaceTeamsContent() {
   const { can } = useWorkspacePermissions();
-  const teamQuery = useTeamMembers();
-  const { data: members = [] } = teamQuery;
+  const [page, setPage] = useState(1);
+  const teamQuery = useTeamMembers({ page, limit: TEAM_MEMBERS_PAGE_SIZE });
+  const membersPage = teamQuery.data;
+  const members = membersPage?.data ?? [];
+  const totalMembers = membersPage?.total ?? 0;
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const canInvite = can("team.invite");
 
   const teamMembers = useMemo(() => members.map(mapApiTeamMemberToTeamMember), [members]);
+
+  const handlePageChange = useCallback((nextPage: number) => {
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const openInviteModal = useCallback(() => {
     setInviteModalOpen(true);
@@ -42,7 +51,7 @@ function WorkspaceTeamsContent() {
   return (
     <QueryPageGuard
       query={teamQuery}
-      loading={<AdminListPageSkeleton tableColumns={7} />}
+      loading={<TeamsPageSkeleton />}
       errorTitle="Unable to load team"
     >
       <div className="mx-auto max-w-8xl">
@@ -52,14 +61,23 @@ function WorkspaceTeamsContent() {
               Team Management
             </Title>
             <Paragraph size="sm" className="mt-1 text-muted">
-              View your project squad. Managers only see people from their own projects.
+              View your project squad. Managers can remove members from projects they lead.
             </Paragraph>
           </div>
 
           {inviteButton}
         </div>
 
-        <TeamsTable data={teamMembers} emptyAction={inviteButton} />
+        <TeamsTable
+          data={teamMembers}
+          emptyAction={inviteButton}
+          serverPagination={{
+            page: membersPage?.page ?? page,
+            pageSize: membersPage?.limit ?? TEAM_MEMBERS_PAGE_SIZE,
+            total: totalMembers,
+            onChange: handlePageChange,
+          }}
+        />
 
         <TeamSummaryCards />
 

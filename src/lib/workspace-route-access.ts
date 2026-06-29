@@ -13,6 +13,7 @@ const WORKSPACE_ROUTE_PERMISSIONS: Record<string, WorkspacePermission | Workspac
   [WORKSPACE_ROUTES.TASKS]: "tasks.view_all",
   [WORKSPACE_ROUTES.REPORTS]: "reports.view",
   [WORKSPACE_ROUTES.TEAMS]: "team.view",
+  [WORKSPACE_ROUTES.ACTIVITY_LOGS]: "activity.view",
 };
 
 const WORKSPACE_ROUTE_PATTERNS: Array<{ pattern: RegExp; permission: WorkspacePermission }> = [

@@ -49,3 +49,32 @@ export type UpdateWorkspaceOrganizationRequest = {
 export type UpdateOrganizationMemberRoleRequest = {
   role: Extract<RegisterAs, "admin" | "manager" | "member">;
 };
+
+export type UpdateOrganizationMemberEmailRequest = {
+  email: string;
+};
+
+export type OrganizationAboutPerson = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: RegisterAs;
+};
+
+export type OrganizationAbout = {
+  organization: {
+    id: string;
+    name: string;
+    slug: string;
+    createdAt: string;
+  };
+  owner: OrganizationAboutPerson;
+  admins: {
+    count: number;
+    data: OrganizationAboutPerson[];
+  };
+  managers: {
+    count: number;
+    data: OrganizationAboutPerson[];
+  };
+};

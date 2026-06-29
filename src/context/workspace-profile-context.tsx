@@ -138,7 +138,7 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
       setChangingEmail(true);
 
       try {
-        await initiateWorkspaceEmailChange({ newEmail, currentPassword }, profile.email);
+        await initiateWorkspaceEmailChange({ newEmail, currentPassword });
         toast.success("OTP sent to your new email address");
         return true;
       } catch (error) {
@@ -148,7 +148,7 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
         setChangingEmail(false);
       }
     },
-    [profile.email],
+    [],
   );
 
   const handleCompleteEmailChange = useCallback(
@@ -156,13 +156,13 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
       setChangingEmail(true);
 
       try {
-        const updatedEmail = await completeWorkspaceEmailChange({ newEmail, otp });
-        const nextProfile = { ...profile, email: updatedEmail, emailVerified: true };
+        const result = await completeWorkspaceEmailChange({ newEmail, otp });
+        const nextProfile = buildWorkspaceProfileFromUser(result.user);
         setProfile(nextProfile);
         setSavedProfile(nextProfile);
 
-        if (user && app?.setUser) {
-          app.setUser(syncUserFromProfile(user, nextProfile));
+        if (app?.setUser) {
+          app.setUser(result.user);
         }
 
         toast.success("Email address updated successfully");
@@ -174,7 +174,7 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
         setChangingEmail(false);
       }
     },
-    [app, profile, user],
+    [app],
   );
 
   const handleSendPasswordResetLink = useCallback(async () => {

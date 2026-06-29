@@ -20,9 +20,11 @@ function WorkspaceGlobalSearch() {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const { data: projects = [] } = useProjectsForSelect();
-  const { data: allTasks = [] } = useTasks();
+  const { data: allTasksPage } = useTasks({ limit: 100 });
   const { data: myTasks = [] } = useMyTasks();
-  const { data: teamMembers = [] } = useTeamMembers();
+  const { data: teamMembersPage } = useTeamMembers({ limit: 100 });
+  const allTasks = allTasksPage?.data ?? [];
+  const teamMembers = teamMembersPage?.data ?? [];
 
   const isMember = app?.user?.role === "member";
   const tasks = isMember ? myTasks : allTasks;

@@ -13,18 +13,26 @@ import type {
 import {
   buildPaginationSearchParams,
   normalizePaginatedResponse,
+  type PaginatedResponse,
   type PaginationParams,
 } from "../types/pagination.types";
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
 const listTasks = async (params: PaginationParams = {}): Promise<ApiWorkspaceTask[]> => {
+  const page = await listTasksPage(params);
+  return page.data;
+};
+
+const listTasksPage = async (
+  params: PaginationParams = {},
+): Promise<PaginatedResponse<ApiWorkspaceTask>> => {
   const searchParams = buildPaginationSearchParams(params);
   const response = await ApiService.get(
     `${API_ROUTES.TASKS.LIST}?${searchParams.toString()}`,
     AUTH_REQUEST,
   );
-  return normalizePaginatedResponse<ApiWorkspaceTask>(assertApiSuccess<unknown>(response)).data;
+  return normalizePaginatedResponse<ApiWorkspaceTask>(assertApiSuccess<unknown>(response));
 };
 
 const listMyTasks = async (params: PaginationParams = {}): Promise<ApiWorkspaceTask[]> => {
@@ -123,6 +131,7 @@ export {
   listBoards,
   listMyTasks,
   listTasks,
+  listTasksPage,
   updateTask,
   uploadTaskAttachment,
 };

@@ -11,18 +11,26 @@ import type {
 import {
   buildPaginationSearchParams,
   normalizePaginatedResponse,
+  type PaginatedResponse,
   type PaginationParams,
 } from "../types/pagination.types";
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
-const getTeamMembers = async (params: PaginationParams = {}): Promise<ApiTeamMember[]> => {
+const getTeamMembersPage = async (
+  params: PaginationParams = {},
+): Promise<PaginatedResponse<ApiTeamMember>> => {
   const searchParams = buildPaginationSearchParams(params);
   const response = await ApiService.get(
     `${API_ROUTES.TEAMS.MEMBERS}?${searchParams.toString()}`,
     AUTH_REQUEST,
   );
-  return normalizePaginatedResponse<ApiTeamMember>(assertApiSuccess<unknown>(response)).data;
+  return normalizePaginatedResponse<ApiTeamMember>(assertApiSuccess<unknown>(response));
+};
+
+const getTeamMembers = async (params: PaginationParams = {}): Promise<ApiTeamMember[]> => {
+  const page = await getTeamMembersPage(params);
+  return page.data;
 };
 
 const getTeamStats = async (): Promise<ApiTeamStats> => {
@@ -81,11 +89,23 @@ const deleteTeamMember = async (memberId: string): Promise<{ message: string }> 
   return assertApiSuccess<{ message: string }>(response);
 };
 
+const removeTeamMemberFromSquad = async (
+  memberId: string,
+): Promise<{ message: string; removedFromProjects?: number }> => {
+  const response = await ApiService.delete(
+    `${API_ROUTES.TEAMS.MEMBERS}/${memberId}/squad`,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<{ message: string; removedFromProjects?: number }>(response);
+};
+
 export {
   deleteTeamMember,
   getTeamMembers,
+  getTeamMembersPage,
   getTeamStats,
   inviteTeamMember,
+  removeTeamMemberFromSquad,
   resendAllPendingInvites,
   resendTeamInvite,
   updateTeamMemberRole,

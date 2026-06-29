@@ -1,7 +1,7 @@
 import React from "react";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { ReportsPageSkeleton } from "../../component/skeletons";
 import { useWorkspaceReports } from "../../hooks/use-workspace-tasks";
 import { Paragraph, Title } from "../../component/ui/typography";
 
@@ -12,7 +12,7 @@ function WorkspaceReportsContent() {
   return (
     <QueryPageGuard
       query={reportsQuery}
-      loading={<AdminListPageSkeleton tableColumns={4} />}
+      loading={<ReportsPageSkeleton />}
       errorTitle="Unable to load reports"
     >
       {data ? (

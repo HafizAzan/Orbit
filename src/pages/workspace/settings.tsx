@@ -16,7 +16,7 @@ import WorkspaceAccessDenied from "../../component/workspace/workspace-access-de
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import QueryErrorState from "../../component/common/query-error-state";
 import SettingsSaveBar from "../../component/admin/settings/settings-save-bar";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { SettingsPageSkeleton } from "../../component/skeletons";
 import { Paragraph, Title } from "../../component/ui/typography";
 import { DEFAULT_WORKSPACE_SETTINGS, WORKSPACE_SETTINGS_NAV_ITEMS } from "../../data/workspace-settings";
 import {
@@ -78,7 +78,7 @@ function WorkspaceSettingsContent() {
 
   const renderContent = () => {
     if (activeTab === "general" && organizationQuery.isPending) {
-      return <AdminListPageSkeleton tableColumns={2} />;
+      return <SettingsPageSkeleton />;
     }
 
     if (activeTab === "general" && organizationQuery.isError) {

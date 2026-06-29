@@ -9,6 +9,7 @@ import type {
 import {
   buildPaginationSearchParams,
   normalizePaginatedResponse,
+  type PaginatedResponse,
   type PaginationParams,
 } from "../types/pagination.types";
 
@@ -44,13 +45,20 @@ export type UpdateOrganizationRequest = {
 
 const AUTH_REQUEST = { requireAuth: true } as const;
 
-const listOrganizations = async (params: PaginationParams = {}): Promise<OrganizationRecord[]> => {
+const listOrganizationsPage = async (
+  params: PaginationParams = {},
+): Promise<PaginatedResponse<OrganizationRecord>> => {
   const searchParams = buildPaginationSearchParams(params);
   const response = await ApiService.get(
     `${API_ROUTES.ADMIN.ORGANIZATIONS}?${searchParams.toString()}`,
     AUTH_REQUEST,
   );
-  return normalizePaginatedResponse<OrganizationRecord>(assertApiSuccess<unknown>(response)).data;
+  return normalizePaginatedResponse<OrganizationRecord>(assertApiSuccess<unknown>(response));
+};
+
+const listOrganizations = async (params: PaginationParams = {}): Promise<OrganizationRecord[]> => {
+  const page = await listOrganizationsPage(params);
+  return page.data;
 };
 
 const getOrganizationStats = async (): Promise<OrganizationStats> => {
@@ -83,5 +91,6 @@ export {
   deleteOrganization,
   getOrganizationStats,
   listOrganizations,
+  listOrganizationsPage,
   updateOrganization,
 };

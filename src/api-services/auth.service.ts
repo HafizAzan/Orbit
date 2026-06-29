@@ -19,6 +19,13 @@ import type {
   AcceptInviteRequest,
   AcceptInviteResponse,
   ActivityHeartbeatResponse,
+  ConfirmEmailChangeRequest,
+  ConfirmEmailChangeResponse,
+  EmailChangeRequestRecipientsResponse,
+  InitiateEmailChangeRequest,
+  InitiateEmailChangeResponse,
+  SubmitEmailChangeRequest,
+  SubmitEmailChangeRequestResponse,
   VerifyRegisterRequest,
   VerifyRegisterResponse,
 } from "../types/auth.types";
@@ -111,9 +118,62 @@ const recordActivityHeartbeat = async (): Promise<ActivityHeartbeatResponse> => 
   return assertApiSuccess<ActivityHeartbeatResponse>(response);
 };
 
+const initiateEmailChange = async (
+  data: InitiateEmailChangeRequest,
+): Promise<InitiateEmailChangeResponse> => {
+  const response = await ApiService.post(
+    API_ROUTES.AUTH.EMAIL_INITIATE,
+    {
+      newEmail: data.newEmail.trim().toLowerCase(),
+      currentPassword: data.currentPassword,
+    },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<InitiateEmailChangeResponse>(response);
+};
+
+const confirmEmailChange = async (
+  data: ConfirmEmailChangeRequest,
+): Promise<ConfirmEmailChangeResponse> => {
+  const response = await ApiService.post(
+    API_ROUTES.AUTH.EMAIL_CONFIRM,
+    {
+      newEmail: data.newEmail.trim().toLowerCase(),
+      otp: data.otp.trim(),
+    },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<ConfirmEmailChangeResponse>(response);
+};
+
+const getEmailChangeRequestRecipients = async (): Promise<EmailChangeRequestRecipientsResponse> => {
+  const response = await ApiService.get(API_ROUTES.AUTH.EMAIL_REQUEST_RECIPIENTS, AUTH_REQUEST);
+  return assertApiSuccess<EmailChangeRequestRecipientsResponse>(response);
+};
+
+const submitEmailChangeRequest = async (
+  data: SubmitEmailChangeRequest,
+): Promise<SubmitEmailChangeRequestResponse> => {
+  const response = await ApiService.post(
+    API_ROUTES.AUTH.EMAIL_REQUEST,
+    {
+      subject: data.subject.trim(),
+      newEmail: data.newEmail.trim().toLowerCase(),
+      currentEmail: data.currentEmail.trim().toLowerCase(),
+      reason: data.reason.trim(),
+      recipientIds: data.recipientIds,
+    },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<SubmitEmailChangeRequestResponse>(response);
+};
+
 export {
+  confirmEmailChange,
   forgotPassword,
+  getEmailChangeRequestRecipients,
   getMe,
+  initiateEmailChange,
   recordActivityHeartbeat,
   getRegisterPending,
   login,
@@ -125,4 +185,5 @@ export {
   acceptInvite,
   validateInviteToken,
   verifyRegister,
+  submitEmailChangeRequest,
 };

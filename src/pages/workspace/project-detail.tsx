@@ -8,7 +8,7 @@ import ProjectPhaseProgressCard from "../../component/workspace/projects/project
 import ProjectTeamCard from "../../component/workspace/projects/project-team-card";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { ProjectDetailSkeleton } from "../../component/skeletons";
 import { useProject } from "../../hooks/use-workspace-projects";
 import {
   useCreateProjectComment,
@@ -62,13 +62,13 @@ function WorkspaceProjectDetail() {
   const app = useAppContext();
   const projectQuery = useProject(projectId);
   const commentsQuery = useProjectComments(projectId);
-  const tasksQuery = useTasks();
+  const tasksQuery = useTasks({ limit: 100 });
   const { mutateAsync: createComment, isPending: isCreatingComment } = useCreateProjectComment(projectId);
   const { mutateAsync: deleteComment } = useDeleteProjectComment(projectId);
   const { data: apiProject } = projectQuery;
 
   const projectTasks = useMemo(
-    () => (tasksQuery.data ?? []).filter((task) => task.projectId === projectId),
+    () => (tasksQuery.data?.data ?? []).filter((task) => task.projectId === projectId),
     [projectId, tasksQuery.data],
   );
 
@@ -103,7 +103,7 @@ function WorkspaceProjectDetail() {
   return (
     <QueryPageGuard
       query={projectQuery}
-      loading={<AdminListPageSkeleton tableColumns={3} />}
+      loading={<ProjectDetailSkeleton />}
       errorTitle="Unable to load project"
       homePath={getWorkspaceHomePath(app?.user?.role)}
     >
@@ -132,9 +132,13 @@ function WorkspaceProjectDetail() {
                 messages={discussionMessages}
                 currentUserId={app?.user?.id}
                 loading={commentsQuery.isLoading}
+                refreshing={commentsQuery.isFetching && !commentsQuery.isLoading}
                 submitting={isCreatingComment}
                 onSubmit={handleSubmitComment}
                 onDelete={handleDeleteComment}
+                onRefresh={() => {
+                  void commentsQuery.refetch();
+                }}
               />
             </div>
           </div>

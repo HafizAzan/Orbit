@@ -6,7 +6,7 @@ import TaskDetailAttachments from "../../component/workspace/tasks/task-detail-a
 import TaskDetailHeader from "../../component/workspace/tasks/task-detail-header";
 import TaskDetailSidebar from "../../component/workspace/tasks/task-detail-sidebar";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { TaskDetailSkeleton } from "../../component/skeletons";
 import { useAppContext } from "../../context/app-context";
 import { useTask } from "../../hooks/use-workspace-tasks";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
@@ -21,7 +21,7 @@ function WorkspaceTaskDetail() {
   return (
     <QueryPageGuard
       query={taskQuery}
-      loading={<AdminListPageSkeleton tableColumns={3} />}
+      loading={<TaskDetailSkeleton />}
       errorTitle="Unable to load task"
       homePath={getWorkspaceHomePath(app?.user?.role)}
     >

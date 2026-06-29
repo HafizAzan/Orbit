@@ -5,9 +5,12 @@ import ProfilePasswordForm from "../../component/admin/profile/profile-password-
 import ProfileSaveBar from "../../component/admin/profile/profile-save-bar";
 import ProfileSummaryCard from "../../component/admin/profile/profile-summary-card";
 import WorkspaceOrganizationCard from "../../component/workspace/profile/workspace-organization-card";
+import WorkspaceAboutOrganizationCard from "../../component/workspace/profile/workspace-about-organization-card";
+import WorkspaceProfileActivityLogsCard from "../../component/workspace/profile/workspace-profile-activity-logs-card";
 import WorkspaceProfileTabs from "../../component/workspace/profile/workspace-profile-tabs";
 import { getWorkspaceProfileDisplayName, type WorkspaceProfileTab } from "../../data/workspace-profile";
 import useWorkspaceProfile from "../../hooks/use-workspace-profile";
+import { canChangeOwnEmail, canRequestOwnEmailChange } from "../../lib/email-access";
 import { getWorkspaceRoleLabel } from "../../lib/workspace-routing";
 import { Paragraph, Title } from "../../component/ui/typography";
 
@@ -31,6 +34,8 @@ function WorkspaceProfile() {
   const [activeTab, setActiveTab] = useState<WorkspaceProfileTab>("personal");
   const roleLabel = getWorkspaceRoleLabel(profile.role);
   const displayName = getWorkspaceProfileDisplayName(profile);
+  const canChangeOwnLoginEmail = canChangeOwnEmail(profile.role);
+  const canRequestOwnLoginEmailChange = canRequestOwnEmailChange(profile.role);
 
   const profileInfo = useMemo(
     () => ({
@@ -79,6 +84,9 @@ function WorkspaceProfile() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <ProfileEmailSecurityCard
             profile={profile}
+            role={profile.role}
+            canChangeEmail={canChangeOwnLoginEmail}
+            canRequestEmailChange={canRequestOwnLoginEmailChange}
             changingEmail={changingEmail}
             onInitiateEmailChange={handleInitiateEmailChange}
             onCompleteEmailChange={handleCompleteEmailChange}
@@ -95,6 +103,10 @@ function WorkspaceProfile() {
       ) : null}
 
       {activeTab === "organization" ? <WorkspaceOrganizationCard profile={profile} /> : null}
+
+      {activeTab === "about-organization" ? <WorkspaceAboutOrganizationCard role={profile.role} /> : null}
+
+      {activeTab === "activity-logs" ? <WorkspaceProfileActivityLogsCard /> : null}
 
       {activeTab === "personal" ? (
         <ProfileSaveBar

@@ -1,4 +1,4 @@
-import { SendOutlined } from "@ant-design/icons";
+import { SendOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Input } from "antd";
 import React, { useState } from "react";
 import type { ProjectDiscussionMessage } from "../../../data/workspace-project-detail";
@@ -9,18 +9,22 @@ type ProjectDiscussionCardProps = {
   messages: ProjectDiscussionMessage[];
   currentUserId?: string;
   loading?: boolean;
+  refreshing?: boolean;
   submitting?: boolean;
   onSubmit?: (message: string) => Promise<void> | void;
   onDelete?: (commentId: string) => Promise<void> | void;
+  onRefresh?: () => void;
 };
 
 function ProjectDiscussionCard({
   messages,
   currentUserId,
   loading = false,
+  refreshing = false,
   submitting = false,
   onSubmit,
   onDelete,
+  onRefresh,
 }: ProjectDiscussionCardProps) {
   const [draft, setDraft] = useState("");
 
@@ -34,7 +38,20 @@ function ProjectDiscussionCard({
 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
-      <h3 className="text-lg font-semibold text-foreground">Discussion</h3>
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold text-foreground">Discussion</h3>
+        {onRefresh ? (
+          <button
+            type="button"
+            aria-label="Refresh comments"
+            disabled={loading || refreshing}
+            onClick={onRefresh}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ReloadOutlined spin={refreshing} />
+          </button>
+        ) : null}
+      </div>
 
       {loading ? (
         <p className="mt-5 text-sm text-muted">Loading discussion...</p>

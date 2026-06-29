@@ -4,7 +4,7 @@ import ProjectFormScreen from "../../component/workspace/projects/project-form/p
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { FormPageSkeleton } from "../../component/skeletons";
 import { useProject } from "../../hooks/use-workspace-projects";
 import { useAppContext } from "../../context/app-context";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
@@ -26,7 +26,7 @@ function WorkspaceProjectEdit() {
   return (
     <QueryPageGuard
       query={projectQuery}
-      loading={<AdminListPageSkeleton tableColumns={2} />}
+      loading={<FormPageSkeleton />}
       errorTitle="Unable to load project"
       homePath={getWorkspaceHomePath(app?.user?.role)}
     >

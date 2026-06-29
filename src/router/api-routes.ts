@@ -6,6 +6,10 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     REGISTER_VERIFY: "/auth/register/verify",
     ME: "/auth/me",
     HEARTBEAT: "/auth/heartbeat",
+    EMAIL_INITIATE: "/auth/me/email/initiate",
+    EMAIL_CONFIRM: "/auth/me/email/confirm",
+    EMAIL_REQUEST_RECIPIENTS: "/auth/me/email/request-recipients",
+    EMAIL_REQUEST: "/auth/me/email/request",
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
     FORGOT_PASSWORD: "/auth/forgot-password",
@@ -23,7 +27,12 @@ const API_ROUTES: Record<string, Record<string, string>> = {
   },
   ORGANIZATIONS: {
     ME: "/organizations/me",
+    ABOUT: "/organizations/me/about",
     MEMBERS: "/organizations/me/members",
+  },
+  ACTIVITY: {
+    LIST: "/activity",
+    FEED: "/activity/feed",
   },
   TEAMS: {
     MEMBERS: "/teams/members",

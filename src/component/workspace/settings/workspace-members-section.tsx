@@ -1,15 +1,17 @@
 import { Button, Dropdown, Select, Table } from "antd";
-import { DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EllipsisOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { OrganizationMember } from "../../../types/organization.types";
 import type { OrganizationMembersSummary } from "../../../types/organization.types";
 import { getInitial } from "../../../lib/helper";
+import { canActorChangeMemberEmail } from "../../../lib/email-access";
 import { getWorkspaceRoleLabel } from "../../../lib/workspace-routing";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import {
   useOrganizationMembers,
   useRemoveOrganizationMember,
+  useUpdateOrganizationMemberEmail,
   useUpdateOrganizationMemberRole,
 } from "../../../hooks/use-workspace-organization";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
@@ -19,6 +21,8 @@ import QueryErrorState from "../../common/query-error-state";
 import SettingsSection from "../../admin/settings/settings-section";
 import { ConfirmModal } from "../../ui/modal";
 import type { RegisterAs } from "../../../types/auth.types";
+import { useAppContext } from "../../../context/app-context";
+import MemberEmailChangeModal from "./member-email-change-modal";
 
 type WorkspaceMembersSectionProps = {
   expanded?: boolean;
@@ -70,12 +74,16 @@ function MemberRoleSelect({ member }: { member: OrganizationMember }) {
 }
 
 function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionProps) {
+  const app = useAppContext();
+  const actorRole = app?.user?.role ?? "member";
   const { can } = useWorkspacePermissions();
   const membersQuery = useOrganizationMembers();
   const { data } = membersQuery;
   const { mutateAsync: removeMember, isPending: removingMember } = useRemoveOrganizationMember();
+  const { mutateAsync: updateMemberEmail, isPending: updatingMemberEmail } = useUpdateOrganizationMemberEmail();
   const canManageMembers = can("team.change_role");
   const [pendingRemoveMember, setPendingRemoveMember] = useState<OrganizationMember | null>(null);
+  const [pendingEmailMember, setPendingEmailMember] = useState<OrganizationMember | null>(null);
 
   const summary: OrganizationMembersSummary | undefined = data;
   const previewMembers = summary?.data.slice(0, 3) ?? [];
@@ -117,6 +125,15 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
                   <Dropdown
                     menu={{
                       items: [
+                        ...(canActorChangeMemberEmail(actorRole, record.role)
+                          ? [
+                              {
+                                key: "change-email",
+                                label: "Change email",
+                                icon: <MailOutlined />,
+                              },
+                            ]
+                          : []),
                         {
                           key: "deactivate",
                           label: "Deactivate member",
@@ -125,6 +142,7 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
                         },
                       ],
                       onClick: ({ key }) => {
+                        if (key === "change-email") setPendingEmailMember(record);
                         if (key === "deactivate") setPendingRemoveMember(record);
                       },
                     }}
@@ -143,7 +161,7 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
           ]
         : []),
     ],
-    [canManageMembers],
+    [actorRole, canManageMembers],
   );
 
   return (
@@ -248,6 +266,24 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
         confirmDanger
         confirmLoading={removingMember}
         icon={<DeleteOutlined />}
+      />
+
+      <MemberEmailChangeModal
+        open={pendingEmailMember !== null}
+        member={pendingEmailMember}
+        loading={updatingMemberEmail}
+        onClose={() => setPendingEmailMember(null)}
+        onSubmit={async (memberId, email) => {
+          try {
+            await updateMemberEmail({ memberId, data: { email } });
+            showApiSuccessToast("Member email updated.");
+            setPendingEmailMember(null);
+            return true;
+          } catch (error) {
+            showApiErrorToast(error);
+            return false;
+          }
+        }}
       />
     </SettingsSection>
   );

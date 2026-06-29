@@ -3,16 +3,20 @@ import {
   createOrganization,
   deleteOrganization,
   getOrganizationStats,
-  listOrganizations,
+  listOrganizationsPage,
   updateOrganization,
   type CreateOrganizationRequest,
   type UpdateOrganizationRequest,
 } from "../api-services/admin-organizations.service";
+import type { PaginationParams } from "../types/pagination.types";
 
-export function useOrganizations() {
+export function useOrganizations(params: PaginationParams = {}) {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 10;
+
   return useQuery({
-    queryKey: ["admin-organizations"],
-    queryFn: () => listOrganizations(),
+    queryKey: ["admin-organizations", page, limit],
+    queryFn: () => listOrganizationsPage({ page, limit }),
   });
 }
 

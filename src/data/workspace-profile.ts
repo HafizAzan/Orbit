@@ -17,6 +17,8 @@ export type WorkspaceProfile = {
 export const WORKSPACE_PROFILE_TABS = [
   { key: "personal", label: "Personal Info", roles: ["owner", "admin", "manager", "member"] as RegisterAs[] },
   { key: "security", label: "Security", roles: ["owner", "admin", "manager", "member"] as RegisterAs[] },
+  { key: "about-organization", label: "About Organization", roles: ["manager", "member"] as RegisterAs[] },
+  { key: "activity-logs", label: "Activity Logs", roles: ["owner", "admin", "manager"] as RegisterAs[] },
   { key: "organization", label: "Organization", roles: ["owner", "admin"] as RegisterAs[] },
 ] as const;
 

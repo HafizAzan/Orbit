@@ -37,6 +37,52 @@ export type ActivityHeartbeatResponse = {
   lastActiveAt: string;
 };
 
+export type InitiateEmailChangeRequest = {
+  newEmail: string;
+  currentPassword: string;
+};
+
+export type InitiateEmailChangeResponse = {
+  message: string;
+  email: string;
+  expiresAt: string;
+};
+
+export type ConfirmEmailChangeRequest = {
+  newEmail: string;
+  otp: string;
+};
+
+export type ConfirmEmailChangeResponse = {
+  message: string;
+  email: string;
+  user: AuthUser;
+};
+
+export type EmailChangeRequestRecipient = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: RegisterAs;
+};
+
+export type EmailChangeRequestRecipientsResponse = {
+  data: EmailChangeRequestRecipient[];
+};
+
+export type SubmitEmailChangeRequest = {
+  subject: string;
+  newEmail: string;
+  currentEmail: string;
+  reason: string;
+  recipientIds: string[];
+};
+
+export type SubmitEmailChangeRequestResponse = {
+  message: string;
+  recipientCount: number;
+};
+
 export type ForgotPasswordFormValues = {
   email: string;
 };

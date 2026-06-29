@@ -2,7 +2,9 @@ import ApiService from "../config/client";
 import { assertApiSuccess } from "../lib/api-error";
 import API_ROUTES from "../router/api-routes";
 import type {
+  OrganizationAbout,
   OrganizationMembersSummary,
+  UpdateOrganizationMemberEmailRequest,
   UpdateOrganizationMemberRoleRequest,
   UpdateWorkspaceOrganizationRequest,
   WorkspaceOrganization,
@@ -18,6 +20,11 @@ const AUTH_REQUEST = { requireAuth: true } as const;
 const getCurrentOrganization = async (): Promise<WorkspaceOrganization> => {
   const response = await ApiService.get(API_ROUTES.ORGANIZATIONS.ME, AUTH_REQUEST);
   return assertApiSuccess<WorkspaceOrganization>(response);
+};
+
+const getOrganizationAbout = async (): Promise<OrganizationAbout> => {
+  const response = await ApiService.get(API_ROUTES.ORGANIZATIONS.ABOUT, AUTH_REQUEST);
+  return assertApiSuccess<OrganizationAbout>(response);
 };
 
 const updateCurrentOrganization = async (
@@ -62,6 +69,18 @@ const updateOrganizationMemberRole = async (
   return assertApiSuccess<OrganizationMembersSummary["data"][number]>(response);
 };
 
+const updateOrganizationMemberEmail = async (
+  memberId: string,
+  data: UpdateOrganizationMemberEmailRequest,
+): Promise<OrganizationMembersSummary["data"][number]> => {
+  const response = await ApiService.patch(
+    `${API_ROUTES.ORGANIZATIONS.MEMBERS}/${memberId}/email`,
+    { email: data.email.trim().toLowerCase() },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<OrganizationMembersSummary["data"][number]>(response);
+};
+
 const removeOrganizationMember = async (memberId: string): Promise<{ message: string }> => {
   const response = await ApiService.delete(
     `${API_ROUTES.ORGANIZATIONS.MEMBERS}/${memberId}`,
@@ -72,8 +91,10 @@ const removeOrganizationMember = async (memberId: string): Promise<{ message: st
 
 export {
   getCurrentOrganization,
+  getOrganizationAbout,
   getOrganizationMembers,
   removeOrganizationMember,
   updateCurrentOrganization,
+  updateOrganizationMemberEmail,
   updateOrganizationMemberRole,
 };

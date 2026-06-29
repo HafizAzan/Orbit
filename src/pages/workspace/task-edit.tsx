@@ -4,7 +4,7 @@ import TaskFormScreen from "../../component/workspace/tasks/task-form/task-form-
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { FormPageSkeleton } from "../../component/skeletons";
 import { useTask } from "../../hooks/use-workspace-tasks";
 import { useAppContext } from "../../context/app-context";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
@@ -24,7 +24,7 @@ function WorkspaceTaskEdit() {
   return (
     <QueryPageGuard
       query={taskQuery}
-      loading={<AdminListPageSkeleton tableColumns={2} />}
+      loading={<FormPageSkeleton />}
       errorTitle="Unable to load task"
       homePath={getWorkspaceHomePath(app?.user?.role)}
     >

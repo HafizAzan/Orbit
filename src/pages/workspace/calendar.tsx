@@ -8,7 +8,7 @@ import CalendarPageHeader from "../../component/workspace/calendar/calendar-page
 import CalendarSidebar from "../../component/workspace/calendar/calendar-sidebar";
 import CalendarWeekView from "../../component/workspace/calendar/calendar-week-view";
 import QueryPageGuard from "../../component/common/query-page-guard";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { CalendarPageSkeleton } from "../../component/skeletons";
 import {
   DEFAULT_CALENDAR_FILTERS,
   type CalendarFilters,
@@ -94,7 +94,7 @@ function WorkspaceCalendar() {
   return (
     <QueryPageGuard
       query={eventsQuery}
-      loading={<AdminListPageSkeleton tableColumns={4} />}
+      loading={<CalendarPageSkeleton />}
       errorTitle="Unable to load calendar"
     >
       <div className="mx-auto max-w-8xl">

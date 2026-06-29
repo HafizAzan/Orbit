@@ -5,6 +5,11 @@ import { useAppContext } from "../context/app-context";
 import { ACTIVITY_HEARTBEAT_INTERVAL_MS } from "../lib/activity-heartbeat.constants";
 import { getAccessToken, isAuthSessionExpired } from "../lib/auth-session";
 import {
+  WORKSPACE_ACTIVITY_FEED_QUERY_KEY,
+  WORKSPACE_ACTIVITY_LIST_QUERY_KEY,
+} from "./use-workspace-activity";
+import { WORKSPACE_DASHBOARD_QUERY_KEY } from "./use-workspace-tasks";
+import {
   WORKSPACE_TEAM_MEMBERS_QUERY_KEY,
   WORKSPACE_TEAM_STATS_QUERY_KEY,
 } from "./use-workspace-team";
@@ -22,8 +27,11 @@ export function useActivityHeartbeat() {
 
     try {
       await recordActivityHeartbeat();
-      await queryClient.invalidateQueries({ queryKey: WORKSPACE_TEAM_MEMBERS_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: [WORKSPACE_TEAM_MEMBERS_QUERY_KEY] });
       await queryClient.invalidateQueries({ queryKey: WORKSPACE_TEAM_STATS_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: WORKSPACE_ACTIVITY_FEED_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: WORKSPACE_ACTIVITY_LIST_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
     } catch {
       // Ignore transient network/auth errors; the next interval will retry.
     }

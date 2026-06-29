@@ -13,6 +13,7 @@ export type WorkspacePermission =
   | "team.view"
   | "team.invite"
   | "team.change_role"
+  | "team.remove_squad_member"
   | "project.create"
   | "project.edit"
   | "project.delete"
@@ -21,7 +22,9 @@ export type WorkspacePermission =
   | "task.delete_any"
   | "my_tasks.view"
   | "tasks.view_all"
-  | "reports.view";
+  | "reports.view"
+  | "activity.view"
+  | "activity.delete";
 
 type WorkspaceRole = Extract<RegisterAs, "owner" | "admin" | "manager" | "member">;
 
@@ -43,6 +46,8 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "project.delete",
     "tasks.view_all",
     "reports.view",
+    "activity.view",
+    "activity.delete",
   ],
   admin: [
     "billing.view",
@@ -64,9 +69,12 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "task.delete_any",
     "tasks.view_all",
     "reports.view",
+    "activity.view",
+    "activity.delete",
   ],
   manager: [
     "team.view",
+    "team.remove_squad_member",
     "project.create",
     "project.edit",
     "project.delete",
@@ -75,6 +83,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "task.delete_any",
     "tasks.view_all",
     "reports.view",
+    "activity.view",
   ],
   member: ["my_tasks.view", "task.create", "task.edit"],
 };

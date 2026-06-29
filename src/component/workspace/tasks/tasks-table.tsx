@@ -76,9 +76,15 @@ type TasksTableProps = {
   emptyAction?: React.ReactNode;
   onBulkDelete?: (taskIds: string[]) => Promise<void>;
   onDeleteTask?: (taskId: string) => Promise<void>;
+  serverPagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    onChange: (page: number) => void;
+  };
 };
 
-function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask }: TasksTableProps) {
+function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask, serverPagination }: TasksTableProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { can } = useWorkspacePermissions();
@@ -191,10 +197,18 @@ function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask }: TasksTabl
     setSelectedRowKeys([]);
   }, [search, filters]);
 
-  const paginatedData = useMemo(
-    () => paginateItems(filteredData, page, WORKSPACE_TASKS_PAGE_SIZE),
-    [filteredData, page],
-  );
+  const paginatedData = useMemo(() => {
+    if (serverPagination) {
+      return filteredData;
+    }
+
+    return paginateItems(filteredData, page, WORKSPACE_TASKS_PAGE_SIZE);
+  }, [filteredData, page, serverPagination]);
+
+  const paginationPage = serverPagination?.page ?? page;
+  const paginationPageSize = serverPagination?.pageSize ?? WORKSPACE_TASKS_PAGE_SIZE;
+  const paginationTotal = serverPagination?.total ?? filteredData.length;
+  const handlePageChange = serverPagination?.onChange ?? setPage;
 
   const handleFilterChange = (key: keyof TaskTableFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -223,10 +237,10 @@ function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask }: TasksTabl
     <span className="text-sm text-muted">
       Showing{" "}
       <span className="font-semibold text-foreground">
-        {filteredData.length === 0 ? 0 : (page - 1) * WORKSPACE_TASKS_PAGE_SIZE + 1}-
-        {Math.min(page * WORKSPACE_TASKS_PAGE_SIZE, filteredData.length)}
+        {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
+        {Math.min(paginationPage * paginationPageSize, paginationTotal)}
       </span>{" "}
-      of <span className="font-semibold text-foreground">{filteredData.length}</span> tasks
+      of <span className="font-semibold text-foreground">{paginationTotal}</span> tasks
     </span>
   );
 
@@ -354,13 +368,13 @@ function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask }: TasksTabl
         emptyAction={emptyAction}
       />
 
-      {filteredData.length > 0 ? (
+      {paginationTotal > 0 ? (
         <TablePaginationFooter
           summary={resultsSummary}
-          current={page}
-          pageSize={WORKSPACE_TASKS_PAGE_SIZE}
-          total={filteredData.length}
-          onChange={setPage}
+          current={paginationPage}
+          pageSize={paginationPageSize}
+          total={paginationTotal}
+          onChange={handlePageChange}
         />
       ) : null}
 

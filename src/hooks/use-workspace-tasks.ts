@@ -8,12 +8,13 @@ import {
   getTask,
   listBoards,
   listMyTasks,
-  listTasks,
+  listTasksPage,
   updateTask,
 } from "../api-services/task.service";
 import type { CreateTaskRequest, UpdateTaskRequest } from "../types/task.types";
+import type { PaginationParams } from "../types/pagination.types";
 
-export const WORKSPACE_TASKS_QUERY_KEY = ["workspace-tasks"] as const;
+export const WORKSPACE_TASKS_QUERY_KEY = "workspace-tasks";
 export const WORKSPACE_MY_TASKS_QUERY_KEY = ["workspace-my-tasks"] as const;
 export const WORKSPACE_DASHBOARD_QUERY_KEY = ["workspace-dashboard"] as const;
 export const WORKSPACE_REPORTS_QUERY_KEY = ["workspace-reports"] as const;
@@ -27,10 +28,13 @@ export function workspaceBoardQueryKey(projectId: string) {
   return ["workspace-board", projectId] as const;
 }
 
-export function useTasks() {
+export function useTasks(params: PaginationParams = {}) {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 20;
+
   return useQuery({
-    queryKey: WORKSPACE_TASKS_QUERY_KEY,
-    queryFn: () => listTasks(),
+    queryKey: [WORKSPACE_TASKS_QUERY_KEY, page, limit],
+    queryFn: () => listTasksPage({ page, limit }),
   });
 }
 
@@ -84,7 +88,7 @@ export function useCreateTask() {
   return useMutation({
     mutationFn: (data: CreateTaskRequest) => createTask(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: WORKSPACE_TASKS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [WORKSPACE_TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_MY_TASKS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_REPORTS_QUERY_KEY });
@@ -101,7 +105,7 @@ export function useUpdateTask() {
     mutationFn: ({ taskId, data }: { taskId: string; data: UpdateTaskRequest }) =>
       updateTask(taskId, data),
     onSuccess: (_result, variables) => {
-      queryClient.invalidateQueries({ queryKey: WORKSPACE_TASKS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [WORKSPACE_TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_MY_TASKS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: workspaceTaskQueryKey(variables.taskId) });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
@@ -118,7 +122,7 @@ export function useDeleteTask() {
   return useMutation({
     mutationFn: (taskId: string) => deleteTask(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: WORKSPACE_TASKS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [WORKSPACE_TASKS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_MY_TASKS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_REPORTS_QUERY_KEY });

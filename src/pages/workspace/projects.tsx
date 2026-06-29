@@ -5,7 +5,7 @@ import ProjectsPageHeader from "../../component/workspace/projects/projects-page
 import ProjectsToolbar from "../../component/workspace/projects/projects-toolbar";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import TablePaginationFooter from "../../component/ui/table-pagination-footer";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { ProjectsPageSkeleton } from "../../component/skeletons";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useDeleteProject, useProjects } from "../../hooks/use-workspace-projects";
 import type { ProjectsViewMode } from "../../data/workspace-projects";
@@ -140,7 +140,7 @@ function WorkspaceProjects() {
   return (
     <QueryPageGuard
       query={projectsQuery}
-      loading={<AdminListPageSkeleton tableColumns={3} />}
+      loading={<ProjectsPageSkeleton />}
       errorTitle="Unable to load projects"
     >
       <div className="mx-auto max-w-8xl">

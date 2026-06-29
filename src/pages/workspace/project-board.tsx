@@ -4,7 +4,7 @@ import KanbanBoardHeader from "../../component/workspace/boards/kanban-board-hea
 import KanbanColumn from "../../component/workspace/boards/kanban-column";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
-import { AdminListPageSkeleton } from "../../component/skeletons";
+import { KanbanBoardSkeleton } from "../../component/skeletons";
 import { useAppContext } from "../../context/app-context";
 import { useBoard } from "../../hooks/use-workspace-tasks";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
@@ -21,7 +21,7 @@ function WorkspaceProjectBoard() {
   return (
     <QueryPageGuard
       query={boardQuery}
-      loading={<AdminListPageSkeleton tableColumns={4} />}
+      loading={<KanbanBoardSkeleton />}
       errorTitle="Unable to load board"
       homePath={getWorkspaceHomePath(app?.user?.role)}
     >

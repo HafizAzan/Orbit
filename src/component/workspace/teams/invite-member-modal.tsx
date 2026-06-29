@@ -134,15 +134,15 @@ function InviteSuccessContent({ email, role }: { email: string; role: TeamInvite
 function InviteMemberModal({ open, onClose }: InviteMemberModalProps) {
   const [form] = Form.useForm<InviteMemberFormValues>();
   const { data: stats } = useTeamStats();
-  const { data: apiMembers = [] } = useTeamMembers();
+  const { data: membersPage } = useTeamMembers({ limit: 100 });
   const { mutateAsync: inviteMember, isPending } = useInviteTeamMember();
   const [step, setStep] = useState<InviteModalStep>("form");
   const [invitedEmail, setInvitedEmail] = useState("");
   const [invitedRole, setInvitedRole] = useState<TeamInviteRole>(DEFAULT_FORM_VALUES.role);
 
   const members = useMemo(
-    () => apiMembers.map(mapApiTeamMemberToTeamMember),
-    [apiMembers],
+    () => (membersPage?.data ?? []).map(mapApiTeamMemberToTeamMember),
+    [membersPage?.data],
   );
 
   const selectedRole = Form.useWatch("role", form) ?? DEFAULT_FORM_VALUES.role;

@@ -7,6 +7,7 @@ import { ConfirmModal } from "../../ui/modal";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import {
   useDeleteTeamMember,
+  useRemoveTeamMemberFromSquad,
   useResendTeamInvite,
   useUpdateTeamMemberStatus,
 } from "../../../hooks/use-workspace-team";
@@ -36,15 +37,23 @@ function matchesTeamFilters(member: TeamMember, filters: TeamTableFilters) {
 type TeamsTableProps = {
   data?: TeamMember[];
   emptyAction?: React.ReactNode;
+  serverPagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    onChange: (page: number) => void;
+  };
 };
 
-function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
+function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProps) {
   const { can } = useWorkspacePermissions();
   const { mutateAsync: updateStatus } = useUpdateTeamMemberStatus();
   const { mutateAsync: resendInvite } = useResendTeamInvite();
   const { mutateAsync: deleteMember } = useDeleteTeamMember();
+  const { mutateAsync: removeFromSquad } = useRemoveTeamMemberFromSquad();
   const canChangeRole = can("team.change_role");
   const canManageInvites = can("team.invite");
+  const canRemoveFromSquad = can("team.remove_squad_member");
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<TeamTableFilters>(DEFAULT_TEAM_TABLE_FILTERS);
   const [page, setPage] = useState(1);
@@ -52,9 +61,11 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
   const [statusChangeMember, setStatusChangeMember] = useState<TeamMember | null>(null);
   const [resendInviteMember, setResendInviteMember] = useState<TeamMember | null>(null);
   const [deleteMemberRecord, setDeleteMemberRecord] = useState<TeamMember | null>(null);
+  const [removeSquadMember, setRemoveSquadMember] = useState<TeamMember | null>(null);
   const [statusChangeLoading, setStatusChangeLoading] = useState(false);
   const [resendInviteLoading, setResendInviteLoading] = useState(false);
   const [deleteMemberLoading, setDeleteMemberLoading] = useState(false);
+  const [removeSquadLoading, setRemoveSquadLoading] = useState(false);
 
   const activeFilterCount = countActiveTeamFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
@@ -74,10 +85,18 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
     setPage(1);
   }, [search, filters, data]);
 
-  const paginatedData = useMemo(
-    () => paginateItems(filteredData, page, TEAM_MEMBERS_PAGE_SIZE),
-    [filteredData, page],
-  );
+  const paginatedData = useMemo(() => {
+    if (serverPagination) {
+      return filteredData;
+    }
+
+    return paginateItems(filteredData, page, TEAM_MEMBERS_PAGE_SIZE);
+  }, [filteredData, page, serverPagination]);
+
+  const paginationPage = serverPagination?.page ?? page;
+  const paginationPageSize = serverPagination?.pageSize ?? TEAM_MEMBERS_PAGE_SIZE;
+  const paginationTotal = serverPagination?.total ?? filteredData.length;
+  const handlePageChange = serverPagination?.onChange ?? setPage;
 
   const handleFilterChange = (key: keyof TeamTableFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -114,6 +133,26 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
   const handleDeleteMember = useCallback((record: TeamMember) => {
     setDeleteMemberRecord(record);
   }, []);
+
+  const handleRemoveFromSquad = useCallback((record: TeamMember) => {
+    setRemoveSquadMember(record);
+  }, []);
+
+  const handleConfirmRemoveFromSquad = useCallback(async () => {
+    if (!removeSquadMember) return;
+
+    setRemoveSquadLoading(true);
+
+    try {
+      const result = await removeFromSquad(removeSquadMember.id);
+      showApiSuccessToast(result.message);
+      setRemoveSquadMember(null);
+    } catch (error) {
+      showApiErrorToast(error);
+    } finally {
+      setRemoveSquadLoading(false);
+    }
+  }, [removeFromSquad, removeSquadMember]);
 
   const handleConfirmDeleteMember = useCallback(async () => {
     if (!deleteMemberRecord) return;
@@ -157,24 +196,35 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
         onResendInvite: handleResendInvite,
         onDeactivate: handleDeactivate,
         onDeleteMember: handleDeleteMember,
+        onRemoveFromSquad: handleRemoveFromSquad,
         canChangeRole,
         canManageInvites,
+        canRemoveFromSquad,
       }),
-    [canChangeRole, canManageInvites, handleDeactivate, handleDeleteMember, handleEditRole, handleResendInvite],
+    [
+      canChangeRole,
+      canManageInvites,
+      canRemoveFromSquad,
+      handleDeactivate,
+      handleDeleteMember,
+      handleEditRole,
+      handleRemoveFromSquad,
+      handleResendInvite,
+    ],
   );
 
   const resultsSummary = (
     <span className="text-sm text-muted">
       Showing{" "}
       <span className="font-semibold text-foreground">
-        {filteredData.length === 0 ? 0 : (page - 1) * TEAM_MEMBERS_PAGE_SIZE + 1}
+        {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}
       </span>
       {" to "}
       <span className="font-semibold text-foreground">
-        {Math.min(page * TEAM_MEMBERS_PAGE_SIZE, filteredData.length)}
+        {Math.min(paginationPage * paginationPageSize, paginationTotal)}
       </span>
       {" of "}
-      <span className="font-semibold text-foreground">{filteredData.length}</span> members
+      <span className="font-semibold text-foreground">{paginationTotal}</span> members
     </span>
   );
 
@@ -225,13 +275,13 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
           emptyAction={emptyAction}
         />
 
-        {filteredData.length > 0 ? (
+        {paginationTotal > 0 ? (
           <TablePaginationFooter
             summary={resultsSummary}
-            current={page}
-            pageSize={TEAM_MEMBERS_PAGE_SIZE}
-            total={filteredData.length}
-            onChange={setPage}
+            current={paginationPage}
+            pageSize={paginationPageSize}
+            total={paginationTotal}
+            onChange={handlePageChange}
           />
         ) : null}
       </div>
@@ -282,6 +332,25 @@ function TeamsTable({ data = [], emptyAction }: TeamsTableProps) {
         confirmText="Resend invite"
         confirmLoading={resendInviteLoading}
         icon={<MailOutlined />}
+      />
+
+      <ConfirmModal
+        open={removeSquadMember !== null}
+        onClose={() => setRemoveSquadMember(null)}
+        onConfirm={handleConfirmRemoveFromSquad}
+        title="Remove from team"
+        description={
+          removeSquadMember ? (
+            <>
+              Remove <span className="font-semibold text-foreground">{removeSquadMember.name}</span> from your project
+              team? They will stay in the workspace but lose access to projects you manage.
+            </>
+          ) : null
+        }
+        confirmText="Remove from team"
+        confirmDanger
+        confirmLoading={removeSquadLoading}
+        icon={<UserSwitchOutlined />}
       />
 
       <ConfirmModal
