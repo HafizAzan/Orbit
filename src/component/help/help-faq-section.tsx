@@ -39,7 +39,7 @@ function HelpFaqSection({ search, selectedTopicId }: HelpFaqSectionProps) {
           </Title>
           {selectedTopicLabel ? (
             <Paragraph size="sm" className="mt-3 text-muted">
-              Showing results for <span className="font-semibold text-primary">{selectedTopicLabel}</span>
+              Showing results for <Text weight="semibold" color="primary">{selectedTopicLabel}</Text>
             </Paragraph>
           ) : null}
         </div>

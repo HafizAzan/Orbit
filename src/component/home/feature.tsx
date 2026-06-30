@@ -5,7 +5,7 @@ import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import { RESOURCES } from "../../lib/resources";
 import { scrollToSection } from "../../lib/utils";
 import AnimateOnScroll from "../common/animate-on-scroll";
-import { Paragraph, Title } from "../ui/typography";
+import { Paragraph, Text, Title } from "../ui/typography";
 
 function Feature() {
   return (
@@ -14,10 +14,10 @@ function Feature() {
         <AnimateOnScroll immediate variant="fade-up" className="flex w-full flex-col gap-6 nav:gap-8">
           <div className="flex flex-col gap-4 nav:gap-5">
             <Title level={1} className="text-3xl leading-tight font-bold sm:text-4xl nav:text-5xl lg:text-[3.25rem]">
-              <span className="text-zinc-800">Sync your workflow,</span>
+              <Text className="text-zinc-800">Sync your workflow,</Text>
               <span className="hidden nav:inline"> </span>
               <br className="nav:hidden" />
-              <span className="text-primary">accelerate your growth</span>
+              <Text color="primary">accelerate your growth</Text>
             </Title>
 
             <Paragraph size="base" color="hero-muted" className="max-w-xl text-sm text-hero-text sm:text-base">

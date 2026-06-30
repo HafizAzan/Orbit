@@ -2,9 +2,9 @@ import { Button, Input } from "antd";
 import React, { useMemo } from "react";
 import type { WorkspaceSettings } from "../../../data/workspace-settings";
 import { getWorkspaceSlugPreview } from "../../../lib/workspace-organization-settings";
-import { cn } from "../../../lib/utils";
 import SettingsField from "../../admin/settings/settings-field";
 import SettingsSection from "../../admin/settings/settings-section";
+import { Paragraph, Text } from "../../ui/typography";
 
 type WorkspaceGeneralSectionProps = {
   settings: WorkspaceSettings;
@@ -47,12 +47,16 @@ function WorkspaceGeneralSection({
 
         <SettingsField label="Workspace URL">
           <div className="rounded-xl border border-border bg-background px-4 py-3">
-            <p className="text-sm text-muted">
+            <Paragraph size="sm">
               flowsync.io/workspace/
-              <span className={cn("font-semibold", settings.workspaceSlug.trim() ? "text-primary" : "text-muted")}>
+              <Text
+                as="span"
+                weight="semibold"
+                color={settings.workspaceSlug.trim() ? "primary" : "muted"}
+              >
                 {previewSlug}
-              </span>
-            </p>
+              </Text>
+            </Paragraph>
           </div>
         </SettingsField>
       </div>

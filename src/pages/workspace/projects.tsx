@@ -15,6 +15,7 @@ import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { pluralize } from "../../lib/helper";
 import { cn } from "../../lib/utils";
+import { Text } from "../../component/ui/typography";
 
 function WorkspaceProjects() {
   const { can } = useWorkspacePermissions();
@@ -127,14 +128,14 @@ function WorkspaceProjects() {
   }, [deleteProject, selectedCount, selectedProjectIds]);
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Showing{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {totalProjects === 0 ? 0 : (currentPage - 1) * pageSize + 1}-
         {Math.min(currentPage * pageSize, totalProjects)}
-      </span>{" "}
-      of <span className="font-semibold text-foreground">{totalProjects}</span> projects
-    </span>
+      </Text>{" "}
+      of <Text as="span" weight="semibold">{totalProjects}</Text> projects
+    </Text>
   );
 
   return (

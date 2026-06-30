@@ -2,6 +2,7 @@ import { Switch } from "antd";
 import React from "react";
 import type { WorkspaceSettings } from "../../../data/workspace-settings";
 import SettingsSection from "../../admin/settings/settings-section";
+import { Paragraph, Text } from "../../ui/typography";
 
 type WorkspaceNotificationsSectionProps = {
   settings: WorkspaceSettings;
@@ -19,16 +20,16 @@ function WorkspaceNotificationsSection({ settings, onChange, expanded = false }:
       <div className="space-y-4">
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-semibold text-foreground">Daily digest summary</p>
-            <p className="mt-1 text-sm text-muted">Receive a morning recap of tasks, deadlines, and team activity.</p>
+            <Text as="p" weight="semibold">Daily digest summary</Text>
+            <Paragraph size="sm" className="mt-1">Receive a morning recap of tasks, deadlines, and team activity.</Paragraph>
           </div>
           <Switch checked={settings.dailyDigest} onChange={(checked) => onChange("dailyDigest", checked)} />
         </div>
 
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-semibold text-foreground">Real-time push notifications</p>
-            <p className="mt-1 text-sm text-muted">Get instant alerts for mentions, assignments, and status changes.</p>
+            <Text as="p" weight="semibold">Real-time push notifications</Text>
+            <Paragraph size="sm" className="mt-1">Get instant alerts for mentions, assignments, and status changes.</Paragraph>
           </div>
           <Switch checked={settings.realtimePush} onChange={(checked) => onChange("realtimePush", checked)} />
         </div>
@@ -36,8 +37,8 @@ function WorkspaceNotificationsSection({ settings, onChange, expanded = false }:
         {expanded ? (
           <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-semibold text-foreground">Weekly workspace report</p>
-              <p className="mt-1 text-sm text-muted">Summary email every Monday with project health metrics.</p>
+              <Text as="p" weight="semibold">Weekly workspace report</Text>
+              <Paragraph size="sm" className="mt-1">Summary email every Monday with project health metrics.</Paragraph>
             </div>
             <Switch defaultChecked onChange={() => undefined} />
           </div>

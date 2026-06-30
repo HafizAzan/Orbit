@@ -5,6 +5,7 @@ import { TASK_PRIORITY_CONFIG } from "../../../data/workspace-tasks";
 import { formatDate } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import MyTasksSectionHeader from "./my-tasks-section-header";
+import { Paragraph, Text } from "../../ui/typography";
 
 type MyTasksAssignedSectionProps = {
   tasks: MyTask[];
@@ -37,13 +38,13 @@ function MyTasksAssignedSection({ tasks, onToggleComplete, onOpenTask }: MyTasks
                   className="mt-1"
                 />
                 <button type="button" onClick={() => onOpenTask(task)} className="min-w-0 text-left">
-                  <p className="font-semibold text-foreground">{task.title}</p>
-                  <p className="mt-1 text-sm text-muted">{task.project}</p>
+                  <Text as="p" weight="semibold">{task.title}</Text>
+                  <Paragraph size="sm" className="mt-1">{task.project}</Paragraph>
                 </button>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                <span className="text-sm text-muted">{formatDate(task.dueDate, { year: undefined })}</span>
+                <Text as="span" size="sm" color="muted">{formatDate(task.dueDate, { year: undefined })}</Text>
                 <span
                   className={cn(
                     "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide",

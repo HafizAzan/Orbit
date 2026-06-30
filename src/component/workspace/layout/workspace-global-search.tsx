@@ -13,6 +13,7 @@ import {
   type WorkspaceGlobalSearchResult,
 } from "../../../lib/workspace-global-search";
 import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
+import { Text } from "../../ui/typography";
 
 function WorkspaceGlobalSearch() {
   const navigate = useNavigate();
@@ -64,13 +65,21 @@ function WorkspaceGlobalSearch() {
 
   const renderOption = (result: WorkspaceGlobalSearchResult) => (
     <div className="flex min-w-0 flex-col py-0.5">
-      <span className="truncate text-sm font-medium text-foreground">{result.title}</span>
-      <span className="truncate text-xs text-muted">{result.subtitle}</span>
+      <Text as="span" size="sm" weight="medium" className="truncate">
+        {result.title}
+      </Text>
+      <Text as="span" size="xs" color="muted" className="truncate">
+        {result.subtitle}
+      </Text>
     </div>
   );
 
   const options = groupedOptions.map((group) => ({
-    label: <span className="text-xs font-semibold tracking-wide text-muted uppercase">{group.label}</span>,
+    label: (
+      <Text as="span" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+        {group.label}
+      </Text>
+    ),
     options: group.options.map((option) => ({
       value: option.value,
       label: renderOption(option.result),

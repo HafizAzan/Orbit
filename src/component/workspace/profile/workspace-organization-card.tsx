@@ -5,6 +5,7 @@ import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import { getWorkspaceRoleLabel } from "../../../lib/workspace-routing";
 import { cn } from "../../../lib/utils";
 import RecordDetailField from "../../admin/shared/record-detail-field";
+import { Paragraph, Title } from "../../ui/typography";
 
 type WorkspaceOrganizationCardProps = {
   profile: WorkspaceProfile;
@@ -20,10 +21,12 @@ function WorkspaceOrganizationCard({ profile }: WorkspaceOrganizationCardProps) 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Organization Details</h2>
-        <p className="mt-1 text-sm text-muted">
+        <Title level={4} className="text-xl text-foreground">
+          Organization Details
+        </Title>
+        <Paragraph size="sm" className="mt-1">
           Workspace and account information for owners and admins.
-        </p>
+        </Paragraph>
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -37,9 +40,9 @@ function WorkspaceOrganizationCard({ profile }: WorkspaceOrganizationCardProps) 
 
       {(profile.role === "owner" || profile.role === "admin") && (
         <div className="mt-6 rounded-xl border border-primary/20 bg-feature-sync/40 p-4">
-          <p className="text-sm text-muted">
+          <Paragraph size="sm">
             Manage billing, members, and workspace policies from organization settings.
-          </p>
+          </Paragraph>
           <Link
             to={WORKSPACE_ROUTES.SETTINGS}
             className={cn(

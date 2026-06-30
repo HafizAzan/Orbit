@@ -2,6 +2,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React, { useState } from "react";
 import { ConfirmModal } from "../../ui/modal";
+import { Text } from "../../ui/typography";
 
 type DeleteProjectButtonProps = {
   projectName: string;
@@ -44,7 +45,7 @@ function DeleteProjectButton({ projectName, onDelete, size = "large", className 
         title="Delete project"
         description={
           <>
-            Are you sure you want to delete <span className="font-semibold text-foreground">{projectName}</span>? All
+            Are you sure you want to delete <Text as="span" weight="semibold">{projectName}</Text>? All
             tasks, files, and activity linked to this project will be permanently removed.
           </>
         }

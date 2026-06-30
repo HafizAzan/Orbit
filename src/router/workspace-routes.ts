@@ -1,9 +1,9 @@
-import { lazy } from "react";
+import { lazy, type ComponentType } from "react";
 
 export type WorkspaceRoute = {
   path: string;
   name: string;
-  component: React.ComponentType;
+  component: ComponentType;
 };
 
 export const WORKSPACE_ROUTES = {
@@ -28,34 +28,58 @@ export const WORKSPACE_ROUTES = {
   ACTIVITY_LOGS: "/activity-logs",
 } as const;
 
-const WORKSPACE_ROUTE_KEYS = [
-  "DASHBOARD",
-  "PROJECTS",
-  "BOARDS",
-  "TASKS",
-  "MY_TASKS",
-  "TEAMS",
-  "CALENDAR",
-  "REPORTS",
-  "BILLING",
-  "SETTINGS",
-  "PROFILE",
-  "ACTIVITY_LOGS",
-] as const;
+type WorkspaceRouteKey = keyof typeof WORKSPACE_ROUTES;
 
-function resolveWorkspacePageImport(key: string) {
-  const routePath = WORKSPACE_ROUTES[key as keyof typeof WORKSPACE_ROUTES];
-  const fileName = routePath.replace(/^\//, "");
+type WorkspaceRouteConfig = {
+  key: WorkspaceRouteKey;
+  pageFile?: string;
+};
 
-  return import(`../pages/workspace/${fileName}.tsx`);
+const WORKSPACE_ROUTE_CONFIGS: WorkspaceRouteConfig[] = [
+  { key: "DASHBOARD" },
+  { key: "PROJECT_CREATE", pageFile: "project-create" },
+  { key: "PROJECT_EDIT", pageFile: "project-edit" },
+  { key: "PROJECT_BOARD", pageFile: "project-board" },
+  { key: "PROJECT_DETAIL", pageFile: "project-detail" },
+  { key: "PROJECTS" },
+  { key: "BOARDS" },
+  { key: "TASK_CREATE", pageFile: "task-create" },
+  { key: "TASK_EDIT", pageFile: "task-edit" },
+  { key: "TASK_DETAIL", pageFile: "task-detail" },
+  { key: "TASKS" },
+  { key: "MY_TASKS" },
+  { key: "TEAMS" },
+  { key: "CALENDAR" },
+  { key: "REPORTS" },
+  { key: "BILLING" },
+  { key: "SETTINGS" },
+  { key: "PROFILE" },
+  { key: "ACTIVITY_LOGS" },
+];
+
+function resolveWorkspacePageFile(key: WorkspaceRouteKey, pageFile?: string) {
+  if (pageFile) return pageFile;
+
+  return WORKSPACE_ROUTES[key].replace(/^\//, "");
 }
 
-function createWorkspaceRoutes(keys: readonly string[]): WorkspaceRoute[] {
-  return keys.map((key) => ({
-    path: WORKSPACE_ROUTES[key as keyof typeof WORKSPACE_ROUTES],
+function createWorkspaceRoutes(configs: readonly WorkspaceRouteConfig[]): WorkspaceRoute[] {
+  return configs.map(({ key, pageFile }) => ({
+    path: WORKSPACE_ROUTES[key],
     name: key,
-    component: lazy(() => resolveWorkspacePageImport(key)),
+    component: lazy(() => import(`../pages/workspace/${resolveWorkspacePageFile(key, pageFile)}.tsx`)),
   }));
 }
 
-export const WORKSPACE_ROUTES_LIST = createWorkspaceRoutes(WORKSPACE_ROUTE_KEYS);
+export const WORKSPACE_ROUTES_LIST = createWorkspaceRoutes(WORKSPACE_ROUTE_CONFIGS);
+
+export const WORKSPACE_NOT_FOUND_ROUTE: WorkspaceRoute = {
+  path: "*",
+  name: "NOT_FOUND",
+  component: lazy(() => import("../component/workspace/workspace-not-found")),
+};
+
+export const WORKSPACE_LEGACY_REDIRECTS = WORKSPACE_ROUTES_LIST.map((route) => ({
+  path: `/app${route.path}`,
+  to: route.path,
+}));

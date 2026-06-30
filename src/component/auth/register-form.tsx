@@ -125,8 +125,8 @@ function RegisterForm() {
                 onClick={() => setSlugTouched(true)}
               >
                 <span className="min-w-0 flex-1 truncate font-mono text-sm">
-                  <span className={cn("font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>{previewSlug}</span>
-                  <span className="text-muted">.{WORKSPACE_DOMAIN}</span>
+                  <Text className={cn("font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>{previewSlug}</Text>
+                  <Text color="muted">.{WORKSPACE_DOMAIN}</Text>
                 </span>
                 <span className="shrink-0 rounded-full bg-feature-sync px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
                   Auto

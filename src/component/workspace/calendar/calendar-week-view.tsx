@@ -3,6 +3,7 @@ import { CALENDAR_WEEKDAY_LABELS, type CalendarEvent } from "../../../data/works
 import { getEventsForIso, getWeekDays } from "../../../lib/calendar-utils";
 import { cn } from "../../../lib/utils";
 import CalendarEventPill from "./calendar-event-pill";
+import { Paragraph, Text } from "../../ui/typography";
 
 type CalendarWeekViewProps = {
   activeDate: Date;
@@ -35,9 +36,9 @@ function CalendarWeekView({ activeDate, events }: CalendarWeekViewProps) {
               )}
             >
               <div className="mb-3 flex items-center gap-2 sm:flex-col sm:items-start">
-                <span className="text-xs font-semibold tracking-wide text-muted uppercase sm:hidden">
+                <Text as="span" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase sm:hidden">
                   {new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day.date)}
-                </span>
+                </Text>
                 <span
                   className={cn(
                     "inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
@@ -52,7 +53,7 @@ function CalendarWeekView({ activeDate, events }: CalendarWeekViewProps) {
                 {dayEvents.length > 0 ? (
                   dayEvents.map((event) => <CalendarEventPill key={event.id} event={event} />)
                 ) : (
-                  <p className="text-xs text-muted">No events</p>
+                  <Paragraph size="xs">No events</Paragraph>
                 )}
               </div>
             </div>

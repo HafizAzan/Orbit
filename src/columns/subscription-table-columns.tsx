@@ -3,6 +3,7 @@ import { Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PLAN_STYLES, SUBSCRIPTION_STATUS_STYLES, type SubscriptionRecord } from "../data/admin-subscriptions";
 import { formatCurrency, formatDate, getInitial } from "../lib/helper";
+import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
 
 type SubscriptionTableColumnOptions = {
@@ -31,8 +32,8 @@ function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: Sub
             {getInitial(record.organizationName)}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-foreground">{record.organizationName}</p>
-            <p className="truncate text-xs text-muted">{record.contactEmail}</p>
+            <Text as="p" weight="semibold" className="truncate">{record.organizationName}</Text>
+            <Text as="p" size="xs" color="muted" className="truncate">{record.contactEmail}</Text>
           </div>
         </div>
       ),
@@ -51,20 +52,20 @@ function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: Sub
       dataIndex: "billingCycle",
       key: "billingCycle",
       responsive: ["lg"],
-      render: (cycle: SubscriptionRecord["billingCycle"]) => <span className="text-sm font-medium text-foreground">{cycle}</span>,
+      render: (cycle: SubscriptionRecord["billingCycle"]) => <Text size="sm" weight="medium">{cycle}</Text>,
     },
     {
       title: "Renewal Date",
       dataIndex: "renewalDate",
       key: "renewalDate",
       responsive: ["md"],
-      render: (date: string) => <span className="text-sm text-muted">{formatDate(date)}</span>,
+      render: (date: string) => <Text size="sm" color="muted">{formatDate(date)}</Text>,
     },
     {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      render: (amount: number) => <span className="font-semibold text-foreground">{formatCurrency(amount, "USD", 2)}</span>,
+      render: (amount: number) => <Text weight="semibold">{formatCurrency(amount, "USD", 2)}</Text>,
     },
     {
       title: "Status",

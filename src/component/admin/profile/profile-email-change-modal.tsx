@@ -3,7 +3,7 @@ import { Button, Form, Input, Steps } from "antd";
 import React, { useEffect, useState } from "react";
 import { EMAIL_CHANGE_STEPS } from "../../../data/admin-profile";
 import Modal from "../../ui/modal";
-import { Label } from "../../ui/typography";
+import { Label, Paragraph, Text } from "../../ui/typography";
 
 type ProfileEmailChangeProfile = {
   email: string;
@@ -73,7 +73,7 @@ function ProfileEmailChangeModal({
       title={
         <div className="flex items-center gap-3">
           <MailOutlined className="text-xl text-primary" />
-          <span className="text-lg font-semibold text-foreground">Change email address</span>
+          <Text size="lg" weight="semibold">Change email address</Text>
         </div>
       }
     >
@@ -87,8 +87,8 @@ function ProfileEmailChangeModal({
       <ul className="mb-6 space-y-2 rounded-xl border border-border bg-background p-4">
         {EMAIL_CHANGE_STEPS.map((item, index) => (
           <li key={item} className="flex gap-2 text-xs text-muted">
-            <span className="font-semibold text-primary">{index + 1}.</span>
-            <span>{item}</span>
+            <Text weight="semibold" color="primary">{index + 1}.</Text>
+            <Text size="xs" color="muted">{item}</Text>
           </li>
         ))}
       </ul>
@@ -110,7 +110,7 @@ function ProfileEmailChangeModal({
             name="currentPassword"
             label={<Label>Current password</Label>}
             rules={[{ required: true, message: "Please enter your current password" }]}
-            extra={<span className="text-xs text-muted">Required to confirm it&apos;s really you.</span>}
+            extra={<Text size="xs" color="muted">Required to confirm it&apos;s really you.</Text>}
           >
             <Input.Password
               size="large"
@@ -133,7 +133,7 @@ function ProfileEmailChangeModal({
         <Form form={otpForm} layout="vertical" requiredMark={false} onFinish={handleOtpSubmit}>
           <div className="mb-4 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm text-foreground">
             <SafetyOutlined className="mr-2 text-primary" />
-            OTP sent to <span className="font-semibold">{pendingEmail}</span>
+            OTP sent to <Text weight="semibold">{pendingEmail}</Text>
           </div>
 
           <Form.Item
@@ -169,7 +169,7 @@ function ProfileEmailChangeModal({
         </Form>
       )}
 
-      <p className="mt-4 text-xs text-muted">Current email on file: {profile.email}</p>
+      <Paragraph size="xs" className="mt-4 mb-0!">Current email on file: {profile.email}</Paragraph>
     </Modal>
   );
 }

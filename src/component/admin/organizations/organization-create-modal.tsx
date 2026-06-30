@@ -182,10 +182,10 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
             <Label className="mb-2 block">Workspace slug</Label>
             <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-3">
               <span className="min-w-0 flex-1 truncate font-mono text-sm">
-                <span className={cn("font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>
+                <Text className={cn("font-mono font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>
                   {organizationName.trim() ? previewSlug : "your-workspace"}
-                </span>
-                <span className="text-muted">.flowsync.io</span>
+                </Text>
+                <Text className="font-mono" color="muted">.flowsync.io</Text>
               </span>
               <span className="shrink-0 rounded-full bg-feature-sync px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
                 Auto
@@ -207,7 +207,7 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
                 { required: true, message: "Please enter the owner email" },
                 { type: "email", message: "Please enter a valid email" },
               ]}
-              extra={isEditMode ? <span className="text-xs text-muted">Owner email cannot be changed from the admin console.</span> : undefined}
+              extra={isEditMode ? <Text size="xs" color="muted">Owner email cannot be changed from the admin console.</Text> : undefined}
             >
               <Input
                 size="large"
@@ -243,7 +243,7 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
                       >
                         {option.value}
                       </span>
-                      <span className="text-sm font-medium text-foreground">{option.label}</span>
+                      <Text size="sm" weight="medium">{option.label}</Text>
                     </button>
                   );
                 })}
@@ -270,7 +270,7 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
                       )}
                     >
                       <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", statusStyle.dot)} />
-                      <span className="text-sm font-medium text-foreground">{statusStyle.label}</span>
+                      <Text size="sm" weight="medium">{statusStyle.label}</Text>
                       {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
                     </button>
                   );
@@ -282,23 +282,23 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-border bg-card/80 px-4 py-3">
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-            <span className="text-muted">
-              Users <span className="font-semibold text-foreground">{usersCount}</span>
-            </span>
-            <span className="text-muted">
-              Projects <span className="font-semibold text-foreground">{projectsCount}</span>
-            </span>
-            <span className="text-muted">
-              Created <span className="font-semibold text-foreground">{createdDateLabel}</span>
-            </span>
+            <Text size="sm" color="muted">
+              Users <Text weight="semibold">{usersCount}</Text>
+            </Text>
+            <Text size="sm" color="muted">
+              Projects <Text weight="semibold">{projectsCount}</Text>
+            </Text>
+            <Text size="sm" color="muted">
+              Created <Text weight="semibold">{createdDateLabel}</Text>
+            </Text>
           </div>
         </div>
 
         {!isEditMode ? (
-          <p className="flex items-center gap-2 px-4 pb-4 text-xs text-muted select-none">
+          <Paragraph size="xs" className="mb-0! flex items-center gap-2 px-4 pb-4 select-none">
             <MailOutlined className="shrink-0 text-primary" />
             An invite will be sent to the owner after creation.
-          </p>
+          </Paragraph>
         ) : null}
       </Form>
 

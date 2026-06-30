@@ -4,6 +4,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { getInitial } from "../../lib/helper";
 import { cn } from "../../lib/utils";
+import { Text } from "../../component/ui/typography";
 
 type AppHeaderProps = {
   onMenuOpen?: () => void;
@@ -45,8 +46,8 @@ function AppHeader({
           className="ml-1 flex items-center gap-3 rounded-xl border-l border-border pl-3 transition-colors hover:bg-background/80 sm:pl-4"
         >
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold text-foreground">{profileName}</p>
-            <p className="text-[10px] font-semibold tracking-wider text-primary uppercase">{profileRole}</p>
+            <Text as="p" size="sm" weight="semibold">{profileName}</Text>
+            <Text as="p" className="text-[10px] font-semibold tracking-wider text-primary uppercase">{profileRole}</Text>
           </div>
           <Avatar
             size={40}

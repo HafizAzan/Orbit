@@ -11,6 +11,7 @@ import {
   type OrganizationStat,
 } from "../../../data/admin-organizations";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 type OrgStatCardProps = {
   stat: OrganizationStat;
@@ -59,10 +60,14 @@ function OrgStatCard({ stat }: OrgStatCardProps) {
         </span>
       </div>
 
-      <p className="mt-4 text-sm font-medium text-muted">{stat.label}</p>
-      <p className={cn("mt-1 text-2xl font-bold tracking-tight lg:text-3xl", isDanger ? "text-red-700" : "text-foreground")}>
+      <Text as="p" size="sm" color="muted" weight="medium" className="mt-4">{stat.label}</Text>
+      <Text
+        as="p"
+        weight="bold"
+        className={cn("mt-1 text-2xl tracking-tight lg:text-3xl", isDanger ? "text-red-700" : "text-foreground")}
+      >
         {stat.value}
-      </p>
+      </Text>
     </article>
   );
 }

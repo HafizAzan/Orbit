@@ -134,7 +134,7 @@ function AcceptInviteForm() {
                 {invite.organizationName}
               </Title>
               <Paragraph size="sm" className="mt-1 mb-0! text-muted">
-                <span className="font-medium text-foreground">{invite.inviterName}</span> invited you to join as{" "}
+                <Text weight="medium">{invite.inviterName}</Text> invited you to join as{" "}
                 <span
                   className={cn(
                     "inline-flex rounded-full border px-2 py-0.5 text-xs font-bold",
@@ -154,7 +154,7 @@ function AcceptInviteForm() {
 
         <Paragraph size="sm" className="text-muted">
           Complete your account to access projects, tasks, and team collaboration in{" "}
-          <span className="font-medium text-foreground">{invite.organizationName}</span>.
+          <Text weight="medium">{invite.organizationName}</Text>.
         </Paragraph>
 
         <Form

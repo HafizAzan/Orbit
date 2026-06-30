@@ -11,6 +11,7 @@ import {
 } from "../../../data/workspace-notifications";
 import { cn } from "../../../lib/utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
+import { Text } from "../../ui/typography";
 
 function WorkspaceNotificationsDropdown() {
   const navigate = useNavigate();
@@ -45,10 +46,12 @@ function WorkspaceNotificationsDropdown() {
     <div className="w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
         <div>
-          <p className="text-sm font-semibold text-foreground">Notifications</p>
-          <p className="text-xs text-muted">
+          <Text as="p" size="sm" weight="semibold">
+            Notifications
+          </Text>
+          <Text as="p" size="xs" color="muted">
             {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
-          </p>
+          </Text>
         </div>
 
         {unreadCount > 0 ? (
@@ -94,13 +97,19 @@ function WorkspaceNotificationsDropdown() {
 
                 <span className="min-w-0 flex-1">
                   <span className="flex items-start gap-2">
-                    <span className="line-clamp-1 text-sm font-semibold text-foreground">{notification.title}</span>
+                    <Text as="span" size="sm" weight="semibold" className="line-clamp-1">
+                      {notification.title}
+                    </Text>
                     {!notification.read ? (
                       <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden />
                     ) : null}
                   </span>
-                  <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted">{notification.message}</span>
-                  <span className="mt-1 block text-[11px] font-medium text-muted">{notification.timeAgo}</span>
+                  <Text as="span" size="xs" color="muted" className="mt-0.5 line-clamp-2 leading-relaxed">
+                    {notification.message}
+                  </Text>
+                  <Text as="span" size="xs" weight="medium" color="muted" className="mt-1 block text-[11px]!">
+                    {notification.timeAgo}
+                  </Text>
                 </span>
               </button>
             );
@@ -110,8 +119,12 @@ function WorkspaceNotificationsDropdown() {
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-primary">
               <BellOutlined className="text-lg" />
             </span>
-            <p className="mt-3 text-sm font-semibold text-foreground">No notifications</p>
-            <p className="mt-1 text-xs text-muted">New workspace alerts will appear here.</p>
+            <Text as="p" size="sm" weight="semibold">
+              No notifications
+            </Text>
+            <Text as="p" size="xs" color="muted" className="mt-1">
+              New workspace alerts will appear here.
+            </Text>
           </div>
         )}
       </div>

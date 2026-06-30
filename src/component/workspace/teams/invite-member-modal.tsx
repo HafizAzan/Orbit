@@ -112,15 +112,15 @@ function InviteSuccessContent({ email, role }: { email: string; role: TeamInvite
         Invitation sent
       </Title>
       <Paragraph size="sm" className="mx-auto mt-2 mb-0! max-w-sm text-muted">
-        We emailed <span className="font-semibold text-foreground">{email}</span> with instructions to join as{" "}
-        <span className="font-semibold text-foreground">{roleInfo.title}</span>.
+        We emailed <Text as="span" weight="semibold">{email}</Text> with instructions to join as{" "}
+        <Text as="span" weight="semibold">{roleInfo.title}</Text>.
       </Paragraph>
 
       <div className="mx-auto mt-5 max-w-sm rounded-2xl border border-border bg-background/60 px-4 py-3 text-left">
-        <p className="flex items-center gap-2 text-sm font-medium text-foreground">
+        <Text as="p" size="sm" weight="medium" className="flex items-center gap-2">
           <MailOutlined className="text-primary" />
           What happens next
-        </p>
+        </Text>
         <ul className="mt-2 space-y-1.5 text-sm text-muted">
           <li>They receive a secure invite link valid for 7 days.</li>
           <li>Once accepted, they appear in your team list as Active.</li>
@@ -361,7 +361,9 @@ function InviteMemberModal({ open, onClose }: InviteMemberModalProps) {
                               </span>
                               {isSelected ? <CheckOutlined className="ml-auto text-xs text-primary" /> : null}
                             </span>
-                            <span className="text-xs leading-relaxed text-muted">{roleInfo.description}</span>
+                            <Text as="span" size="xs" color="muted" className="leading-relaxed">
+                              {roleInfo.description}
+                            </Text>
                           </button>
                         );
                       })}
@@ -370,10 +372,10 @@ function InviteMemberModal({ open, onClose }: InviteMemberModalProps) {
                 </div>
 
                 <div className="rounded-2xl border border-primary/15 bg-feature-sync/60 p-4">
-                  <p className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  <Text as="p" size="sm" weight="semibold" color="primary" className="flex items-center gap-2">
                     <InfoCircleOutlined />
                     {permissions.title} permissions
-                  </p>
+                  </Text>
                   <ul className="mt-3 space-y-2">
                     {permissions.bullets.map((bullet) => (
                       <li key={bullet} className="flex items-start gap-2 text-sm text-muted">

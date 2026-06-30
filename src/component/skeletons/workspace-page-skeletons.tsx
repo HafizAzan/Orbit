@@ -313,6 +313,7 @@ function ProjectDetailSkeleton({ className }: WorkspacePageSkeletonProps) {
         <div className="space-y-6 xl:col-span-2">
           <PanelCardSkeleton lines={4} />
           <PanelCardSkeleton lines={5} />
+          <PanelCardSkeleton lines={6} />
         </div>
         <div className="space-y-6">
           <PanelCardSkeleton lines={4} />

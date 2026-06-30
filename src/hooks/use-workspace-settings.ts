@@ -10,6 +10,7 @@ import {
   isValidWorkspaceSettingsTab,
 } from "../data/workspace-settings";
 import { countObjectChanges, delay } from "../lib/helper";
+import { setSearchParamValue } from "../lib/url-tab";
 import { toast } from "../lib/toast";
 
 type UseWorkspaceSettingsOptions = {
@@ -38,7 +39,14 @@ function useWorkspaceSettings({
 
   useEffect(() => {
     if (!isValidWorkspaceSettingsTab(tabParam)) {
-      setSearchParams({ tab: getWorkspaceSettingsTabSlug(DEFAULT_WORKSPACE_SETTINGS_TAB) }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          setSearchParamValue(next, "tab", getWorkspaceSettingsTabSlug(DEFAULT_WORKSPACE_SETTINGS_TAB));
+          return next;
+        },
+        { replace: true },
+      );
     }
   }, [tabParam, setSearchParams]);
 
@@ -51,7 +59,14 @@ function useWorkspaceSettings({
 
   const handleTabChange = useCallback(
     (sectionId: WorkspaceSettingsSectionId) => {
-      setSearchParams({ tab: getWorkspaceSettingsTabSlug(sectionId) }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          setSearchParamValue(next, "tab", getWorkspaceSettingsTabSlug(sectionId));
+          return next;
+        },
+        { replace: true },
+      );
     },
     [setSearchParams],
   );

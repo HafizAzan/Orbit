@@ -8,6 +8,7 @@ import {
 import { useAssignableProjectMembers } from "../../../../hooks/use-workspace-projects";
 import { formatDate } from "../../../../lib/helper";
 import ProjectTeamAvatars from "../project-team-avatars";
+import { Paragraph, Text, Title } from "../../../ui/typography";
 
 type ProjectFormPreviewProps = {
   values: ProjectFormValues;
@@ -52,19 +53,21 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
   return (
     <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
       <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <p className="text-xs font-bold tracking-wide text-muted uppercase">Project Preview</p>
+        <Text as="p" size="xs" weight="bold" color="muted" className="tracking-wide uppercase">
+          Project Preview
+        </Text>
 
         <div className="mt-4 rounded-2xl border border-border bg-background/60 p-4">
           <span className="inline-flex rounded-full border border-primary/20 bg-feature-sync px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-primary uppercase">
             {priorityLabel} Priority
           </span>
 
-          <h3 className="mt-3 text-lg font-semibold text-foreground">
+          <Title level={5} color="default" className="mt-3">
             {values.name.trim() || "Untitled Project"}
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-muted">
+          </Title>
+          <Paragraph size="sm" className="mt-2 leading-6">
             {values.description.trim() || "Your project description will appear here as you type."}
-          </p>
+          </Paragraph>
 
           <dl className="mt-5 space-y-3 text-sm">
             <div className="flex items-center justify-between gap-3">
@@ -84,17 +87,21 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
               <dt className="text-muted">Team</dt>
               <dd className="flex items-center gap-2">
                 {previewMembers.length > 0 ? <ProjectTeamAvatars members={previewMembers} maxVisible={3} /> : null}
-                <span className="text-sm font-medium text-foreground">
+                <Text as="span" size="sm" weight="medium">
                   {squadCount} {squadCount === 1 ? "Member" : "Members"}
-                </span>
+                </Text>
               </dd>
             </div>
           </dl>
 
           <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between text-xs font-medium text-muted">
-              <span>{values.startDate ? formatDate(values.startDate) : "Start date"}</span>
-              <span>{values.dueDate ? formatDate(values.dueDate) : "Due date"}</span>
+            <div className="mb-2 flex items-center justify-between">
+              <Text as="span" size="xs" weight="medium" color="muted">
+                {values.startDate ? formatDate(values.startDate) : "Start date"}
+              </Text>
+              <Text as="span" size="xs" weight="medium" color="muted">
+                {values.dueDate ? formatDate(values.dueDate) : "Due date"}
+              </Text>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-slate-100">
               <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${timelineProgress}%` }} />
@@ -109,11 +116,13 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
             <BulbOutlined />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground">Pro Tip</p>
-            <p className="mt-1 text-sm leading-6 text-muted">
+            <Text as="p" size="sm" weight="semibold">
+              Pro Tip
+            </Text>
+            <Paragraph size="sm" className="mt-1 leading-6">
               Owners assign a delivery lead and execution squad. Managers run day-to-day tasks after the project is
               created.
-            </p>
+            </Paragraph>
           </div>
         </div>
       </article>

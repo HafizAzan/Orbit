@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Logo from "../../../component/logo";
 import FOOTER_LINKS, { SOCIAL_LINKS } from "../../../data/footer-links";
 import { UN_AUTH_ROUTES } from "../../../router/public-routes";
+import { Paragraph } from "../../../component/ui/typography";
 
 function Footer() {
   return (
@@ -12,7 +13,7 @@ function Footer() {
           <Link to={UN_AUTH_ROUTES.HOME} className="inline-flex w-fit transition-opacity duration-300 hover:opacity-90">
             <Logo />
           </Link>
-          <p className="font-roboto text-sm text-muted">© {new Date().getFullYear()} FlowSync Inc. All rights reserved.</p>
+          <Paragraph size="sm" font="roboto">© {new Date().getFullYear()} FlowSync Inc. All rights reserved.</Paragraph>
         </div>
 
         <nav className="nav:justify-self-center">

@@ -5,7 +5,7 @@ import { DASHBOARD_PERIOD_FILTER_OPTIONS, DEFAULT_DASHBOARD_PERIOD_FILTER, type 
 import { cn } from "../../../lib/utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import WorkspaceNavLink from "../common/workspace-nav-link";
-import { Paragraph, Title } from "../../ui/typography";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type ProjectOverviewHeaderProps = {
   period?: DashboardPeriodFilter;
@@ -30,24 +30,25 @@ function ProjectOverviewHeader({ period: periodProp, onPeriodChange }: ProjectOv
 
   const dropdownContent = (
     <div className="w-52 overflow-hidden rounded-2xl border border-border bg-card p-2 shadow-xl">
-      <p className="px-2.5 py-1.5 text-[11px] font-semibold tracking-wide text-muted uppercase">Time Period</p>
+      <Text as="p" size="xs" weight="semibold" color="muted" className="px-2.5 py-1.5 text-[11px]! tracking-wide uppercase">Time Period</Text>
       <div className="space-y-1">
         {DASHBOARD_PERIOD_FILTER_OPTIONS.map((option) => {
           const isSelected = option.value === period;
 
           return (
-            <button
+            <Button
               key={option.value}
-              type="button"
+              type="text"
+              block
               onClick={() => handleSelect(option.value)}
               className={cn(
-                "flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all",
-                isSelected ? "bg-feature-sync text-primary" : "text-foreground hover:bg-background",
+                "h-auto justify-start rounded-xl px-3 py-2.5 text-left font-medium!",
+                isSelected ? "bg-feature-sync text-primary" : "text-foreground hover:bg-background!",
               )}
             >
               <span>{option.label}</span>
               {isSelected ? <CheckOutlined className="ml-auto text-xs" /> : null}
-            </button>
+            </Button>
           );
         })}
       </div>

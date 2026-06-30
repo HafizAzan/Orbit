@@ -1,6 +1,7 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
 import { cn } from "../../lib/utils";
+import { Text } from "./typography";
 
 type LoaderProps = {
   label?: string;
@@ -21,7 +22,7 @@ function Loader({ label = "Loading...", className, fullScreen = false }: LoaderP
       )}
     >
       <Spin indicator={<LoadingOutlined spin className="text-3xl text-primary!" />} size="large" />
-      <p className="font-roboto text-sm font-medium text-muted">{label}</p>
+      <Text as="p" size="sm" color="muted" weight="medium" font="roboto">{label}</Text>
     </div>
   );
 }

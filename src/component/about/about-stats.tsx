@@ -1,6 +1,7 @@
 import React from "react";
 import { ABOUT_STATS } from "../../data/about";
 import AnimateOnScroll from "../common/animate-on-scroll";
+import { Text } from "../ui/typography";
 
 function AboutStats() {
   return (
@@ -8,8 +9,8 @@ function AboutStats() {
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6">
         {ABOUT_STATS.map((stat, index) => (
           <AnimateOnScroll key={stat.id} variant="fade-up" delay={index * 80} className="text-center">
-            <p className="text-3xl font-bold text-primary sm:text-4xl">{stat.value}</p>
-            <p className="mt-2 text-sm font-medium text-muted">{stat.label}</p>
+            <Text as="p" className="text-3xl font-bold text-primary sm:text-4xl">{stat.value}</Text>
+            <Text as="p" size="sm" color="muted" weight="medium" className="mt-2">{stat.label}</Text>
           </AnimateOnScroll>
         ))}
       </div>

@@ -11,6 +11,7 @@ import type { BillingInvoice } from "../../../types/billing.types";
 import SettingsSection from "../../admin/settings/settings-section";
 import WorkspaceInvoicesTable from "../billing/workspace-invoices-table";
 import WorkspaceInvoiceDetailModal from "../billing/workspace-invoice-detail-modal";
+import { Paragraph, Text } from "../../ui/typography";
 
 type WorkspaceBillingSectionProps = {
   expanded?: boolean;
@@ -46,11 +47,15 @@ function WorkspaceBillingSection({ expanded = false }: WorkspaceBillingSectionPr
           description="Your active subscription and renewal details."
         >
           <div className="rounded-2xl border border-border bg-background/50 p-4">
-            <p className="text-sm font-semibold text-primary uppercase">{WORKSPACE_BILLING_SUMMARY.planName}</p>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">{WORKSPACE_BILLING_SUMMARY.priceLabel}</p>
-            <p className="mt-2 text-sm text-muted">
-              Next payment on <span className="font-medium text-foreground">{WORKSPACE_BILLING_SUMMARY.nextPaymentDate}</span>
-            </p>
+            <Text as="p" size="sm" weight="semibold" color="primary" className="uppercase">
+              {WORKSPACE_BILLING_SUMMARY.planName}
+            </Text>
+            <Text as="p" weight="bold" className="mt-2 text-3xl tracking-tight">
+              {WORKSPACE_BILLING_SUMMARY.priceLabel}
+            </Text>
+            <Paragraph size="sm" className="mt-2">
+              Next payment on <Text as="span" weight="medium">{WORKSPACE_BILLING_SUMMARY.nextPaymentDate}</Text>
+            </Paragraph>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
@@ -77,10 +82,12 @@ function WorkspaceBillingSection({ expanded = false }: WorkspaceBillingSectionPr
               <CreditCardOutlined className="text-xl" />
             </div>
             <div>
-              <p className="font-semibold text-foreground">
+              <Text as="p" weight="semibold">
                 {WORKSPACE_BILLING_SUMMARY.cardBrand} ending in {WORKSPACE_BILLING_SUMMARY.cardLast4}
-              </p>
-              <p className="mt-1 text-sm text-muted">Expires {WORKSPACE_BILLING_SUMMARY.cardExpiry}</p>
+              </Text>
+              <Paragraph size="sm" className="mt-1">
+                Expires {WORKSPACE_BILLING_SUMMARY.cardExpiry}
+              </Paragraph>
             </div>
           </div>
 

@@ -9,6 +9,7 @@ import { getInitial } from "../../../../lib/helper";
 import { cn } from "../../../../lib/utils";
 import DatePicker from "../../../ui/date-picker";
 import TaskLabelsModal from "./task-labels-modal";
+import { Paragraph, Text } from "../../../ui/typography";
 
 type TaskFormSidebarProps = {
   values: TaskFormValues;
@@ -57,11 +58,15 @@ function TaskFormSidebar({
     <>
       <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
         <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="text-sm font-semibold text-foreground">People</h3>
+          <Text as="p" size="sm" weight="semibold">
+            People
+          </Text>
 
           <div className="mt-4 space-y-4">
             <div>
-              <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Assignee</p>
+              <Text as="p" size="xs" weight="medium" color="muted" className="mb-2 tracking-wide uppercase">
+                Assignee
+              </Text>
 
               {hasSelectedProject && assigneeOptions.length > 0 ? (
                 <Input
@@ -94,35 +99,47 @@ function TaskFormSidebar({
                 />
               </div>
 
-              <p className="mt-2 text-xs text-muted">
+              <Paragraph size="xs" className="mt-2">
                 Only members added to the selected project can be assigned.
-              </p>
+              </Paragraph>
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Reporter</p>
+              <Text as="p" size="xs" weight="medium" color="muted" className="mb-2 tracking-wide uppercase">
+                Reporter
+              </Text>
               <div className="flex items-center gap-2.5 rounded-xl border border-border bg-background/50 p-3">
                 <Avatar size={32} className="bg-primary! text-xs! font-semibold! text-white!">
                   {getInitial(reporterName)}
                 </Avatar>
-                <span className="text-sm font-medium text-foreground">Me ({reporterName.split(" ")[0]})</span>
+                <Text as="span" size="sm" weight="medium">
+                  Me ({reporterName.split(" ")[0]})
+                </Text>
               </div>
             </div>
           </div>
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="text-sm font-semibold text-foreground">Dates</h3>
+          <Text as="p" size="sm" weight="semibold">
+            Dates
+          </Text>
           <div className="mt-4">
-            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Due Date</p>
+            <Text as="p" size="xs" weight="medium" color="muted" className="mb-2 tracking-wide uppercase">
+              Due Date
+            </Text>
             <DatePicker value={values.dueDate} onChange={(dueDate) => updateValues({ dueDate })} placeholder="mm/dd/yyyy" />
           </div>
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <h3 className="text-sm font-semibold text-foreground">Classification</h3>
+          <Text as="p" size="sm" weight="semibold">
+            Classification
+          </Text>
           <div className="mt-4">
-            <p className="mb-2 text-xs font-medium tracking-wide text-muted uppercase">Labels</p>
+            <Text as="p" size="xs" weight="medium" color="muted" className="mb-2 tracking-wide uppercase">
+              Labels
+            </Text>
             <div className="flex flex-wrap items-center gap-2">
               {values.labels.map((label) => (
                 <span
@@ -155,7 +172,9 @@ function TaskFormSidebar({
 
         <section className="rounded-2xl border border-dashed border-border bg-background/40 p-5 text-center">
           <ClockCircleOutlined className="text-xl text-muted" />
-          <p className="mt-3 text-sm text-muted">Activity will appear here as the task progresses.</p>
+          <Paragraph size="sm" className="mt-3">
+            Activity will appear here as the task progresses.
+          </Paragraph>
         </section>
       </aside>
 
@@ -175,7 +194,9 @@ function AssigneeOptionContent({ assignee }: { assignee: TaskAssigneeOption }) {
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-feature-sync text-[11px] font-bold text-primary">
         {assignee.initials}
       </div>
-      <span className="text-sm font-medium text-foreground">{assignee.name}</span>
+      <Text as="span" size="sm" weight="medium">
+        {assignee.name}
+      </Text>
     </div>
   );
 }
@@ -218,9 +239,13 @@ function AssigneeMemberList({
 
       <div className="min-h-20 max-h-48 overflow-y-auto rounded-xl border border-border bg-background/50 p-1.5">
         {loading ? (
-          <p className="px-3 py-4 text-sm text-muted">Loading project members...</p>
+          <Paragraph size="sm" className="px-3 py-4">
+            Loading project members...
+          </Paragraph>
         ) : options.length === 0 ? (
-          <p className="px-3 py-4 text-sm text-muted">{emptyHint}</p>
+          <Paragraph size="sm" className="px-3 py-4">
+            {emptyHint}
+          </Paragraph>
         ) : (
           <ul className="space-y-1">
             {options.map((assignee) => {

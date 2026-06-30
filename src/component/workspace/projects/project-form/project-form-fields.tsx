@@ -1,5 +1,5 @@
 import { CloseOutlined, GlobalOutlined, LockOutlined, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { Input, Select } from "antd";
+import { Input, Select, Button } from "antd";
 import React, { useMemo, useState } from "react";
 import {
   PROJECT_CATEGORY_OPTIONS,
@@ -13,6 +13,7 @@ import { useAssignableProjectMembers } from "../../../../hooks/use-workspace-pro
 import { getInitial } from "../../../../lib/helper";
 import { cn } from "../../../../lib/utils";
 import DatePicker from "../../../ui/date-picker";
+import { Paragraph, Text } from "../../../ui/typography";
 
 type ProjectFormFieldsProps = {
   values: ProjectFormValues;
@@ -120,7 +121,9 @@ function ProjectFormFields({
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <h3 className="text-sm font-semibold text-foreground">Project Identity</h3>
+        <Text as="p" size="sm" weight="semibold">
+          Project Identity
+        </Text>
 
         <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_180px]">
           <div>
@@ -171,14 +174,16 @@ function ProjectFormFields({
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <h3 className="text-sm font-semibold text-foreground">Delivery Lead</h3>
-        <p className="mt-1 text-sm text-muted">
+        <Text as="p" size="sm" weight="semibold">
+          Delivery Lead
+        </Text>
+        <Paragraph size="sm" className="mt-1">
           {canAssignLead
             ? requiresDeliveryLead
               ? "Assign a manager to run delivery. Owners oversee projects without joining the execution squad."
               : "Choose who leads day-to-day delivery. You can assign another manager or keep yourself as lead."
             : "You will lead this project and manage tasks for your execution team."}
-        </p>
+        </Paragraph>
 
         {canAssignLead ? (
           <div className="mt-4">
@@ -203,21 +208,27 @@ function ProjectFormFields({
               <UserOutlined />
             </span>
             <span>
-              <span className="block text-sm font-semibold text-foreground">{currentUserName ?? "You"}</span>
-              <span className="block text-xs text-muted">Delivery lead on this project</span>
+              <Text as="span" size="sm" weight="semibold" className="block">
+                {currentUserName ?? "You"}
+              </Text>
+              <Text as="span" size="xs" color="muted" className="block">
+                Delivery lead on this project
+              </Text>
             </span>
           </div>
         )}
 
         {selectedLead ? (
-          <p className="mt-3 text-xs text-muted">
+          <Paragraph size="xs" className="mt-3">
             {selectedLead.name} will own task planning, assignments, and squad coordination.
-          </p>
+          </Paragraph>
         ) : null}
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <h3 className="text-sm font-semibold text-foreground">Planning</h3>
+        <Text as="p" size="sm" weight="semibold">
+          Planning
+        </Text>
 
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
@@ -263,7 +274,9 @@ function ProjectFormFields({
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <h3 className="text-sm font-semibold text-foreground">Visibility</h3>
+        <Text as="p" size="sm" weight="semibold">
+          Visibility
+        </Text>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {PROJECT_VISIBILITY_OPTIONS.map((option) => {
@@ -271,23 +284,25 @@ function ProjectFormFields({
             const Icon = option.value === "private" ? LockOutlined : GlobalOutlined;
 
             return (
-              <button
+              <Button
                 key={option.value}
-                type="button"
+                type="default"
                 onClick={() => updateValues({ visibility: option.value })}
                 className={cn(
-                  "rounded-2xl border px-4 py-4 text-left transition-all",
+                  "h-auto rounded-2xl border px-4 py-4 text-left whitespace-normal shadow-none",
                   isSelected
                     ? "border-primary bg-feature-sync shadow-sm"
                     : "border-border bg-background hover:border-primary/25",
                 )}
               >
-                <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Text as="span" size="sm" weight="semibold" className="flex items-center gap-2">
                   <Icon className={isSelected ? "text-primary" : "text-muted"} />
                   {option.label}
-                </span>
-                <p className="mt-2 text-sm text-muted">{option.description}</p>
-              </button>
+                </Text>
+                <Paragraph size="sm" className="mt-2 font-normal">
+                  {option.description}
+                </Paragraph>
+              </Button>
             );
           })}
         </div>
@@ -296,11 +311,13 @@ function ProjectFormFields({
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Execution Squad</h3>
-            <p className="mt-1 text-sm text-muted">
+            <Text as="p" size="sm" weight="semibold">
+              Execution Squad
+            </Text>
+            <Paragraph size="sm" className="mt-1">
               Add the people who will do the work. The delivery lead is added automatically and does not need to be
               selected here.
-            </p>
+            </Paragraph>
           </div>
         </div>
 
@@ -319,14 +336,14 @@ function ProjectFormFields({
                 {getInitial(member.name)}
               </span>
               {member.name}
-              <button
-                type="button"
+              <Button
+                type="text"
+                size="small"
                 onClick={() => handleRemoveMember(member.id)}
-                className="text-muted transition-colors hover:text-foreground"
+                icon={<CloseOutlined className="text-xs!" />}
                 aria-label={`Remove ${member.name}`}
-              >
-                <CloseOutlined className="text-xs" />
-              </button>
+                className="text-muted hover:text-foreground!"
+              />
             </span>
           ))}
         </div>
@@ -345,16 +362,17 @@ function ProjectFormFields({
 
         <div className="mt-4 space-y-2">
           {membersLoading ? (
-            <p className="text-sm text-muted">Loading team members...</p>
+            <Paragraph size="sm">Loading team members...</Paragraph>
           ) : availableMembers.length === 0 ? (
-            <p className="text-sm text-muted">No more team members available.</p>
+            <Paragraph size="sm">No more team members available.</Paragraph>
           ) : (
             availableMembers.map((member) => (
-              <button
+              <Button
                 key={member.id}
-                type="button"
+                type="default"
+                block
                 onClick={() => handleAddMember(member.id)}
-                className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:border-primary/25 hover:bg-feature-sync/40"
+                className="h-auto justify-between rounded-xl border-border bg-background px-4 py-3 text-left shadow-none hover:border-primary/25 hover:bg-feature-sync/40!"
               >
                 <span className="flex items-center gap-3">
                   <span
@@ -366,12 +384,16 @@ function ProjectFormFields({
                     {getInitial(member.name)}
                   </span>
                   <span>
-                    <span className="block text-sm font-semibold text-foreground">{member.name}</span>
-                    <span className="block text-xs text-muted">{member.email}</span>
+                    <Text as="span" size="sm" weight="semibold" className="block">
+                      {member.name}
+                    </Text>
+                    <Text as="span" size="xs" color="muted" className="block">
+                      {member.email}
+                    </Text>
                   </span>
                 </span>
                 <PlusOutlined className="text-primary" />
-              </button>
+              </Button>
             ))
           )}
         </div>

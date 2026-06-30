@@ -2,15 +2,16 @@ import React from "react";
 import { CONTACT_INFO_GROUPS } from "../../data/contact";
 import { SOCIAL_LINKS } from "../../data/footer-links";
 import { cn } from "../../lib/utils";
+import { Paragraph, Text, Title } from "../ui/typography";
 
 function ContactInfoCard() {
   return (
     <div className="flex h-full flex-col">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Get in touch</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
+        <Title level={4}>Get in touch</Title>
+        <Paragraph size="sm" className="mt-2">
           Reach our support or sales team — we typically reply within one business day.
-        </p>
+        </Paragraph>
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -29,13 +30,13 @@ function ContactInfoCard() {
                   <GroupIcon className="text-base" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{group.title}</p>
+                  <Text as="p" size="sm" weight="semibold">{group.title}</Text>
                   {primaryItem.href ? (
                     <a href={primaryItem.href} className="mt-0.5 block truncate text-sm text-primary hover:opacity-80">
                       {primaryItem.value}
                     </a>
                   ) : (
-                    <p className="mt-0.5 text-sm text-muted">{primaryItem.value}</p>
+                    <Text as="p" size="sm" color="muted" className="mt-0.5">{primaryItem.value}</Text>
                   )}
                 </div>
               </div>
@@ -49,7 +50,7 @@ function ContactInfoCard() {
                           {item.value}
                         </a>
                       ) : (
-                        <span className="font-medium text-foreground">{item.value}</span>
+                        <Text weight="medium">{item.value}</Text>
                       )}
                     </li>
                   ))}
@@ -61,7 +62,7 @@ function ContactInfoCard() {
       </div>
 
       <div className="mt-auto border-t border-border/80 pt-6">
-        <p className="text-xs font-semibold tracking-wide text-muted uppercase">Follow our journey</p>
+        <Text as="p" size="xs" color="muted" weight="semibold" className="tracking-wide uppercase">Follow our journey</Text>
         <div className="mt-3 flex items-center gap-2">
           {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
             <a

@@ -1,6 +1,7 @@
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Title } from "../../ui/typography";
 
 type MyTasksCompletedSectionProps = {
   count: number;
@@ -14,7 +15,7 @@ function MyTasksCompletedSection({ count, onClearAll }: MyTasksCompletedSectionP
     <section>
       <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-foreground">Completed</h2>
+          <Title level={5} color="default">Completed</Title>
           <span className="inline-flex min-w-7 items-center justify-center rounded-full bg-slate-500 px-2 py-0.5 text-xs font-bold text-white">
             {count}
           </span>
@@ -42,9 +43,9 @@ function MyTasksCompletedSection({ count, onClearAll }: MyTasksCompletedSectionP
       </div>
 
       {expanded ? (
-        <div className="mt-3 rounded-2xl border border-border bg-card px-5 py-4 text-sm text-muted shadow-sm">
+        <Paragraph size="sm" className="mt-3 rounded-2xl border border-border bg-card px-5 py-4 shadow-sm">
           Completed tasks are archived here. Open a task from your active sections to review details.
-        </div>
+        </Paragraph>
       ) : null}
     </section>
   );

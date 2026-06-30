@@ -55,6 +55,15 @@ export type PlanDistributionItem = {
 
 export type SubscriptionTabKey = SubscriptionStatus;
 
+export const SUBSCRIPTION_TAB_SLUGS: Record<SubscriptionTabKey, string> = {
+  active: "active",
+  trial: "trial",
+  expired: "expired",
+  cancelled: "cancelled",
+};
+
+export const DEFAULT_SUBSCRIPTION_TAB: SubscriptionTabKey = "active";
+
 export const SUBSCRIPTION_TABS: { key: SubscriptionTabKey; label: string }[] = [
   { key: "active", label: "Active" },
   { key: "trial", label: "Trial" },

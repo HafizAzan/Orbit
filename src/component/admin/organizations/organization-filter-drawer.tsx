@@ -133,7 +133,7 @@ function OrganizationFilterDrawer({ open, draftFilters, onClose, onDraftChange, 
                 )}
               >
                 <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", statusStyle.dot)} />
-                <span className="text-sm font-medium text-foreground">{statusStyle.label}</span>
+                <Text size="sm" weight="medium">{statusStyle.label}</Text>
                 {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
               </button>
             );
@@ -160,7 +160,7 @@ function OrganizationFilterDrawer({ open, draftFilters, onClose, onDraftChange, 
                   >
                     {option.value}
                   </span>
-                  <span className="text-sm font-medium text-foreground">{option.label}</span>
+                  <Text size="sm" weight="medium">{option.label}</Text>
                 </button>
               );
             })}
@@ -184,7 +184,7 @@ function OrganizationFilterDrawer({ open, draftFilters, onClose, onDraftChange, 
                   )}
                 >
                   {option.value !== "all" ? <CalendarOutlined className={cn("text-sm", isSelected ? "text-primary" : "text-muted")} /> : null}
-                  <span className="text-sm font-medium text-foreground">{option.label}</span>
+                  <Text size="sm" weight="medium">{option.label}</Text>
                   {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
                 </button>
               );

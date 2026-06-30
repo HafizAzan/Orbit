@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import ProfileEmailSecurityCard from "../../component/admin/profile/profile-email-security-card";
 import ProfileInfoForm from "../../component/admin/profile/profile-info-form";
 import ProfilePasswordForm from "../../component/admin/profile/profile-password-form";
@@ -8,11 +8,12 @@ import WorkspaceOrganizationCard from "../../component/workspace/profile/workspa
 import WorkspaceAboutOrganizationCard from "../../component/workspace/profile/workspace-about-organization-card";
 import WorkspaceProfileActivityLogsCard from "../../component/workspace/profile/workspace-profile-activity-logs-card";
 import WorkspaceProfileTabs from "../../component/workspace/profile/workspace-profile-tabs";
-import { getWorkspaceProfileDisplayName, type WorkspaceProfileTab } from "../../data/workspace-profile";
+import { getWorkspaceProfileDisplayName } from "../../data/workspace-profile";
 import useWorkspaceProfile from "../../hooks/use-workspace-profile";
+import useWorkspaceProfileTab from "../../hooks/use-workspace-profile-tab";
 import { canChangeOwnEmail, canRequestOwnEmailChange } from "../../lib/email-access";
 import { getWorkspaceRoleLabel } from "../../lib/workspace-routing";
-import { Paragraph, Title } from "../../component/ui/typography";
+import { Paragraph, Text, Title } from "../../component/ui/typography";
 
 function WorkspaceProfile() {
   const {
@@ -31,7 +32,7 @@ function WorkspaceProfile() {
     handleSendPasswordResetLink,
   } = useWorkspaceProfile();
 
-  const [activeTab, setActiveTab] = useState<WorkspaceProfileTab>("personal");
+  const { activeTab, setActiveTab } = useWorkspaceProfileTab(profile.role);
   const roleLabel = getWorkspaceRoleLabel(profile.role);
   const displayName = getWorkspaceProfileDisplayName(profile);
   const canChangeOwnLoginEmail = canChangeOwnEmail(profile.role);
@@ -49,7 +50,7 @@ function WorkspaceProfile() {
   return (
     <div className="mx-auto max-w-8xl">
       <div className="mb-6">
-        <p className="text-xs font-medium text-muted">Account · {profile.organizationName}</p>
+        <Text as="p" size="xs" weight="medium" color="muted">Account · {profile.organizationName}</Text>
         <Title level={2} className="mt-1 text-2xl text-foreground lg:text-3xl">
           My Profile
         </Title>

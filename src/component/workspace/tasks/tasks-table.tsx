@@ -24,6 +24,7 @@ import {
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
 import BulkDeleteTasksButton from "./bulk-delete-tasks-button";
+import { Text } from "../../ui/typography";
 
 function countActiveTaskFilters(filters: TaskTableFilters) {
   return Object.values(filters).filter((value) => value !== "all").length;
@@ -234,14 +235,14 @@ function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask, serverPagin
   }, [onBulkDelete, selectedRowKeys]);
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Showing{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
         {Math.min(paginationPage * paginationPageSize, paginationTotal)}
-      </span>{" "}
-      of <span className="font-semibold text-foreground">{paginationTotal}</span> tasks
-    </span>
+      </Text>{" "}
+      of <Text as="span" weight="semibold">{paginationTotal}</Text> tasks
+    </Text>
   );
 
   return (
@@ -387,7 +388,7 @@ function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask, serverPagin
           pendingDeleteTask ? (
             <>
               Are you sure you want to delete{" "}
-              <span className="font-semibold text-foreground">{pendingDeleteTask.taskCode}</span> —{" "}
+              <Text as="span" weight="semibold">{pendingDeleteTask.taskCode}</Text> —{" "}
               {pendingDeleteTask.title}? This action cannot be undone.
             </>
           ) : null

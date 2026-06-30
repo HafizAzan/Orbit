@@ -2,7 +2,7 @@ import React from "react";
 import { ABOUT_STORY } from "../../data/about";
 import { RESOURCES } from "../../lib/resources";
 import AnimateOnScroll from "../common/animate-on-scroll";
-import { Paragraph, Title } from "../ui/typography";
+import { Paragraph, Text, Title } from "../ui/typography";
 
 function AboutStory() {
   return (
@@ -24,8 +24,8 @@ function AboutStory() {
           <div className="grid grid-cols-3 gap-3 border-t border-border pt-6 sm:gap-4">
             {ABOUT_STORY.milestones.map((milestone) => (
               <div key={milestone.id}>
-                <p className="text-lg font-bold text-primary">{milestone.year}</p>
-                <p className="mt-1 text-sm text-muted">{milestone.label}</p>
+                <Text as="p" size="lg" color="primary" weight="bold">{milestone.year}</Text>
+                <Text as="p" size="sm" color="muted" className="mt-1">{milestone.label}</Text>
               </div>
             ))}
           </div>

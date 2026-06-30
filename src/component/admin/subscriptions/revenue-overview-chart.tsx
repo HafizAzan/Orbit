@@ -3,6 +3,7 @@ import React from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { SubscriptionRevenuePoint } from "../../../data/admin-subscriptions";
 import { formatCurrency, formatCurrencyCompact } from "../../../lib/helper";
+import { Paragraph, Title } from "../../ui/typography";
 
 type RevenueOverviewChartProps = {
   data: SubscriptionRevenuePoint[];
@@ -15,8 +16,8 @@ function RevenueOverviewChart({ data }: RevenueOverviewChartProps) {
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Revenue Overview</h3>
-          <p className="mt-0.5 text-sm text-muted">Monthly subscription revenue across all plans</p>
+          <Title level={5} color="default">Revenue Overview</Title>
+          <Paragraph size="sm" className="mt-0.5 mb-0!">Monthly subscription revenue across all plans</Paragraph>
         </div>
         <Select
           defaultValue="12m"

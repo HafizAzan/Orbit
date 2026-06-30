@@ -3,6 +3,7 @@ import { assertApiSuccess } from "../lib/api-error";
 import API_ROUTES from "../router/api-routes";
 import type {
   ApiTeamMember,
+  ApiTeamMemberDetail,
   ApiTeamStats,
   InviteTeamMemberRequest,
   UpdateTeamMemberRoleRequest,
@@ -31,6 +32,14 @@ const getTeamMembersPage = async (
 const getTeamMembers = async (params: PaginationParams = {}): Promise<ApiTeamMember[]> => {
   const page = await getTeamMembersPage(params);
   return page.data;
+};
+
+const getTeamMemberDetail = async (memberId: string): Promise<ApiTeamMemberDetail> => {
+  const response = await ApiService.get(
+    `${API_ROUTES.TEAMS.MEMBERS}/${memberId}/detail`,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<ApiTeamMemberDetail>(response);
 };
 
 const getTeamStats = async (): Promise<ApiTeamStats> => {
@@ -101,6 +110,7 @@ const removeTeamMemberFromSquad = async (
 
 export {
   deleteTeamMember,
+  getTeamMemberDetail,
   getTeamMembers,
   getTeamMembersPage,
   getTeamStats,

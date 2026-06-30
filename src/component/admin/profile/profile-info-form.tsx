@@ -3,7 +3,7 @@ import { Avatar, Button, Input } from "antd";
 import React from "react";
 import { PLATFORM_ADMIN_ROLE_LABEL, type AdminProfile } from "../../../data/admin-profile";
 import { toast } from "../../../lib/toast";
-import { Label } from "../../ui/typography";
+import { Label, Paragraph, Title } from "../../ui/typography";
 
 type ProfileInfoFormProfile = Pick<AdminProfile, "firstName" | "lastName" | "avatarUrl">;
 
@@ -27,8 +27,8 @@ function ProfileInfoForm({
   return (
     <article className="flex h-full w-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-        <p className="mt-1 text-sm text-muted">{description}</p>
+        <Title level={4} color="default">{title}</Title>
+        <Paragraph size="sm" className="mt-1 mb-0!">{description}</Paragraph>
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-background p-4">
@@ -37,7 +37,7 @@ function ProfileInfoForm({
           <Button icon={<CameraOutlined />} onClick={() => toast.info("Avatar upload coming soon")} className="font-medium!">
             Change Photo
           </Button>
-          <p className="mt-2 text-xs text-muted">JPG, PNG or GIF. Max 2MB.</p>
+          <Paragraph size="xs" className="mt-2 mb-0!">JPG, PNG or GIF. Max 2MB.</Paragraph>
         </div>
       </div>
 

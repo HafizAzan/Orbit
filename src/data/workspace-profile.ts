@@ -24,6 +24,16 @@ export const WORKSPACE_PROFILE_TABS = [
 
 export type WorkspaceProfileTab = (typeof WORKSPACE_PROFILE_TABS)[number]["key"];
 
+export const WORKSPACE_PROFILE_TAB_SLUGS: Record<WorkspaceProfileTab, string> = {
+  personal: "personal-info",
+  security: "security",
+  "about-organization": "about-organization",
+  "activity-logs": "activity-logs",
+  organization: "organization",
+};
+
+export const DEFAULT_WORKSPACE_PROFILE_TAB: WorkspaceProfileTab = "personal";
+
 export {
   PROFILE_PASSWORD_HINTS,
   PROFILE_EMAIL_SECURITY_NOTE,

@@ -16,6 +16,7 @@ import {
   type ActivityRecord,
 } from "../data/admin-activity";
 import { getActivityFlagReasonLabel } from "../lib/activity-review";
+import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
 
 type ActivityReviewTableColumnOptions = {
@@ -55,13 +56,13 @@ function createActivityReviewTableColumns({
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold text-foreground">{record.title}</p>
+                <Text as="p" weight="semibold">{record.title}</Text>
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 uppercase">
                   <FlagOutlined className="text-[10px]" />
                   Flagged
                 </span>
               </div>
-              <p className="mt-0.5 line-clamp-1 text-sm text-muted">{record.description}</p>
+              <Text as="p" size="sm" color="muted" className="mt-0.5 line-clamp-1">{record.description}</Text>
             </div>
           </div>
         );
@@ -72,7 +73,7 @@ function createActivityReviewTableColumns({
       dataIndex: "organization",
       key: "organization",
       responsive: ["lg"],
-      render: (organization: string) => <span className="text-sm font-medium text-foreground">{organization}</span>,
+      render: (organization: string) => <Text size="sm" weight="medium">{organization}</Text>,
     },
     {
       title: "Reason",
@@ -83,7 +84,7 @@ function createActivityReviewTableColumns({
             {getActivityFlagReasonLabel(record.flagReason)}
           </span>
         ) : (
-          <span className="text-sm text-muted">—</span>
+          <Text size="sm" color="muted">—</Text>
         ),
     },
     {
@@ -106,7 +107,7 @@ function createActivityReviewTableColumns({
       title: "Flagged",
       dataIndex: "flaggedAt",
       key: "flaggedAt",
-      render: (flaggedAt: string | undefined) => <span className="text-sm text-muted">{flaggedAt ?? "—"}</span>,
+      render: (flaggedAt: string | undefined) => <Text size="sm" color="muted">{flaggedAt ?? "—"}</Text>,
     },
     {
       title: "Category",

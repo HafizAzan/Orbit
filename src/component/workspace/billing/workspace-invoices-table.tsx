@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import type { BillingInvoice } from "../../../types/billing.types";
 import Table from "../../ui/table";
+import { Text } from "../../ui/typography";
 
 type WorkspaceInvoicesTableProps = {
   invoices: BillingInvoice[];
@@ -23,8 +24,10 @@ function WorkspaceInvoicesTable({ invoices, loading = false, onViewInvoice }: Wo
         key: "number",
         render: (number: string | null, record) => (
           <div>
-            <p className="font-semibold text-foreground">{number ?? record.id}</p>
-            <p className="text-xs text-muted">{formatDate(record.createdAt)}</p>
+            <Text as="p" weight="semibold">{number ?? record.id}</Text>
+            <Text as="p" size="xs" color="muted">
+              {formatDate(record.createdAt)}
+            </Text>
           </div>
         ),
       },
@@ -33,11 +36,13 @@ function WorkspaceInvoicesTable({ invoices, loading = false, onViewInvoice }: Wo
         key: "period",
         render: (_, record) =>
           record.periodStart && record.periodEnd ? (
-            <span className="text-sm text-muted">
+            <Text as="span" size="sm" color="muted">
               {formatDate(record.periodStart)} – {formatDate(record.periodEnd)}
-            </span>
+            </Text>
           ) : (
-            <span className="text-sm text-muted">—</span>
+            <Text as="span" size="sm" color="muted">
+              —
+            </Text>
           ),
       },
       {
@@ -45,9 +50,9 @@ function WorkspaceInvoicesTable({ invoices, loading = false, onViewInvoice }: Wo
         key: "amount",
         align: "right",
         render: (_, record) => (
-          <span className="font-semibold text-foreground">
+          <Text as="span" weight="semibold">
             {formatCurrency(record.amountPaid || record.amountDue, record.currency, 2)}
-          </span>
+          </Text>
         ),
       },
       {

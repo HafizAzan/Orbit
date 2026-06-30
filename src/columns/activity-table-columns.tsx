@@ -8,6 +8,7 @@ import {
   ACTIVITY_SEVERITY_STYLES,
   type ActivityRecord,
 } from "../data/admin-activity";
+import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
 
 type ActivityTableColumnOptions = {
@@ -59,7 +60,7 @@ function createActivityTableColumns({
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold text-foreground">{record.title}</p>
+                <Text as="p" weight="semibold">{record.title}</Text>
                 {isFlagged ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 uppercase">
                     <FlagOutlined className="text-[10px]" />
@@ -67,7 +68,7 @@ function createActivityTableColumns({
                   </span>
                 ) : null}
               </div>
-              <p className="mt-0.5 line-clamp-1 text-sm text-muted">{record.description}</p>
+              <Text as="p" size="sm" color="muted" className="mt-0.5 line-clamp-1">{record.description}</Text>
             </div>
           </div>
         );
@@ -78,14 +79,14 @@ function createActivityTableColumns({
       dataIndex: "organization",
       key: "organization",
       responsive: ["lg"],
-      render: (organization: string) => <span className="text-sm font-medium text-foreground">{organization}</span>,
+      render: (organization: string) => <Text size="sm" weight="medium">{organization}</Text>,
     },
     {
       title: "Actor",
       dataIndex: "actor",
       key: "actor",
       responsive: ["md"],
-      render: (actor: string) => <span className="text-sm text-muted">{actor}</span>,
+      render: (actor: string) => <Text size="sm" color="muted">{actor}</Text>,
     },
     {
       title: "Category",
@@ -117,7 +118,7 @@ function createActivityTableColumns({
       title: "Time",
       dataIndex: "timestamp",
       key: "timestamp",
-      render: (timestamp: string) => <span className="text-sm text-muted">{timestamp}</span>,
+      render: (timestamp: string) => <Text size="sm" color="muted">{timestamp}</Text>,
     },
     {
       title: "Actions",

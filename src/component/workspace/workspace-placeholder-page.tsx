@@ -1,5 +1,5 @@
 import React from "react";
-import { Paragraph, Title } from "../../component/ui/typography";
+import { Paragraph, Title, Text } from "../../component/ui/typography";
 
 type WorkspacePlaceholderPageProps = {
   title: string;
@@ -17,8 +17,12 @@ function WorkspacePlaceholderPage({ title, description }: WorkspacePlaceholderPa
       </Paragraph>
 
       <div className="mt-8 rounded-2xl border border-dashed border-border bg-card p-10 text-center shadow-sm">
-        <p className="text-sm font-medium text-muted">This section is coming soon.</p>
-        <p className="mt-2 text-sm text-muted">UI shell is ready — connect APIs when backend work resumes.</p>
+        <Text as="p" size="sm" weight="medium" color="muted">
+          This section is coming soon.
+        </Text>
+        <Paragraph size="sm" className="mt-2">
+          UI shell is ready — connect APIs when backend work resumes.
+        </Paragraph>
       </div>
     </div>
   );

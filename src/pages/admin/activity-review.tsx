@@ -3,7 +3,7 @@ import { Button } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
 import ActivityReviewTable from "../../component/admin/activity/activity-review-table";
-import { Paragraph, Title } from "../../component/ui/typography";
+import { Paragraph, Text, Title } from "../../component/ui/typography";
 import { useAdminActivity } from "../../context/admin-activity-context";
 import { ADMIN_ROUTES } from "../../router/admin-routes";
 
@@ -34,12 +34,12 @@ function AdminActivityReview() {
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
             <FlagOutlined className="text-lg" />
           </div>
-          <p className="mt-4 text-sm font-medium text-muted">Pending review</p>
-          <p className="mt-1 text-2xl font-bold tracking-tight text-amber-800 lg:text-3xl">{flaggedCount}</p>
+          <Text as="p" size="sm" color="muted" weight="medium" className="mt-4">Pending review</Text>
+          <Text as="p" className="mt-1 text-2xl font-bold tracking-tight text-amber-800 lg:text-3xl">{flaggedCount}</Text>
         </article>
 
         <article className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:col-span-2">
-          <p className="text-sm font-semibold text-foreground">How review works</p>
+          <Text as="p" size="sm" weight="semibold">How review works</Text>
           <Paragraph size="sm" className="mt-2 mb-0! text-muted">
             Events flagged from Activity Logs appear here. Inspect details, mark as resolved when handled, or remove the
             flag if it was added by mistake.

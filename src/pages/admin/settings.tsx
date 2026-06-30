@@ -2,7 +2,7 @@ import React from "react";
 import SettingsConfigNav from "../../component/admin/settings/settings-config-nav";
 import SettingsSaveBar from "../../component/admin/settings/settings-save-bar";
 import { SETTINGS_SECTION_REGISTRY } from "../../component/admin/settings/settings-section-registry";
-import { Paragraph, Title } from "../../component/ui/typography";
+import { Paragraph, Text, Title } from "../../component/ui/typography";
 import usePlatformSettings from "../../hooks/use-platform-settings";
 
 function AdminSettings() {
@@ -14,7 +14,7 @@ function AdminSettings() {
   return (
     <div className="mx-auto max-w-8xl">
       <div className="mb-6">
-        <p className="text-xs font-medium text-muted">Platform Settings · Workspace · Admin Console</p>
+        <Text as="p" size="xs" color="muted" weight="medium">Platform Settings · Workspace · Admin Console</Text>
         <Title level={2} className="mt-1 text-2xl text-foreground lg:text-3xl">
           Platform Settings
         </Title>

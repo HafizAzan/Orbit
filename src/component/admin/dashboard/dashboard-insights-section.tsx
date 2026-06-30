@@ -9,11 +9,12 @@ import {
 } from "../../../data/admin-dashboard";
 import { formatCurrency } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 function TopOrgsList({ items }: { items: TopOrgItem[] }) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="text-lg font-semibold text-foreground">Top Orgs (Revenue)</h3>
+      <Title level={5} color="default">Top Orgs (Revenue)</Title>
       <ul className="mt-4 divide-y divide-border">
         {items.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
@@ -22,11 +23,11 @@ function TopOrgsList({ items }: { items: TopOrgItem[] }) {
                 {item.initial}
               </span>
               <div className="min-w-0">
-                <p className="truncate font-semibold text-foreground">{item.name}</p>
-                <p className="text-xs text-muted">{item.plan}</p>
+                <Text as="p" weight="semibold" className="truncate">{item.name}</Text>
+                <Paragraph size="xs" className="mb-0!">{item.plan}</Paragraph>
               </div>
             </div>
-            <span className="shrink-0 text-sm font-bold text-foreground">{formatCurrency(item.revenue)}</span>
+            <Text as="span" size="sm" weight="bold" className="shrink-0">{formatCurrency(item.revenue)}</Text>
           </li>
         ))}
       </ul>
@@ -37,7 +38,7 @@ function TopOrgsList({ items }: { items: TopOrgItem[] }) {
 function MostActiveList({ items }: { items: ActiveOrgItem[] }) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="text-lg font-semibold text-foreground">Most Active</h3>
+      <Title level={5} color="default">Most Active</Title>
       <ul className="mt-4 divide-y divide-border">
         {items.map((item) => (
           <li key={item.id} className="py-3 first:pt-0 last:pb-0">
@@ -49,8 +50,8 @@ function MostActiveList({ items }: { items: ActiveOrgItem[] }) {
                   className="h-9 w-9 rounded-lg bg-background object-cover"
                 />
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-foreground">{item.name}</p>
-                  <p className="text-xs text-muted">{item.sessions} sessions</p>
+                  <Text as="p" weight="semibold" className="truncate">{item.name}</Text>
+                  <Paragraph size="xs" className="mb-0!">{item.sessions} sessions</Paragraph>
                 </div>
               </div>
             </div>
@@ -70,13 +71,13 @@ function MostActiveList({ items }: { items: ActiveOrgItem[] }) {
 function RecentSignupsList({ items }: { items: RecentSignupItem[] }) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <h3 className="text-lg font-semibold text-foreground">Recent Signups</h3>
+      <Title level={5} color="default">Recent Signups</Title>
       <ul className="mt-4 divide-y divide-border">
         {items.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
             <div className="min-w-0">
-              <p className="truncate font-semibold text-foreground">{item.name}</p>
-              <p className="text-xs text-muted">{item.timeAgo}</p>
+              <Text as="p" weight="semibold" className="truncate">{item.name}</Text>
+              <Paragraph size="xs" className="mb-0!">{item.timeAgo}</Paragraph>
             </div>
             <span className={cn("shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wide", item.badgeClass)}>
               {item.planBadge}

@@ -8,6 +8,7 @@ import {
   searchAdminGlobal,
   type AdminGlobalSearchResult,
 } from "../../../lib/admin-global-search";
+import { Paragraph, Text } from "../../ui/typography";
 
 function AdminGlobalSearch() {
   const navigate = useNavigate();
@@ -29,13 +30,13 @@ function AdminGlobalSearch() {
 
   const renderOption = (result: AdminGlobalSearchResult) => (
     <div className="flex min-w-0 flex-col py-0.5">
-      <span className="truncate text-sm font-medium text-foreground">{result.title}</span>
-      <span className="truncate text-xs text-muted">{result.subtitle}</span>
+      <Text as="span" size="sm" weight="medium" className="truncate">{result.title}</Text>
+      <Text as="span" size="xs" color="muted" className="truncate">{result.subtitle}</Text>
     </div>
   );
 
   const options = groupedOptions.map((group) => ({
-    label: <span className="text-xs font-semibold tracking-wide text-muted uppercase">{group.label}</span>,
+    label: <Text as="span" size="xs" color="muted" weight="semibold" className="tracking-wide uppercase">{group.label}</Text>,
     options: group.options.map((option) => ({
       value: option.value,
       label: renderOption(option.result),
@@ -60,9 +61,9 @@ function AdminGlobalSearch() {
       }}
       notFoundContent={
         query.trim().length >= 2 ? (
-          <div className="px-3 py-2 text-sm text-muted">No results for &ldquo;{query.trim()}&rdquo;</div>
+          <Paragraph size="sm" className="px-3 py-2 mb-0!">No results for &ldquo;{query.trim()}&rdquo;</Paragraph>
         ) : (
-          <div className="px-3 py-2 text-sm text-muted">Type at least 2 characters to search</div>
+          <Paragraph size="sm" className="px-3 py-2 mb-0!">Type at least 2 characters to search</Paragraph>
         )
       }
       className="w-full max-w-md [&_.ant-select-selector]:rounded-xl! [&_.ant-select-selector]:bg-background! [&_.ant-select-selector]:px-0!"

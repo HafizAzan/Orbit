@@ -117,7 +117,7 @@ function UserFilterDrawer({ open, draftFilters, onClose, onDraftChange, onApply,
                 )}
               >
                 <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", statusStyle.dot)} />
-                <span className="text-sm font-medium text-foreground">{statusStyle.label}</span>
+                <Text size="sm" weight="medium">{statusStyle.label}</Text>
                 {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
               </button>
             );
@@ -166,7 +166,7 @@ function UserFilterDrawer({ open, draftFilters, onClose, onDraftChange, onApply,
                     isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25 hover:bg-background",
                   )}
                 >
-                  <span className="text-sm font-medium text-foreground">{option.label}</span>
+                  <Text size="sm" weight="medium">{option.label}</Text>
                   {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
                 </button>
               );

@@ -2,6 +2,7 @@ import { CreditCardOutlined, CrownOutlined, CalendarOutlined } from "@ant-design
 import React from "react";
 import { WORKSPACE_BILLING_SUMMARY } from "../../../data/workspace-settings";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Text } from "../../ui/typography";
 
 type SummaryCardProps = {
   icon: React.ReactNode;
@@ -24,9 +25,15 @@ function SummaryCard({ icon, label, title, subtitle, iconClassName }: SummaryCar
           {icon}
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold tracking-wide text-muted uppercase">{label}</p>
-          <p className="mt-1 text-lg font-bold text-foreground">{title}</p>
-          <p className="mt-1 text-sm text-muted">{subtitle}</p>
+          <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+            {label}
+          </Text>
+          <Text as="p" size="lg" weight="bold" className="mt-1">
+            {title}
+          </Text>
+          <Paragraph size="sm" className="mt-1">
+            {subtitle}
+          </Paragraph>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { FileOutlined } from "@ant-design/icons";
 import React from "react";
 import type { ApiTaskAttachment } from "../../../types/task.types";
 import { resolveTaskAttachmentUrl } from "../../../lib/task-attachments";
+import { Text } from "../../ui/typography";
 
 type TaskDetailAttachmentsProps = {
   attachments: ApiTaskAttachment[];
@@ -20,7 +21,9 @@ function TaskDetailAttachments({ attachments }: TaskDetailAttachmentsProps) {
 
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <h3 className="text-sm font-semibold text-foreground">Attachments</h3>
+      <Text as="p" size="sm" weight="semibold">
+        Attachments
+      </Text>
 
       <ul className="mt-4 space-y-2">
         {attachments.map((attachment) => (
@@ -36,8 +39,12 @@ function TaskDetailAttachments({ attachments }: TaskDetailAttachmentsProps) {
                   <FileOutlined />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">{attachment.fileName}</p>
-                  <p className="text-xs text-muted">{formatFileSize(attachment.size)}</p>
+                  <Text as="p" size="sm" weight="medium" className="truncate">
+                    {attachment.fileName}
+                  </Text>
+                  <Text as="p" size="xs" color="muted">
+                    {formatFileSize(attachment.size)}
+                  </Text>
                 </div>
               </div>
             </a>

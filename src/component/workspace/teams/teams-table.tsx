@@ -3,6 +3,7 @@ import { Input, Select } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createWorkspaceTeamTableColumns from "../../../columns/workspace-team-table-columns";
 import ChangeMemberRoleModal from "./change-member-role-modal";
+import TeamMemberDetailModal from "./team-member-detail-modal";
 import { ConfirmModal } from "../../ui/modal";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import {
@@ -23,6 +24,7 @@ import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { matchesSearchQuery, paginateItems } from "../../../lib/helper";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 
 function countActiveTeamFilters(filters: TeamTableFilters) {
   return Object.values(filters).filter((value) => value !== "all").length;
@@ -58,6 +60,7 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
   const [filters, setFilters] = useState<TeamTableFilters>(DEFAULT_TEAM_TABLE_FILTERS);
   const [page, setPage] = useState(1);
   const [roleChangeMember, setRoleChangeMember] = useState<TeamMember | null>(null);
+  const [detailMember, setDetailMember] = useState<TeamMember | null>(null);
   const [statusChangeMember, setStatusChangeMember] = useState<TeamMember | null>(null);
   const [resendInviteMember, setResendInviteMember] = useState<TeamMember | null>(null);
   const [deleteMemberRecord, setDeleteMemberRecord] = useState<TeamMember | null>(null);
@@ -101,6 +104,10 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
   const handleFilterChange = (key: keyof TeamTableFilters, value: string) => {
     setFilters((current) => ({ ...current, [key]: value }));
   };
+
+  const handleViewDetail = useCallback((record: TeamMember) => {
+    setDetailMember(record);
+  }, []);
 
   const handleEditRole = useCallback((record: TeamMember) => {
     setRoleChangeMember(record);
@@ -192,11 +199,13 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
   const columns = useMemo(
     () =>
       createWorkspaceTeamTableColumns({
+        onViewDetail: handleViewDetail,
         onEditRole: handleEditRole,
         onResendInvite: handleResendInvite,
         onDeactivate: handleDeactivate,
         onDeleteMember: handleDeleteMember,
         onRemoveFromSquad: handleRemoveFromSquad,
+        canViewDetail: true,
         canChangeRole,
         canManageInvites,
         canRemoveFromSquad,
@@ -210,22 +219,23 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
       handleEditRole,
       handleRemoveFromSquad,
       handleResendInvite,
+      handleViewDetail,
     ],
   );
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Showing{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}
-      </span>
+      </Text>
       {" to "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {Math.min(paginationPage * paginationPageSize, paginationTotal)}
-      </span>
+      </Text>
       {" of "}
-      <span className="font-semibold text-foreground">{paginationTotal}</span> members
-    </span>
+      <Text as="span" weight="semibold">{paginationTotal}</Text> members
+    </Text>
   );
 
   return (
@@ -288,6 +298,8 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
 
       <ChangeMemberRoleModal member={roleChangeMember} onClose={() => setRoleChangeMember(null)} />
 
+      <TeamMemberDetailModal member={detailMember} onClose={() => setDetailMember(null)} />
+
       <ConfirmModal
         open={statusChangeMember !== null}
         onClose={() => setStatusChangeMember(null)}
@@ -298,12 +310,12 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
             <>
               {statusChangeMember.status === "deactivated" ? (
                 <>
-                  Reactivate <span className="font-semibold text-foreground">{statusChangeMember.name}</span>? They will
+                  Reactivate <Text as="span" weight="semibold">{statusChangeMember.name}</Text>? They will
                   regain access to the workspace.
                 </>
               ) : (
                 <>
-                  Deactivate <span className="font-semibold text-foreground">{statusChangeMember.name}</span>? They will
+                  Deactivate <Text as="span" weight="semibold">{statusChangeMember.name}</Text>? They will
                   lose workspace access until reactivated.
                 </>
               )}
@@ -325,7 +337,7 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
           resendInviteMember ? (
             <>
               Send a new invite email to{" "}
-              <span className="font-semibold text-foreground">{resendInviteMember.email}</span>?
+              <Text as="span" weight="semibold">{resendInviteMember.email}</Text>?
             </>
           ) : null
         }
@@ -342,7 +354,7 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
         description={
           removeSquadMember ? (
             <>
-              Remove <span className="font-semibold text-foreground">{removeSquadMember.name}</span> from your project
+              Remove <Text as="span" weight="semibold">{removeSquadMember.name}</Text> from your project
               team? They will stay in the workspace but lose access to projects you manage.
             </>
           ) : null
@@ -361,7 +373,7 @@ function TeamsTable({ data = [], emptyAction, serverPagination }: TeamsTableProp
         description={
           deleteMemberRecord ? (
             <>
-              Permanently delete <span className="font-semibold text-foreground">{deleteMemberRecord.name}</span>? This
+              Permanently delete <Text as="span" weight="semibold">{deleteMemberRecord.name}</Text>? This
               removes their workspace account and frees their seat. This action cannot be undone.
             </>
           ) : null

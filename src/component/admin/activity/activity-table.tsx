@@ -13,6 +13,7 @@ import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 import ActivityFilterDrawer from "./activity-filter-drawer";
 import ActivityFlagModal from "./activity-flag-modal";
 import ActivityViewModal from "./activity-view-modal";
@@ -100,16 +101,16 @@ function ActivityTable() {
   const activeEventLabel = ACTIVITY_TABS.find((tab) => tab.key === filters.eventTab)?.label.toLowerCase() ?? "events";
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Showing{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {filteredData.length === 0 ? 0 : (page - 1) * ACTIVITIES_PAGE_SIZE + 1}
-      </span>
+      </Text>
       {" to "}
-      <span className="font-semibold text-foreground">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</span>
+      <Text as="span" weight="semibold">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</Text>
       {" of "}
-      <span className="font-semibold text-foreground">{filteredData.length}</span> {filters.eventTab === "all" ? "events" : activeEventLabel}
-    </span>
+      <Text as="span" weight="semibold">{filteredData.length}</Text> {filters.eventTab === "all" ? "events" : activeEventLabel}
+    </Text>
   );
 
   return (

@@ -26,17 +26,14 @@ function WorkspaceProjectBoard() {
       homePath={getWorkspaceHomePath(app?.user?.role)}
     >
       {!board ? (
-        <WorkspaceNotFound
-          title="Board not found"
-          description="This board does not exist or you do not have access to it."
-        />
+        <WorkspaceNotFound title="Board not found" description="This board does not exist or you do not have access to it." />
       ) : (
         <div className="mx-auto max-w-8xl">
           <KanbanBoardHeader board={board} />
 
           <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
             {board.columns.map((column, index) => (
-              <KanbanColumn key={column.id} column={column} showAddTask={index === 0} />
+              <KanbanColumn key={column.id} column={column} showAddTask={index === 0} projectId={board.projectId} />
             ))}
           </div>
         </div>

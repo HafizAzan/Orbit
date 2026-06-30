@@ -2,6 +2,7 @@ import React from "react";
 import type { ProjectDetailMember } from "../../../data/workspace-project-detail";
 import { getInitial } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type ProjectTeamCardProps = {
   members: ProjectDetailMember[];
@@ -10,7 +11,7 @@ type ProjectTeamCardProps = {
 function ProjectTeamCard({ members }: ProjectTeamCardProps) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
-      <h3 className="mb-5 text-lg font-semibold text-foreground">Team</h3>
+      <Title level={5} color="default" className="mb-5">Team</Title>
 
       <ul className="space-y-4">
         {members.map((member) => (
@@ -24,8 +25,8 @@ function ProjectTeamCard({ members }: ProjectTeamCardProps) {
               {getInitial(member.name)}
             </div>
             <div className="min-w-0">
-              <p className="truncate font-semibold text-foreground">{member.name}</p>
-              <p className="truncate text-sm text-muted">{member.role}</p>
+              <Text as="p" weight="semibold" className="truncate">{member.name}</Text>
+              <Paragraph size="sm" className="truncate">{member.role}</Paragraph>
             </div>
           </li>
         ))}

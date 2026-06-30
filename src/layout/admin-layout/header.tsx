@@ -9,6 +9,7 @@ import { getAdminDisplayName } from "../../lib/admin-profile";
 import { ADMIN_ROUTES } from "../../router/admin-routes";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import useAdminProfile from "../../hooks/use-admin-profile";
+import { Text } from "../../component/ui/typography";
 
 type AdminHeaderProps = {
   onMenuOpen: () => void;
@@ -48,8 +49,8 @@ function AdminHeader({ onMenuOpen }: AdminHeaderProps) {
           className="ml-1 flex items-center gap-3 rounded-xl border-l border-border pl-3 transition-colors hover:bg-background/80 sm:pl-4"
         >
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold text-foreground">{getAdminDisplayName(profile)}</p>
-            <p className="text-[10px] font-semibold tracking-wider text-primary uppercase">{PLATFORM_ADMIN_ROLE_LABEL}</p>
+            <Text as="p" size="sm" weight="semibold">{getAdminDisplayName(profile)}</Text>
+            <Text as="p" className="text-[10px] font-semibold tracking-wider text-primary uppercase">{PLATFORM_ADMIN_ROLE_LABEL}</Text>
           </div>
           <Avatar
             size={40}

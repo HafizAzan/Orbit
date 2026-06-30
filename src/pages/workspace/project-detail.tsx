@@ -5,6 +5,7 @@ import ProjectAttachmentsCard from "../../component/workspace/projects/project-a
 import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
 import ProjectDiscussionCard from "../../component/workspace/projects/project-discussion-card";
 import ProjectPhaseProgressCard from "../../component/workspace/projects/project-phase-progress-card";
+import ProjectTasksCard from "../../component/workspace/projects/project-tasks-card";
 import ProjectTeamCard from "../../component/workspace/projects/project-team-card";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
@@ -123,6 +124,11 @@ function WorkspaceProjectDetail() {
             <div className="space-y-6 xl:col-span-2">
               <ProjectPhaseProgressCard project={project} />
               <ProjectActivityFeed items={project.activities} />
+              <ProjectTasksCard
+                projectId={projectId}
+                tasks={projectTasks}
+                loading={tasksQuery.isLoading}
+              />
             </div>
 
             <div className="space-y-6">

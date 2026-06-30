@@ -6,6 +6,7 @@ import { KANBAN_PRIORITY_CONFIG } from "../../../data/workspace-board";
 import { getTaskDetailPath } from "../../../data/workspace-task-form";
 import MarkdownContent from "../../common/markdown-content";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 type KanbanTaskCardProps = {
   task: KanbanTask;
@@ -34,24 +35,26 @@ function KanbanTaskCard({ task, variant = "default" }: KanbanTaskCardProps) {
         {priorityConfig.label}
       </span>
 
-      <h3
+      <Text
+        as="p"
+        weight="semibold"
         className={cn(
-          "mt-4 text-base font-semibold leading-snug sm:text-[17px]",
+          "mt-4 text-base leading-snug sm:text-[17px]",
           isCompleted ? "text-muted line-through decoration-slate-300" : "text-foreground",
         )}
       >
         {task.title}
-      </h3>
+      </Text>
 
       {task.description ? (
         <MarkdownContent content={task.description} className="mt-3" lineClamp={3} interactive={false} />
       ) : null}
 
       <div className="mt-5 flex items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-2 text-sm text-muted">
+        <Text as="span" size="sm" color="muted" className="inline-flex items-center gap-2">
           <CalendarOutlined />
           {task.dueLabel}
-        </span>
+        </Text>
 
         <div
           title={task.assignee.name}

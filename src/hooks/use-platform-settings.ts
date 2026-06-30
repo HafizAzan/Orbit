@@ -7,6 +7,7 @@ import {
   type SettingsSectionId,
 } from "../data/admin-settings";
 import { countObjectChanges, delay, getSettingsSectionFromTab, getSettingsTabSlug, isValidSettingsTab } from "../lib/helper";
+import { setSearchParamValue } from "../lib/url-tab";
 import { toast } from "../lib/toast";
 
 type UsePlatformSettingsOptions = {
@@ -27,7 +28,14 @@ function usePlatformSettings({ initialSettings = DEFAULT_PLATFORM_SETTINGS, onSa
 
   useEffect(() => {
     if (!isValidSettingsTab(tabParam)) {
-      setSearchParams({ tab: getSettingsTabSlug(DEFAULT_SETTINGS_TAB) }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          setSearchParamValue(next, "tab", getSettingsTabSlug(DEFAULT_SETTINGS_TAB));
+          return next;
+        },
+        { replace: true },
+      );
     }
   }, [tabParam, setSearchParams]);
 
@@ -40,7 +48,14 @@ function usePlatformSettings({ initialSettings = DEFAULT_PLATFORM_SETTINGS, onSa
 
   const handleTabChange = useCallback(
     (sectionId: SettingsSectionId) => {
-      setSearchParams({ tab: getSettingsTabSlug(sectionId) }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          setSearchParamValue(next, "tab", getSettingsTabSlug(sectionId));
+          return next;
+        },
+        { replace: true },
+      );
     },
     [setSearchParams],
   );

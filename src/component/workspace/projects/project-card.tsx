@@ -11,6 +11,7 @@ import { formatDate } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import ProjectTeamAvatars from "./project-team-avatars";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type ProjectCardProps = {
   project: WorkspaceProject;
@@ -32,8 +33,8 @@ function ProjectProgress({
   return (
     <div className={cn("w-full", compact && "min-w-0")}>
       <div className="mb-2 flex items-center justify-between gap-2 text-sm">
-        <span className="font-medium text-muted">Progress</span>
-        <span className="shrink-0 font-bold tabular-nums text-foreground">{progress}%</span>
+        <Text as="span" size="sm" weight="medium" color="muted">Progress</Text>
+        <Text as="span" size="sm" weight="bold" className="shrink-0 tabular-nums">{progress}%</Text>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-slate-100">
         <div
@@ -136,8 +137,8 @@ function ProjectCardGrid({
         </div>
 
         <div className="mt-4 min-w-0">
-          <h3 className="text-lg font-semibold text-foreground">{project.title}</h3>
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">{project.description}</p>
+          <Title level={5} color="default">{project.title}</Title>
+          <Paragraph size="sm" className="mt-2 line-clamp-2 leading-relaxed">{project.description}</Paragraph>
         </div>
 
         <div className="mt-5">
@@ -146,10 +147,10 @@ function ProjectCardGrid({
 
         <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <ProjectTeamAvatars members={project.members} />
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap text-muted">
+          <Text as="span" size="sm" color="muted" className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap">
             <CalendarOutlined className="text-xs" />
             {formatDate(project.dueDate)}
-          </span>
+          </Text>
         </div>
 
         <div className="mt-5 flex items-center gap-5 border-t border-border pt-4">
@@ -184,7 +185,7 @@ function ProjectCardList({
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <h3 className="truncate text-base font-semibold text-foreground lg:text-lg">{project.title}</h3>
+              <Title level={5} color="default" className="truncate text-base! lg:text-lg!">{project.title}</Title>
               <span
                 className={cn(
                   "inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
@@ -194,7 +195,7 @@ function ProjectCardList({
                 {statusConfig.label}
               </span>
             </div>
-            <p className="mt-1 line-clamp-1 text-sm text-muted">{project.description}</p>
+            <Paragraph size="sm" className="mt-1 line-clamp-1">{project.description}</Paragraph>
           </div>
         </div>
 

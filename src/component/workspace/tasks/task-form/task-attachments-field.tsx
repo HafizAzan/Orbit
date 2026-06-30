@@ -4,6 +4,7 @@ import type { TaskFormAttachment } from "../../../../data/workspace-task-form";
 import { resolveTaskAttachmentUrl } from "../../../../lib/task-attachments";
 import { toast } from "../../../../lib/toast";
 import { cn } from "../../../../lib/utils";
+import { Text } from "../../../ui/typography";
 
 const ACCEPTED_TYPES = ["image/png", "image/jpeg", "application/pdf"];
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -122,8 +123,12 @@ function TaskAttachmentsField({ attachments, onChange }: TaskAttachmentsFieldPro
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-feature-sync text-primary">
           <CloudUploadOutlined className="text-xl" />
         </div>
-        <p className="mt-3 text-sm font-medium text-foreground">Click to upload or drag and drop</p>
-        <p className="mt-1 text-xs text-muted">PNG, JPG, PDF up to 10MB — add multiple files</p>
+        <Text as="p" size="sm" weight="medium" className="mt-3">
+          Click to upload or drag and drop
+        </Text>
+        <Text as="p" size="xs" color="muted" className="mt-1">
+          PNG, JPG, PDF up to 10MB — add multiple files
+        </Text>
       </label>
 
       {attachments.length > 0 ? (
@@ -148,9 +153,13 @@ function TaskAttachmentsField({ attachments, onChange }: TaskAttachmentsFieldPro
                       {attachment.name}
                     </a>
                   ) : (
-                    <p className="truncate text-sm font-medium text-foreground">{attachment.name}</p>
+                    <Text as="p" size="sm" weight="medium" className="truncate">
+                      {attachment.name}
+                    </Text>
                   )}
-                  <p className="text-xs text-muted">{formatFileSize(attachment.size)}</p>
+                  <Text as="p" size="xs" color="muted">
+                    {formatFileSize(attachment.size)}
+                  </Text>
                 </div>
               </div>
 

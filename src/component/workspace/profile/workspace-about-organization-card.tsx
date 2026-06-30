@@ -12,6 +12,7 @@ import { formatDate } from "../../../lib/helper";
 import { getWorkspaceRoleLabel } from "../../../lib/workspace-routing";
 import QueryErrorState from "../../common/query-error-state";
 import RecordDetailField from "../../admin/shared/record-detail-field";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type WorkspaceAboutOrganizationCardProps = {
   role: RegisterAs;
@@ -21,8 +22,8 @@ function PersonRow({ person }: { person: OrganizationAboutPerson }) {
   return (
     <div className="flex flex-col gap-1 rounded-xl border border-border bg-background px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="font-semibold text-foreground">{person.fullName}</p>
-        <p className="text-sm text-muted">{getWorkspaceRoleLabel(person.role)}</p>
+        <Text as="p" weight="semibold">{person.fullName}</Text>
+        <Paragraph size="sm">{getWorkspaceRoleLabel(person.role)}</Paragraph>
       </div>
       <a
         href={`mailto:${person.email}`}
@@ -51,14 +52,14 @@ function PeopleSection({
   return (
     <section className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-        <p className="mt-1 text-sm text-muted">{description}</p>
+        <Title level={5} color="default">{title}</Title>
+        <Paragraph size="sm" className="mt-1">{description}</Paragraph>
       </div>
 
       <div className="rounded-xl border border-border bg-card px-4 py-3">
-        <p className="text-sm text-muted">
-          Total: <span className="font-semibold text-foreground">{count}</span>
-        </p>
+        <Paragraph size="sm">
+          Total: <Text as="span" weight="semibold">{count}</Text>
+        </Paragraph>
       </div>
 
       {people.length > 0 ? (
@@ -69,7 +70,7 @@ function PeopleSection({
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-border bg-background px-4 py-6 text-sm text-muted">
-          {emptyMessage}
+          <Paragraph size="sm">{emptyMessage}</Paragraph>
         </div>
       )}
     </section>
@@ -125,10 +126,10 @@ function WorkspaceAboutOrganizationCard({ role }: WorkspaceAboutOrganizationCard
             <BankOutlined className="text-lg" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-foreground">About Organization</h2>
-            <p className="mt-1 text-sm text-muted">
+            <Title level={4} color="default">About Organization</Title>
+            <Paragraph size="sm" className="mt-1">
               Key details about your workspace leadership and structure.
-            </p>
+            </Paragraph>
           </div>
         </div>
 
@@ -146,7 +147,7 @@ function WorkspaceAboutOrganizationCard({ role }: WorkspaceAboutOrganizationCard
       <article className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <div className="mb-5 flex items-center gap-2">
           <CrownOutlined className="text-lg text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">Organization owner</h3>
+          <Title level={5} color="default">Organization owner</Title>
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

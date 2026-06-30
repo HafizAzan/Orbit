@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { CONTACT_SUBJECT_OPTIONS } from "../../data/contact";
 import { delay } from "../../lib/helper";
 import { toast } from "../../lib/toast";
-import { Label } from "../ui/typography";
+import { Label, Paragraph, Title } from "../ui/typography";
 
 type ContactFormValues = {
   fullName: string;
@@ -35,8 +35,8 @@ function ContactForm() {
   return (
     <div className="flex h-full flex-col">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Send us a message</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">Share a few details and we&apos;ll route your request to the right team.</p>
+        <Title level={4}>Send us a message</Title>
+        <Paragraph size="sm" className="mt-2">Share a few details and we&apos;ll route your request to the right team.</Paragraph>
       </div>
 
       <Form form={form} layout="vertical" requiredMark={false} className="mt-8 flex flex-1 flex-col [&_.ant-form-item]:mb-4" onFinish={handleFinish}>

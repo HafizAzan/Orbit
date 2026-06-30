@@ -1,5 +1,6 @@
 import React from "react";
 import type { GrowthStat } from "../../../data/admin-dashboard";
+import { Text } from "../../ui/typography";
 
 type GrowthStatCardProps = {
   stat: GrowthStat;
@@ -10,8 +11,8 @@ export function GrowthStatCard({ stat }: GrowthStatCardProps) {
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-muted">{stat.label}</p>
-          <p className="mt-1 text-3xl font-bold text-foreground">{stat.value}</p>
+          <Text as="p" size="sm" color="muted" weight="medium">{stat.label}</Text>
+          <Text as="p" className="mt-1 text-3xl font-bold">{stat.value}</Text>
         </div>
       </div>
 
@@ -22,7 +23,7 @@ export function GrowthStatCard({ stat }: GrowthStatCardProps) {
         />
       </div>
 
-      <p className="mt-3 text-xs font-medium text-emerald-600">{stat.helperText}</p>
+      <Text as="p" size="xs" weight="medium" className="mt-3 text-emerald-600">{stat.helperText}</Text>
     </article>
   );
 }

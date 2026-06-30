@@ -6,11 +6,14 @@ import {
   SUBSCRIPTIONS_DATA,
   SUBSCRIPTIONS_PAGE_SIZE,
   SUBSCRIPTION_TABS,
+  SUBSCRIPTION_TAB_SLUGS,
+  DEFAULT_SUBSCRIPTION_TAB,
   type SubscriptionRecord,
   type SubscriptionTabKey,
 } from "../../../data/admin-subscriptions";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
 import useSubscriptionFilters from "../../../hooks/use-subscription-filters";
+import useUrlTab from "../../../hooks/use-url-tab";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
 import {
   countActiveSubscriptionFilters,
@@ -22,6 +25,7 @@ import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 import SubscriptionFilterDrawer from "./subscription-filter-drawer";
 import SubscriptionViewModal from "./subscription-view-modal";
 
@@ -44,7 +48,10 @@ function SubscriptionsTable({
   const [rows, setRows] = useState(data);
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useSubscriptionFilters();
-  const [activeTab, setActiveTab] = useState<SubscriptionTabKey>("active");
+  const { activeTab, setActiveTab } = useUrlTab<SubscriptionTabKey>({
+    slugToKey: SUBSCRIPTION_TAB_SLUGS,
+    defaultKey: DEFAULT_SUBSCRIPTION_TAB,
+  });
   const [page, setPage] = useState(1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
@@ -135,14 +142,14 @@ function SubscriptionsTable({
   };
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Displaying{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
         {Math.min(paginationPage * paginationPageSize, paginationTotal)}
-      </span>{" "}
-      of <span className="font-semibold text-foreground">{paginationTotal}</span> results
-    </span>
+      </Text>{" "}
+      of <Text as="span" weight="semibold">{paginationTotal}</Text> results
+    </Text>
   );
 
   return (

@@ -5,6 +5,7 @@ import type { ApiWorkspaceTask } from "../../../types/task.types";
 import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { formatDate } from "../../../lib/helper";
+import { Paragraph, Text } from "../../ui/typography";
 
 type TaskDetailSidebarProps = {
   task: ApiWorkspaceTask;
@@ -25,8 +26,10 @@ function DetailRow({
         {icon}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium tracking-wide text-muted uppercase">{label}</p>
-        <div className="mt-1 text-sm font-medium text-foreground">{children}</div>
+        <Text as="p" size="xs" weight="medium" color="muted" className="tracking-wide uppercase">
+          {label}
+        </Text>
+        <div className="mt-1">{children}</div>
       </div>
     </div>
   );
@@ -40,7 +43,9 @@ function TaskDetailSidebar({ task }: TaskDetailSidebarProps) {
   return (
     <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-foreground">Details</h3>
+        <Text as="p" size="sm" weight="semibold">
+          Details
+        </Text>
 
         <div className="mt-4 space-y-4">
           <DetailRow icon={<ProjectOutlined />} label="Project">
@@ -55,22 +60,28 @@ function TaskDetailSidebar({ task }: TaskDetailSidebarProps) {
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-feature-sync text-[11px] font-bold text-primary">
                   {assignee.initials}
                 </div>
-                <span>{assignee.name}</span>
+                <Text as="span" size="sm" weight="medium">
+                  {assignee.name}
+                </Text>
               </div>
             ) : (
-              <span className="text-muted">Unassigned</span>
+              <Text as="span" color="muted">
+                Unassigned
+              </Text>
             )}
           </DetailRow>
 
           <DetailRow icon={<CalendarOutlined />} label="Due date">
-            {task.dueDate ? formatDate(task.dueDate) : <span className="text-muted">No due date</span>}
+            {task.dueDate ? formatDate(task.dueDate) : <Text as="span" color="muted">No due date</Text>}
           </DetailRow>
 
           <DetailRow icon={<FieldTimeOutlined />} label="Estimated hours">
             {task.estimatedHours != null ? (
               `${task.estimatedHours} hrs`
             ) : (
-              <span className="text-muted">Not set</span>
+              <Text as="span" color="muted">
+                Not set
+              </Text>
             )}
           </DetailRow>
 
@@ -87,7 +98,9 @@ function TaskDetailSidebar({ task }: TaskDetailSidebarProps) {
                 ))}
               </div>
             ) : (
-              <span className="text-muted">No labels</span>
+              <Text as="span" color="muted">
+                No labels
+              </Text>
             )}
           </DetailRow>
 
@@ -103,7 +116,9 @@ function TaskDetailSidebar({ task }: TaskDetailSidebarProps) {
 
       <section className="rounded-2xl border border-dashed border-border bg-background/40 p-5 text-center">
         <ClockCircleOutlined className="text-xl text-muted" />
-        <p className="mt-3 text-sm text-muted">Activity will appear here as the task progresses.</p>
+        <Paragraph size="sm" className="mt-3">
+          Activity will appear here as the task progresses.
+        </Paragraph>
       </section>
     </aside>
   );

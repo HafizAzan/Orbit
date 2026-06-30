@@ -10,7 +10,7 @@ import { TaskDetailSkeleton } from "../../component/skeletons";
 import { useAppContext } from "../../context/app-context";
 import { useTask } from "../../hooks/use-workspace-tasks";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
-import { Paragraph } from "../../component/ui/typography";
+import { Paragraph, Text } from "../../component/ui/typography";
 
 function WorkspaceTaskDetail() {
   const { taskId = "" } = useParams();
@@ -37,7 +37,7 @@ function WorkspaceTaskDetail() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
             <div className="space-y-6">
               <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-                <h3 className="text-sm font-semibold text-foreground">Description</h3>
+                <Text as="p" size="sm" weight="semibold">Description</Text>
 
                 {task.description.trim() ? (
                   <MarkdownContent content={task.description} className="mt-4 text-foreground" />

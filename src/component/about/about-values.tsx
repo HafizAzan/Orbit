@@ -26,8 +26,8 @@ function AboutValues() {
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Icon className="text-lg" />
                   </span>
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">{value.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{value.description}</p>
+                  <Title level={5} className="mt-4">{value.title}</Title>
+                  <Paragraph size="sm" className="mt-2">{value.description}</Paragraph>
                 </article>
               </AnimateOnScroll>
             );

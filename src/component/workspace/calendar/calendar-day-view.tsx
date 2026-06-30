@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import type { CalendarEvent } from "../../../data/workspace-calendar";
 import { getEventsForIso } from "../../../lib/calendar-utils";
 import CalendarEventPill from "./calendar-event-pill";
+import { Text } from "../../ui/typography";
 
 type CalendarDayViewProps = {
   activeDate: Date;
@@ -20,9 +21,9 @@ function CalendarDayView({ activeDate, events }: CalendarDayViewProps) {
 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <p className="text-sm font-medium text-muted">
+      <Text as="p" size="sm" weight="medium" color="muted">
         {new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(activeDate)}
-      </p>
+      </Text>
 
       {dayEvents.length > 0 ? (
         <ul className="mt-5 space-y-3">
@@ -34,7 +35,9 @@ function CalendarDayView({ activeDate, events }: CalendarDayViewProps) {
         </ul>
       ) : (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-background/50 p-10 text-center">
-          <p className="text-sm font-medium text-muted">No events scheduled for this day.</p>
+          <Text as="p" size="sm" weight="medium" color="muted">
+            No events scheduled for this day.
+          </Text>
         </div>
       )}
     </article>

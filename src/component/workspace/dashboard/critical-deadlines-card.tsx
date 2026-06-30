@@ -2,6 +2,7 @@ import { TeamOutlined } from "@ant-design/icons";
 import React from "react";
 import type { CriticalDeadline } from "../../../data/workspace-dashboard";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type CriticalDeadlinesCardProps = {
   items: CriticalDeadline[];
@@ -10,7 +11,7 @@ type CriticalDeadlinesCardProps = {
 function CriticalDeadlinesCard({ items }: CriticalDeadlinesCardProps) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
-      <h3 className="text-lg font-semibold text-foreground">Critical Deadlines</h3>
+      <Title level={5} color="default">Critical Deadlines</Title>
 
       <ul className="mt-5 space-y-4">
         {items.map((item) => (
@@ -22,25 +23,25 @@ function CriticalDeadlinesCard({ items }: CriticalDeadlinesCardProps) {
             )}
           >
             <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl border border-border bg-card text-center">
-              <span className="text-[10px] font-bold tracking-wider text-muted uppercase">{item.month}</span>
-              <span className="text-xl font-bold text-foreground">{item.day}</span>
+              <Text as="span" size="xs" weight="bold" color="muted" className="text-[10px]! tracking-wider uppercase">{item.month}</Text>
+              <Text as="span" weight="bold" className="text-xl">{item.day}</Text>
             </div>
 
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold text-foreground">{item.title}</p>
+                <Text as="p" weight="semibold">{item.title}</Text>
                 {item.priority === "high" ? (
                   <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600 uppercase">
                     High Priority
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-sm text-muted">{item.subtitle}</p>
+              <Paragraph size="sm" className="mt-1">{item.subtitle}</Paragraph>
               {item.assignees ? (
-                <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-muted">
+                <Text as="p" size="xs" weight="medium" color="muted" className="mt-2 inline-flex items-center gap-1">
                   <TeamOutlined />
                   {item.assignees} assignees
-                </p>
+                </Text>
               ) : null}
             </div>
           </li>

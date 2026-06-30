@@ -19,6 +19,21 @@ export type ApiTeamMember = {
   lastActive: string;
 };
 
+export type ApiTeamMemberProjectDetail = {
+  projectId: string;
+  projectKey: string;
+  projectName: string;
+  projectRole: string;
+  assignedTasks: number;
+  completedTasks: number;
+};
+
+export type ApiTeamMemberDetail = ApiTeamMember & {
+  totalAssignedTasks: number;
+  completedAssignedTasks: number;
+  projectsDetail: ApiTeamMemberProjectDetail[];
+};
+
 export type ApiTeamStats = {
   totalSeats: {
     used: number;

@@ -4,7 +4,7 @@ import {
   TeamOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { Checkbox, Select } from "antd";
+import { Button, Checkbox, Select } from "antd";
 import React from "react";
 import type { ProjectsViewMode } from "../../../data/workspace-projects";
 import {
@@ -12,6 +12,7 @@ import {
   PROJECT_STATUS_FILTER_OPTIONS,
 } from "../../../data/workspace-projects";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 const TOOLBAR_CONTROL_CLASS =
   "h-8 min-h-8 rounded-lg border border-border bg-background shadow-none";
@@ -72,15 +73,15 @@ function ProjectsToolbar({
               onChange={(event) => onSelectAllChange(event.target.checked)}
               className="m-0! leading-none [&_.ant-checkbox]:top-0"
             />
-            <span className="text-sm font-medium whitespace-nowrap text-foreground">
+            <Text as="span" size="sm" weight="medium" className="whitespace-nowrap">
               Select all
               {selectedCount > 0 ? (
-                <span className="text-muted">
+                <Text as="span" color="muted">
                   {" "}
                   ({selectedCount}/{totalProjects})
-                </span>
+                </Text>
               ) : null}
-            </span>
+            </Text>
           </label>
         ) : null}
 
@@ -116,28 +117,20 @@ function ProjectsToolbar({
       </div>
 
       <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1">
-        <button
-          type="button"
+        <Button
+          type={viewMode === "grid" ? "primary" : "text"}
           aria-label="Grid view"
           onClick={() => onViewModeChange("grid")}
-          className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
-            viewMode === "grid" ? "bg-primary text-white" : "text-muted hover:text-foreground",
-          )}
-        >
-          <AppstoreOutlined />
-        </button>
-        <button
-          type="button"
+          icon={<AppstoreOutlined />}
+          className="h-9 w-9 rounded-lg!"
+        />
+        <Button
+          type={viewMode === "list" ? "primary" : "text"}
           aria-label="List view"
           onClick={() => onViewModeChange("list")}
-          className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
-            viewMode === "list" ? "bg-primary text-white" : "text-muted hover:text-foreground",
-          )}
-        >
-          <UnorderedListOutlined />
-        </button>
+          icon={<UnorderedListOutlined />}
+          className="h-9 w-9 rounded-lg!"
+        />
       </div>
     </div>
   );

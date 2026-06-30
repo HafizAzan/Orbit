@@ -6,6 +6,7 @@ import {
   type MyTasksFilters,
 } from "../../../data/workspace-my-tasks";
 import { formatMyTasksRemainingLabel } from "../../../lib/workspace-my-tasks-utils";
+import { Text } from "../../ui/typography";
 
 type MyTasksFilterBarProps = {
   filters: MyTasksFilters;
@@ -47,7 +48,7 @@ function MyTasksFilterBar({ filters, remainingCount, projectOptions, onChange }:
         />
       </div>
 
-      <p className="text-sm font-medium text-muted lg:shrink-0">{formatMyTasksRemainingLabel(remainingCount)}</p>
+      <Text as="p" size="sm" weight="medium" color="muted" className="lg:shrink-0">{formatMyTasksRemainingLabel(remainingCount)}</Text>
     </div>
   );
 }

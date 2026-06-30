@@ -2,6 +2,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import React from "react";
 import { getProjectCreatePath } from "../../../data/workspace-project-form";
 import WorkspaceNavLink from "../common/workspace-nav-link";
+import { Paragraph, Title } from "../../ui/typography";
 
 function ProjectTemplateCard() {
   return (
@@ -12,10 +13,10 @@ function ProjectTemplateCard() {
       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
         <PlusOutlined className="text-2xl" />
       </div>
-      <h3 className="mt-5 text-lg font-semibold text-foreground">New Project Template</h3>
-      <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">
+      <Title level={5} color="default" className="mt-5">New Project Template</Title>
+      <Paragraph size="sm" className="mt-2 max-w-xs leading-relaxed">
         Quickly launch a new workspace with pre-built workflows.
-      </p>
+      </Paragraph>
     </WorkspaceNavLink>
   );
 }

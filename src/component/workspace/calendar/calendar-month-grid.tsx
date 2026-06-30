@@ -3,6 +3,7 @@ import { CALENDAR_WEEKDAY_LABELS, type CalendarEvent } from "../../../data/works
 import { getEventsForIso, getMonthGrid, type CalendarDayCell } from "../../../lib/calendar-utils";
 import { cn } from "../../../lib/utils";
 import CalendarEventPill from "./calendar-event-pill";
+import { Text } from "../../ui/typography";
 
 type CalendarMonthGridProps = {
   activeDate: Date;
@@ -77,7 +78,9 @@ function CalendarMonthCell({ cell, events }: CalendarMonthCellProps) {
           <CalendarEventPill key={event.id} event={event} compact />
         ))}
         {hiddenCount > 0 ? (
-          <p className="px-1 text-[10px] font-medium text-muted sm:text-xs">+{hiddenCount} more</p>
+          <Text as="p" size="xs" weight="medium" color="muted" className="px-1 text-[10px]! sm:text-xs!">
+            +{hiddenCount} more
+          </Text>
         ) : null}
       </div>
     </div>

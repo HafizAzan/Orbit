@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { TaskStatusSlice } from "../../../data/workspace-dashboard";
+import { Text, Title } from "../../ui/typography";
 
 type TaskStatusChartProps = {
   data: TaskStatusSlice[];
@@ -11,7 +12,7 @@ function TaskStatusChart({ data }: TaskStatusChartProps) {
 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
-      <h3 className="text-lg font-semibold text-foreground">Task Status</h3>
+      <Title level={5} color="default">Task Status</Title>
 
       <div className="relative mx-auto mt-4 h-52 w-full max-w-[220px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -32,19 +33,19 @@ function TaskStatusChart({ data }: TaskStatusChartProps) {
         </ResponsiveContainer>
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <p className="text-3xl font-bold text-foreground">{totalTasks}</p>
-          <p className="text-xs font-medium text-muted">Tasks</p>
+          <Text as="p" weight="bold" className="text-3xl">{totalTasks}</Text>
+          <Text as="p" size="xs" weight="medium" color="muted">Tasks</Text>
         </div>
       </div>
 
       <ul className="mt-4 space-y-2">
         {data.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex items-center gap-2 text-muted">
+            <Text as="span" size="sm" color="muted" className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
               {item.label}
-            </span>
-            <span className="font-semibold text-foreground">{item.count}</span>
+            </Text>
+            <Text as="span" size="sm" weight="semibold">{item.count}</Text>
           </li>
         ))}
       </ul>

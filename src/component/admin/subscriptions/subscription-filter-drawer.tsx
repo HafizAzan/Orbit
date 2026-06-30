@@ -110,7 +110,7 @@ function SubscriptionFilterDrawer({ open, draftFilters, onClose, onDraftChange, 
                   >
                     {option.value}
                   </span>
-                  <span className="text-sm font-medium text-foreground">{option.label}</span>
+                  <Text size="sm" weight="medium">{option.label}</Text>
                 </button>
               );
             })}
@@ -131,7 +131,7 @@ function SubscriptionFilterDrawer({ open, draftFilters, onClose, onDraftChange, 
                   isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25 hover:bg-background",
                 )}
               >
-                <span className="text-sm font-medium text-foreground">{option.label}</span>
+                <Text size="sm" weight="medium">{option.label}</Text>
                 {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
               </button>
             );

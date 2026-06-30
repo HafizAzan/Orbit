@@ -12,6 +12,7 @@ import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { clearAuthSession } from "../../lib/auth-session";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import { cn } from "../../lib/utils";
+import { Text } from "../../component/ui/typography";
 
 type AdminSidebarContentProps = {
   className?: string;
@@ -53,7 +54,7 @@ function AdminSidebarContent({ className, onNavigate }: AdminSidebarContentProps
         <Link to={"/"} onClick={handleNavClick} className="inline-flex transition-opacity duration-300 hover:opacity-90">
           <Logo />
         </Link>
-        <p className="mt-2 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase">Platform Admin</p>
+        <Text as="p" className="mt-2 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase">Platform Admin</Text>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">

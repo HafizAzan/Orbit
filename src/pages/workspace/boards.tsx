@@ -5,7 +5,7 @@ import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-lin
 import QueryPageGuard from "../../component/common/query-page-guard";
 import { BoardsPageSkeleton } from "../../component/skeletons";
 import { useBoards } from "../../hooks/use-workspace-tasks";
-import { Paragraph, Title } from "../../component/ui/typography";
+import { Paragraph, Text, Title } from "../../component/ui/typography";
 
 function WorkspaceBoards() {
   const boardsQuery = useBoards();
@@ -43,9 +43,9 @@ function WorkspaceBoards() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-xs font-bold tracking-[0.14em] text-primary uppercase">Project Board</p>
-                    <h3 className="mt-2 text-lg font-semibold text-foreground">{board.projectName}</h3>
-                    <p className="mt-1 text-sm text-muted">{board.title}</p>
+                    <Text as="p" size="xs" weight="bold" color="primary" className="tracking-[0.14em] uppercase">Project Board</Text>
+                    <Title level={5} color="default" className="mt-2">{board.projectName}</Title>
+                    <Paragraph size="sm" className="mt-1">{board.title}</Paragraph>
                   </div>
                 </div>
 
@@ -58,9 +58,9 @@ function WorkspaceBoards() {
                     }))}
                     maxVisible={4}
                   />
-                  <div className="text-right text-sm">
-                    <p className="font-semibold text-foreground">{board.taskCount} tasks</p>
-                    <p className="text-muted">{board.inProgressCount} in progress</p>
+                  <div className="text-right">
+                    <Text as="p" size="sm" weight="semibold">{board.taskCount} tasks</Text>
+                    <Paragraph size="sm">{board.inProgressCount} in progress</Paragraph>
                   </div>
                 </div>
               </WorkspaceNavLink>

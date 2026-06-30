@@ -1,6 +1,7 @@
 import {
   DeleteOutlined,
   EllipsisOutlined,
+  EyeOutlined,
   MailOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
@@ -15,14 +16,17 @@ import {
 } from "../data/workspace-teams";
 import { pluralize } from "../lib/helper";
 import { getInitial } from "../lib/helper";
+import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
 
 type WorkspaceTeamTableColumnOptions = {
+  onViewDetail?: (record: TeamMember) => void;
   onEditRole?: (record: TeamMember) => void;
   onResendInvite?: (record: TeamMember) => void;
   onDeactivate?: (record: TeamMember) => void;
   onDeleteMember?: (record: TeamMember) => void;
   onRemoveFromSquad?: (record: TeamMember) => void;
+  canViewDetail?: boolean;
   canChangeRole?: boolean;
   canManageInvites?: boolean;
   canRemoveFromSquad?: boolean;
@@ -31,15 +35,20 @@ type WorkspaceTeamTableColumnOptions = {
 function getActionItems(
   record: TeamMember,
   {
+    canViewDetail = true,
     canChangeRole = false,
     canManageInvites = false,
     canRemoveFromSquad = false,
   }: Pick<
     WorkspaceTeamTableColumnOptions,
-    "canChangeRole" | "canManageInvites" | "canRemoveFromSquad"
+    "canViewDetail" | "canChangeRole" | "canManageInvites" | "canRemoveFromSquad"
   >,
 ): MenuProps["items"] {
   const items: MenuProps["items"] = [];
+
+  if (canViewDetail) {
+    items.push({ key: "view-detail", label: "View detail", icon: <EyeOutlined /> });
+  }
 
   if (canChangeRole) {
     items.push({ key: "edit-role", label: "Change role", icon: <UserSwitchOutlined /> });
@@ -82,16 +91,18 @@ function getActionItems(
 }
 
 function createWorkspaceTeamTableColumns({
+  onViewDetail,
   onEditRole,
   onResendInvite,
   onDeactivate,
   onDeleteMember,
   onRemoveFromSquad,
+  canViewDetail = true,
   canChangeRole = false,
   canManageInvites = false,
   canRemoveFromSquad = false,
 }: WorkspaceTeamTableColumnOptions = {}): ColumnsType<TeamMember> {
-  const showActions = canChangeRole || canManageInvites || canRemoveFromSquad;
+  const showActions = canViewDetail || canChangeRole || canManageInvites || canRemoveFromSquad;
 
   return [
     {
@@ -109,8 +120,8 @@ function createWorkspaceTeamTableColumns({
             {getInitial(record.name)}
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-foreground">{record.name}</p>
-            <p className="truncate text-sm text-muted">{record.email}</p>
+            <Text as="p" weight="semibold" className="truncate">{record.name}</Text>
+            <Text as="p" size="sm" color="muted" className="truncate">{record.email}</Text>
           </div>
         </div>
       ),
@@ -121,7 +132,7 @@ function createWorkspaceTeamTableColumns({
       key: "department",
       width: 130,
       render: (department: TeamMember["department"]) => (
-        <span className="text-sm font-medium text-foreground">{TEAM_DEPARTMENT_LABELS[department]}</span>
+        <Text size="sm" weight="medium">{TEAM_DEPARTMENT_LABELS[department]}</Text>
       ),
     },
     {
@@ -141,7 +152,7 @@ function createWorkspaceTeamTableColumns({
       key: "joinedDate",
       width: 130,
       responsive: ["lg"],
-      render: (joinedDate: string) => <span className="text-sm text-muted">{joinedDate}</span>,
+      render: (joinedDate: string) => <Text size="sm" color="muted">{joinedDate}</Text>,
     },
     {
       title: "Role",
@@ -179,7 +190,7 @@ function createWorkspaceTeamTableColumns({
       key: "lastActive",
       responsive: ["md"],
       width: 140,
-      render: (lastActive: string) => <span className="text-sm text-muted">{lastActive}</span>,
+      render: (lastActive: string) => <Text size="sm" color="muted">{lastActive}</Text>,
     },
     ...(showActions
       ? [
@@ -191,8 +202,14 @@ function createWorkspaceTeamTableColumns({
             render: (_: unknown, record: TeamMember) => (
               <Dropdown
                 menu={{
-                  items: getActionItems(record, { canChangeRole, canManageInvites, canRemoveFromSquad }),
+                  items: getActionItems(record, {
+                    canViewDetail,
+                    canChangeRole,
+                    canManageInvites,
+                    canRemoveFromSquad,
+                  }),
                   onClick: ({ key }) => {
+                    if (key === "view-detail") onViewDetail?.(record);
                     if (key === "edit-role") onEditRole?.(record);
                     if (key === "resend") onResendInvite?.(record);
                     if (key === "deactivate") onDeactivate?.(record);

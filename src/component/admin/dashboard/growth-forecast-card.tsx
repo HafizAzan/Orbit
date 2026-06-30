@@ -1,6 +1,7 @@
 import { RocketOutlined } from "@ant-design/icons";
 import React from "react";
 import { GROWTH_FORECAST } from "../../../data/admin-dashboard";
+import { Paragraph, Text } from "../../ui/typography";
 
 function GrowthForecastCard() {
   return (
@@ -10,9 +11,9 @@ function GrowthForecastCard() {
           <RocketOutlined className="text-lg" />
         </span>
         <div>
-          <p className="text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">Growth Forecast</p>
-          <p className="mt-2 text-3xl font-bold">{GROWTH_FORECAST.target}</p>
-          <p className="mt-2 text-sm text-slate-400">{GROWTH_FORECAST.helperText}</p>
+          <Text size="xs" weight="semibold" className="tracking-[0.2em] text-slate-400 uppercase">Growth Forecast</Text>
+          <Text as="p" className="mt-2 text-3xl font-bold">{GROWTH_FORECAST.target}</Text>
+          <Paragraph size="sm" className="mt-2 mb-0! text-slate-400">{GROWTH_FORECAST.helperText}</Paragraph>
         </div>
       </div>
     </article>

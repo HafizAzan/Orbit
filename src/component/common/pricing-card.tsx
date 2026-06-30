@@ -77,8 +77,8 @@ function PricingCard({
       </div>
 
       <div className="mt-6 flex items-end gap-1">
-        <span className="text-4xl font-bold text-foreground nav:text-5xl">{price}</span>
-        {priceSuffix ? <span className="pb-1 text-sm text-muted">{priceSuffix}</span> : null}
+        <Text className="text-4xl font-bold text-foreground nav:text-5xl">{price}</Text>
+        {priceSuffix ? <Text size="sm" color="muted" className="pb-1">{priceSuffix}</Text> : null}
       </div>
 
       <ul className="mt-6 flex min-h-52 max-h-72 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgb(148_163_184)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300/80">

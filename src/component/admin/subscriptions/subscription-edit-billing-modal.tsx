@@ -166,7 +166,7 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
                 { required: true, message: "Please enter a billing email" },
                 { type: "email", message: "Please enter a valid email" },
               ]}
-              extra={<span className="text-xs text-muted">Billing email cannot be changed from the admin console.</span>}
+              extra={<Text size="xs" color="muted">Billing email cannot be changed from the admin console.</Text>}
             >
               <Input
                 size="large"
@@ -201,7 +201,7 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
                         >
                           {option.value}
                         </span>
-                        <span className="text-sm font-medium text-foreground">{option.label}</span>
+                        <Text size="sm" weight="medium">{option.label}</Text>
                       </button>
                     );
                   })}
@@ -270,10 +270,10 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
             </div>
 
             {typeof amount === "number" ? (
-              <p className="text-xs text-muted">
-                New billing total: <span className="font-semibold text-foreground">{formatCurrency(amount, "USD", 2)}</span>
+              <Paragraph size="xs" className="mb-0!">
+                New billing total: <Text weight="semibold">{formatCurrency(amount, "USD", 2)}</Text>
                 {selectedBillingCycle ? ` / ${selectedBillingCycle.toLowerCase()}` : null}
-              </p>
+              </Paragraph>
             ) : null}
           </FormSection>
 
@@ -295,7 +295,7 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
                       )}
                     >
                       <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", statusStyle.dot)} />
-                      <span className="text-sm font-medium text-foreground">{statusStyle.label}</span>
+                      <Text size="sm" weight="medium">{statusStyle.label}</Text>
                       {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
                     </button>
                   );

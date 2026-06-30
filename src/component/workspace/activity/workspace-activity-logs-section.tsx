@@ -12,6 +12,7 @@ import {
 import QueryErrorState from "../../common/query-error-state";
 import { ConfirmModal } from "../../ui/modal";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 
 const MODULE_LABELS: Record<ActivityEvent["module"], string> = {
   tasks: "Tasks",
@@ -45,7 +46,7 @@ function WorkspaceActivityLogsSection({
         key: "createdAt",
         width: 160,
         render: (value: string) => (
-          <span className="text-sm text-muted">{formatDate(value, { month: "short" })}</span>
+          <Text as="span" size="sm" color="muted">{formatDate(value, { month: "short" })}</Text>
         ),
       },
       {
@@ -62,8 +63,8 @@ function WorkspaceActivityLogsSection({
         key: "actor",
         render: (_: unknown, record: ActivityEvent) => (
           <div>
-            <p className="font-medium text-foreground">{record.actorName}</p>
-            <p className="text-xs text-muted">{getWorkspaceRoleLabel(record.actorRole)}</p>
+            <Text as="p" weight="medium">{record.actorName}</Text>
+            <Text as="p" size="xs" color="muted">{getWorkspaceRoleLabel(record.actorRole)}</Text>
           </div>
         ),
       },
@@ -71,7 +72,7 @@ function WorkspaceActivityLogsSection({
         title: "Activity",
         dataIndex: "summary",
         key: "summary",
-        render: (summary: string) => <span className="text-sm text-foreground">{summary}</span>,
+        render: (summary: string) => <Text as="span" size="sm">{summary}</Text>,
       },
       {
         title: "Actions",
@@ -122,9 +123,9 @@ function WorkspaceActivityLogsSection({
       {!compact && summary ? (
         <TablePaginationFooter
           summary={
-            <span className="text-sm text-muted">
+            <Text as="span" size="sm" color="muted">
               Showing {summary.data.length} of {summary.total} activity logs
-            </span>
+            </Text>
           }
           current={summary.page}
           pageSize={pageSize}
@@ -152,7 +153,7 @@ function WorkspaceActivityLogsSection({
           pendingDelete ? (
             <>
               Remove this audit entry for{" "}
-              <span className="font-semibold text-foreground">{pendingDelete.summary}</span>?
+              <Text as="span" weight="semibold">{pendingDelete.summary}</Text>?
             </>
           ) : null
         }

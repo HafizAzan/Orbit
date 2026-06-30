@@ -12,6 +12,7 @@ import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 import OrganizationFilterDrawer from "./organization-filter-drawer";
 import OrganizationViewModal from "./organization-view-modal";
 
@@ -153,14 +154,14 @@ function OrganizationsTable({
   };
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Displaying{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
         {Math.min(paginationPage * paginationPageSize, paginationTotal)}
-      </span>{" "}
-      of <span className="font-semibold text-foreground">{paginationTotal}</span> results
-    </span>
+      </Text>{" "}
+      of <Text as="span" weight="semibold">{paginationTotal}</Text> results
+    </Text>
   );
 
   return (

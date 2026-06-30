@@ -10,6 +10,7 @@ import { cn } from "../../../lib/utils";
 import type { BillingInvoice } from "../../../types/billing.types";
 import DetailModal from "../../ui/detail-modal";
 import RecordDetailField from "../../admin/shared/record-detail-field";
+import { Text } from "../../ui/typography";
 
 type WorkspaceInvoiceDetailModalProps = {
   invoice: BillingInvoice | null;
@@ -58,9 +59,15 @@ function WorkspaceInvoiceDetailModal({ invoice, onClose }: WorkspaceInvoiceDetai
 
           <div className="overflow-hidden rounded-2xl border border-border">
             <div className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-border bg-background/60 px-4 py-3 text-[11px] font-semibold tracking-wide text-muted uppercase">
-              <span>Description</span>
-              <span className="text-right">Qty</span>
-              <span className="min-w-24 text-right">Amount</span>
+              <Text as="span" size="xs" weight="semibold" color="muted" className="text-[11px]! tracking-wide uppercase">
+                Description
+              </Text>
+              <Text as="span" size="xs" weight="semibold" color="muted" className="text-right text-[11px]! tracking-wide uppercase">
+                Qty
+              </Text>
+              <Text as="span" size="xs" weight="semibold" color="muted" className="min-w-24 text-right text-[11px]! tracking-wide uppercase">
+                Amount
+              </Text>
             </div>
 
             {detail.lineItems.map((item, index) => (
@@ -68,27 +75,43 @@ function WorkspaceInvoiceDetailModal({ invoice, onClose }: WorkspaceInvoiceDetai
                 key={`${item.description}-${index}`}
                 className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
               >
-                <span className="font-medium text-foreground">{item.description}</span>
-                <span className="text-right text-muted">{item.quantity}</span>
-                <span className="min-w-24 text-right font-medium text-foreground">
+                <Text as="span" size="sm" weight="medium">
+                  {item.description}
+                </Text>
+                <Text as="span" size="sm" color="muted" className="text-right">
+                  {item.quantity}
+                </Text>
+                <Text as="span" size="sm" weight="medium" className="min-w-24 text-right">
                   {formatCurrency(item.unitAmount * item.quantity, detail.currency, 2)}
-                </span>
+                </Text>
               </div>
             ))}
           </div>
 
           <div className="space-y-2 rounded-2xl border border-border bg-background/40 p-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted">Subtotal</span>
-              <span className="font-medium text-foreground">{formatCurrency(detail.subtotal, detail.currency, 2)}</span>
+              <Text as="span" size="sm" color="muted">
+                Subtotal
+              </Text>
+              <Text as="span" size="sm" weight="medium">
+                {formatCurrency(detail.subtotal, detail.currency, 2)}
+              </Text>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted">Tax</span>
-              <span className="font-medium text-foreground">{formatCurrency(detail.tax, detail.currency, 2)}</span>
+              <Text as="span" size="sm" color="muted">
+                Tax
+              </Text>
+              <Text as="span" size="sm" weight="medium">
+                {formatCurrency(detail.tax, detail.currency, 2)}
+              </Text>
             </div>
             <div className="flex items-center justify-between border-t border-border pt-3">
-              <span className="text-sm font-semibold text-foreground">Total paid</span>
-              <span className="text-lg font-bold text-foreground">{formatCurrency(detail.total, detail.currency, 2)}</span>
+              <Text as="span" size="sm" weight="semibold">
+                Total paid
+              </Text>
+              <Text as="span" size="lg" weight="bold">
+                {formatCurrency(detail.total, detail.currency, 2)}
+              </Text>
             </div>
           </div>
 

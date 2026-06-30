@@ -123,7 +123,7 @@ function VerifyOtpForm() {
 
         <Paragraph size="sm" className="mt-2 text-center text-muted">
           We&apos;ve sent a 6-digit verification code to{" "}
-          <span className="font-medium text-foreground">{email}</span>. Enter it below to complete
+          <Text weight="medium">{email}</Text>. Enter it below to complete
           your signup.
         </Paragraph>
 

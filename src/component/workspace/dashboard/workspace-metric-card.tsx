@@ -2,6 +2,7 @@ import React from "react";
 import { WORKSPACE_METRIC_ICONS, type WorkspaceMetric } from "../../../data/workspace-dashboard";
 import TrendBadge from "../../ui/trend-badge";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 type WorkspaceMetricCardProps = {
   metric: WorkspaceMetric;
@@ -19,8 +20,8 @@ function WorkspaceMetricCard({ metric }: WorkspaceMetricCardProps) {
         <TrendBadge label={metric.trend} trendType={metric.trendType} />
       </div>
 
-      <p className="mt-4 text-sm font-medium text-muted">{metric.label}</p>
-      <p className="mt-1 text-2xl font-bold tracking-tight text-foreground lg:text-3xl">{metric.value}</p>
+      <Text as="p" size="sm" weight="medium" color="muted" className="mt-4">{metric.label}</Text>
+      <Text as="p" weight="bold" className="mt-1 text-2xl tracking-tight lg:text-3xl">{metric.value}</Text>
     </article>
   );
 }

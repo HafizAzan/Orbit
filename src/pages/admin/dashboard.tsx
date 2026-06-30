@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React from "react";
 import ChurnRateCard from "../../component/admin/dashboard/churn-rate-card";
 import DashboardInsightsSection from "../../component/admin/dashboard/dashboard-insights-section";
 import GrowthForecastCard from "../../component/admin/dashboard/growth-forecast-card";
 import { GrowthStatCard } from "../../component/admin/dashboard/growth-stats";
 import MetricCard from "../../component/admin/dashboard/metric-card";
-import PlatformOverviewHeader, { type DashboardViewTab } from "../../component/admin/dashboard/platform-overview-header";
+import PlatformOverviewHeader, {
+  DASHBOARD_VIEW_TAB_SLUGS,
+  DEFAULT_DASHBOARD_VIEW_TAB,
+  type DashboardViewTab,
+} from "../../component/admin/dashboard/platform-overview-header";
 import RecentActivity from "../../component/admin/dashboard/recent-activity";
 import RevenueChart from "../../component/admin/dashboard/revenue-chart";
 import SystemHealth from "../../component/admin/dashboard/system-health";
 import { DASHBOARD_METRICS, GROWTH_STATS, RECENT_ACTIVITY, REVENUE_CHART_DATA, SYSTEM_REGIONS } from "../../data/admin-dashboard";
+import useUrlTab from "../../hooks/use-url-tab";
 
 function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<DashboardViewTab>("dashboard");
+  const { activeTab, setActiveTab } = useUrlTab<DashboardViewTab>({
+    slugToKey: DASHBOARD_VIEW_TAB_SLUGS,
+    defaultKey: DEFAULT_DASHBOARD_VIEW_TAB,
+  });
 
   return (
     <div className="mx-auto max-w-8xl">

@@ -5,6 +5,7 @@ import {
 } from "../../../data/workspace-settings";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 type WorkspaceSettingsNavProps = {
   activeSection: WorkspaceSettingsSectionId;
@@ -16,7 +17,7 @@ function WorkspaceSettingsNav({ activeSection, onNavigate }: WorkspaceSettingsNa
   const visibleItems = WORKSPACE_SETTINGS_NAV_ITEMS.filter((item) => canAccessSettingsTab(item.id));
   return (
     <nav className="rounded-2xl border border-border bg-card p-3 shadow-sm lg:sticky lg:top-28">
-      <p className="mb-3 px-3 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase">Settings</p>
+      <Text as="p" size="xs" weight="semibold" color="muted" className="mb-3 px-3 text-[10px]! tracking-[0.2em] uppercase">Settings</Text>
       <ul className="space-y-1">
         {visibleItems.map((item) => (
           <li key={item.id}>

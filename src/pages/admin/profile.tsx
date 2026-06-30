@@ -2,7 +2,7 @@ import React from "react";
 import ProfileInfoForm from "../../component/admin/profile/profile-info-form";
 import ProfilePasswordForm from "../../component/admin/profile/profile-password-form";
 import ProfileSaveBar from "../../component/admin/profile/profile-save-bar";
-import { Paragraph, Title } from "../../component/ui/typography";
+import { Paragraph, Text, Title } from "../../component/ui/typography";
 import useAdminProfile from "../../hooks/use-admin-profile";
 
 function AdminProfile() {
@@ -22,7 +22,7 @@ function AdminProfile() {
   return (
     <div className="mx-auto max-w-8xl">
       <div className="mb-6">
-        <p className="text-xs font-medium text-muted">Account · Platform Admin</p>
+        <Text as="p" size="xs" color="muted" weight="medium">Account · Platform Admin</Text>
         <Title level={2} className="mt-1 text-2xl text-foreground lg:text-3xl">
           My Profile
         </Title>

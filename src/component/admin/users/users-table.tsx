@@ -12,6 +12,7 @@ import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 import UserFilterDrawer from "./user-filter-drawer";
 import UserViewModal from "./user-view-modal";
 
@@ -99,18 +100,18 @@ function UsersTable({ data = USERS_DATA }: UsersTableProps) {
   };
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Showing{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {filteredData.length === 0 ? 0 : (page - 1) * USERS_PAGE_SIZE + 1}
-      </span>
+      </Text>
       {" to "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {Math.min(page * USERS_PAGE_SIZE, filteredData.length)}
-      </span>
+      </Text>
       {" of "}
-      <span className="font-semibold text-foreground">{filteredData.length}</span> users
-    </span>
+      <Text as="span" weight="semibold">{filteredData.length}</Text> users
+    </Text>
   );
 
   return (

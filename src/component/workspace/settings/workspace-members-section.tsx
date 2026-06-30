@@ -23,6 +23,7 @@ import { ConfirmModal } from "../../ui/modal";
 import type { RegisterAs } from "../../../types/auth.types";
 import { useAppContext } from "../../../context/app-context";
 import MemberEmailChangeModal from "./member-email-change-modal";
+import { Paragraph, Text } from "../../ui/typography";
 
 type WorkspaceMembersSectionProps = {
   expanded?: boolean;
@@ -50,7 +51,7 @@ function MemberRoleSelect({ member }: { member: OrganizationMember }) {
   const canChangeRole = can("team.change_role") && member.role !== "owner";
 
   if (!canChangeRole) {
-    return <span className="text-sm font-medium text-foreground">{getWorkspaceRoleLabel(member.role)}</span>;
+    return <Text as="span" size="sm" weight="medium">{getWorkspaceRoleLabel(member.role)}</Text>;
   }
 
   return (
@@ -95,8 +96,8 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
         key: "member",
         render: (_: unknown, record: OrganizationMember) => (
           <div>
-            <p className="font-semibold text-foreground">{record.fullName}</p>
-            <p className="text-sm text-muted">{record.email}</p>
+            <Text as="p" weight="semibold">{record.fullName}</Text>
+            <Paragraph size="sm">{record.email}</Paragraph>
           </div>
         ),
       },
@@ -110,7 +111,9 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
         dataIndex: "accountStatus",
         key: "status",
         render: (status: OrganizationMember["accountStatus"]) => (
-          <span className="text-sm capitalize text-muted">{status}</span>
+          <Text as="span" size="sm" color="muted" className="capitalize">
+            {status}
+          </Text>
         ),
       },
       ...(canManageMembers
@@ -181,15 +184,15 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
     >
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-2xl font-bold tracking-tight text-foreground">
+          <Text as="p" weight="bold" className="text-2xl tracking-tight">
             {summary?.occupiedSeats ?? 0}{" "}
-            <span className="text-base font-medium text-muted">
+            <Text as="span" size="base" weight="medium" color="muted">
               seats occupied out of {summary?.totalSeats ?? 0}
-            </span>
-          </p>
-          <p className="mt-1 text-sm text-muted">
+            </Text>
+          </Text>
+          <Paragraph size="sm" className="mt-1">
             {(summary?.totalSeats ?? 0) - (summary?.occupiedSeats ?? 0)} seats available for new members.
-          </p>
+          </Paragraph>
         </div>
 
         <div className="flex items-center">
@@ -257,7 +260,7 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
         description={
           pendingRemoveMember ? (
             <>
-              Deactivate <span className="font-semibold text-foreground">{pendingRemoveMember.fullName}</span>? They
+              Deactivate <Text as="span" weight="semibold">{pendingRemoveMember.fullName}</Text>? They
               will lose workspace access until reactivated.
             </>
           ) : null

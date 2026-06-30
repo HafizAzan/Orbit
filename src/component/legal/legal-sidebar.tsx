@@ -2,6 +2,7 @@ import { CalendarOutlined } from "@ant-design/icons";
 import React from "react";
 import type { LegalDocument } from "../../data/legal";
 import { cn } from "../../lib/utils";
+import { Paragraph, Text, Title } from "../ui/typography";
 
 type LegalSidebarProps = {
   document: LegalDocument;
@@ -13,8 +14,8 @@ function LegalSidebar({ document }: LegalSidebarProps) {
   return (
     <div className="flex h-full flex-col">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">{sidebar.title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{sidebar.description}</p>
+        <Title level={4}>{sidebar.title}</Title>
+        <Paragraph size="sm" className="mt-2">{sidebar.description}</Paragraph>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -23,7 +24,7 @@ function LegalSidebar({ document }: LegalSidebarProps) {
             <CalendarOutlined />
             Effective date
           </div>
-          <p className="mt-2 text-sm font-medium text-foreground">{sidebar.effectiveDate}</p>
+          <Text as="p" size="sm" weight="medium" className="mt-2">{sidebar.effectiveDate}</Text>
         </div>
 
         <div className="rounded-xl border border-border/80 bg-background/60 p-4">
@@ -31,12 +32,12 @@ function LegalSidebar({ document }: LegalSidebarProps) {
             <CalendarOutlined />
             Last updated
           </div>
-          <p className="mt-2 text-sm font-medium text-foreground">{sidebar.lastUpdated}</p>
+          <Text as="p" size="sm" weight="medium" className="mt-2">{sidebar.lastUpdated}</Text>
         </div>
       </div>
 
       <nav className="mt-8" aria-label="Table of contents">
-        <p className="text-xs font-semibold tracking-wide text-muted uppercase">On this page</p>
+        <Text as="p" size="xs" color="muted" weight="semibold" className="tracking-wide uppercase">On this page</Text>
         <ul className="mt-3 space-y-1">
           {sections.map((section) => {
             const SectionIcon = section.icon;
@@ -53,7 +54,7 @@ function LegalSidebar({ document }: LegalSidebarProps) {
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <SectionIcon className="text-sm" />
                   </span>
-                  <span className="font-medium">{section.title}</span>
+                  <Text weight="medium">{section.title}</Text>
                 </a>
               </li>
             );

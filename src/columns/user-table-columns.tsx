@@ -2,6 +2,7 @@ import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from "@an
 import { Avatar, Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { USER_ROLE_STYLES, USER_STATUS_STYLES, type UserRecord } from "../data/admin-users";
+import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
 
 type UserTableColumnOptions = {
@@ -30,7 +31,7 @@ function createUserTableColumns({ onView, onDelete }: UserTableColumnOptions): C
             className="shrink-0 bg-primary/10! text-primary! font-semibold!"
             src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(record.name)}`}
           />
-          <p className="font-semibold text-foreground">{record.name}</p>
+          <Text as="p" weight="semibold">{record.name}</Text>
         </div>
       ),
     },
@@ -39,14 +40,14 @@ function createUserTableColumns({ onView, onDelete }: UserTableColumnOptions): C
       dataIndex: "email",
       key: "email",
       responsive: ["md"],
-      render: (email: string) => <span className="text-sm text-muted">{email}</span>,
+      render: (email: string) => <Text size="sm" color="muted">{email}</Text>,
     },
     {
       title: "Organization",
       dataIndex: "organization",
       key: "organization",
       responsive: ["lg"],
-      render: (organization: string) => <span className="text-sm font-medium text-foreground">{organization}</span>,
+      render: (organization: string) => <Text size="sm" weight="medium">{organization}</Text>,
     },
     {
       title: "Role",
@@ -61,7 +62,7 @@ function createUserTableColumns({ onView, onDelete }: UserTableColumnOptions): C
       dataIndex: "lastActive",
       key: "lastActive",
       responsive: ["md"],
-      render: (lastActive: string) => <span className="text-sm text-muted">{lastActive}</span>,
+      render: (lastActive: string) => <Text size="sm" color="muted">{lastActive}</Text>,
     },
     {
       title: "Status",

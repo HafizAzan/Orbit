@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Text } from "../../ui/typography";
 
 type RecordDetailFieldProps = {
   label: string;
@@ -10,7 +11,7 @@ type RecordDetailFieldProps = {
 function RecordDetailField({ label, value, children, className }: RecordDetailFieldProps) {
   return (
     <div className={className}>
-      <p className="text-xs font-semibold tracking-wide text-muted uppercase">{label}</p>
+      <Text size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">{label}</Text>
       <div className="mt-1.5 text-sm font-medium text-foreground">{children ?? value}</div>
     </div>
   );

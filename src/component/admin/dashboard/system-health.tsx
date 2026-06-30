@@ -1,6 +1,7 @@
 import { GlobalOutlined } from "@ant-design/icons";
 import React from "react";
 import type { SystemRegion } from "../../../data/admin-dashboard";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type SystemHealthProps = {
   regions: SystemRegion[];
@@ -16,10 +17,10 @@ function SystemHealth({ regions }: SystemHealthProps) {
           </div>
 
           <div>
-            <h3 className="text-base font-semibold text-foreground">Global System Health</h3>
-            <p className="mt-1 max-w-2xl text-sm text-muted">
+            <Title level={5} color="default" className="text-base">Global System Health</Title>
+            <Paragraph size="sm" className="mt-1 mb-0! max-w-2xl">
               All systems are operational across 12 worldwide regions. Low latency detected in Tokyo hub.
-            </p>
+            </Paragraph>
           </div>
         </div>
 
@@ -30,7 +31,7 @@ function SystemHealth({ regions }: SystemHealthProps) {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-sm font-medium text-foreground">{region.name}</span>
+              <Text size="sm" weight="medium">{region.name}</Text>
             </div>
           ))}
         </div>

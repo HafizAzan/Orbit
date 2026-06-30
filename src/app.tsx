@@ -9,6 +9,7 @@ import AdminLayout from "./layout/admin-layout/layout";
 import WorkspaceLayout from "./layout/workspace-layout/layout";
 import Layout from "./layout/public-layout/layout";
 import { ADMIN_ROUTES_LIST, type AdminRoute } from "./router/admin-routes";
+import { AUTH_PROTECTED_ROUTES_LIST, type AuthProtectedRoute } from "./router/auth-routes";
 import RequireAuth from "./router/guards/require-auth";
 import RequirePlanSelectionRedirect from "./router/guards/require-plan-selection-redirect";
 import RequirePlatformAdmin from "./router/guards/require-platform-admin";
@@ -17,21 +18,13 @@ import RequireMemberRouteAccess from "./router/guards/require-member-route-acces
 import RequireWorkspaceRouteAccess from "./router/guards/require-workspace-route-access";
 import WorkspaceHomeRedirect from "./router/guards/workspace-home-redirect";
 import RequireGuest from "./router/guards/require-guest";
-import { PLAN_ROUTES } from "./lib/auth-routing";
-import { LIST, type Route } from "./router/public-routes";
-import { WORKSPACE_ROUTES_LIST, WORKSPACE_ROUTES, type WorkspaceRoute } from "./router/workspace-routes";
-import ChoosePlan from "./pages/choose-plan";
-import ChoosePlanCheckoutSuccess from "./pages/choose-plan-checkout-success";
-import ChoosePlanCheckoutCancel from "./pages/choose-plan-checkout-cancel";
-import WorkspaceProjectDetail from "./pages/workspace/project-detail";
-import WorkspaceProjectBoard from "./pages/workspace/project-board";
-import WorkspaceProjectCreate from "./pages/workspace/project-create";
-import WorkspaceProjectEdit from "./pages/workspace/project-edit";
-import WorkspaceTaskCreate from "./pages/workspace/task-create";
-import WorkspaceTaskDetail from "./pages/workspace/task-detail";
-import WorkspaceTaskEdit from "./pages/workspace/task-edit";
-import WorkspaceNotFound from "./component/workspace/workspace-not-found";
-import NotFound from "./pages/not-found";
+import { APP_NOT_FOUND_ROUTE, LIST, type Route } from "./router/public-routes";
+import {
+  WORKSPACE_LEGACY_REDIRECTS,
+  WORKSPACE_NOT_FOUND_ROUTE,
+  WORKSPACE_ROUTES_LIST,
+  type WorkspaceRoute,
+} from "./router/workspace-routes";
 
 function App() {
   return (
@@ -52,27 +45,23 @@ function App() {
               <ChildRoute element={<WorkspaceLayout />}>
                 <ChildRoute element={<RequireMemberRouteAccess />}>
                   <ChildRoute element={<RequireWorkspaceRouteAccess />}>
-                  {WORKSPACE_ROUTES_LIST.map((route: WorkspaceRoute) => (
-                    <ChildRoute key={route.path} path={route.path} element={<route.component />} />
-                  ))}
-                  <ChildRoute path={WORKSPACE_ROUTES.PROJECT_CREATE} element={<WorkspaceProjectCreate />} />
-                  <ChildRoute path={WORKSPACE_ROUTES.PROJECT_EDIT} element={<WorkspaceProjectEdit />} />
-                  <ChildRoute path={WORKSPACE_ROUTES.TASK_CREATE} element={<WorkspaceTaskCreate />} />
-                  <ChildRoute path={WORKSPACE_ROUTES.TASK_EDIT} element={<WorkspaceTaskEdit />} />
-                  <ChildRoute path={WORKSPACE_ROUTES.TASK_DETAIL} element={<WorkspaceTaskDetail />} />
-                  <ChildRoute path={WORKSPACE_ROUTES.PROJECT_DETAIL} element={<WorkspaceProjectDetail />} />
-                  <ChildRoute path={`${WORKSPACE_ROUTES.PROJECT_DETAIL}/board`} element={<WorkspaceProjectBoard />} />
-                  <ChildRoute path="*" element={<WorkspaceNotFound />} />
+                    {WORKSPACE_ROUTES_LIST.map((route: WorkspaceRoute) => (
+                      <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                    ))}
+                    <ChildRoute
+                      path={WORKSPACE_NOT_FOUND_ROUTE.path}
+                      element={<WORKSPACE_NOT_FOUND_ROUTE.component />}
+                    />
                   </ChildRoute>
                 </ChildRoute>
               </ChildRoute>
             </ChildRoute>
 
-            {WORKSPACE_ROUTES_LIST.map((route: WorkspaceRoute) => (
+            {WORKSPACE_LEGACY_REDIRECTS.map((redirect) => (
               <ChildRoute
-                key={`legacy-app-${route.path}`}
-                path={`/app${route.path}`}
-                element={<Navigate to={route.path} replace />}
+                key={`legacy-app-${redirect.path}`}
+                path={redirect.path}
+                element={<Navigate to={redirect.to} replace />}
               />
             ))}
             <ChildRoute path="/app" element={<WorkspaceHomeRedirect />} />
@@ -86,9 +75,9 @@ function App() {
             </ChildRoute>
 
             <ChildRoute element={<RequireAuth />}>
-              <ChildRoute path={PLAN_ROUTES.CHOOSE_PLAN} element={<ChoosePlan />} />
-              <ChildRoute path={PLAN_ROUTES.CHECKOUT_SUCCESS} element={<ChoosePlanCheckoutSuccess />} />
-              <ChildRoute path={PLAN_ROUTES.CHECKOUT_CANCEL} element={<ChoosePlanCheckoutCancel />} />
+              {AUTH_PROTECTED_ROUTES_LIST.map((route: AuthProtectedRoute) => (
+                <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+              ))}
             </ChildRoute>
 
             <ChildRoute element={<Layout />}>
@@ -99,7 +88,7 @@ function App() {
               </ChildRoute>
             </ChildRoute>
 
-            <ChildRoute path="*" element={<NotFound />} />
+            <ChildRoute path={APP_NOT_FOUND_ROUTE.path} element={<APP_NOT_FOUND_ROUTE.component />} />
           </Routes>
         </BrowserRouter>
       </AppProvider>

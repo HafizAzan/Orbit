@@ -3,6 +3,7 @@ import { Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PLAN_STYLES, STATUS_STYLES, type OrganizationRecord } from "../data/admin-organizations";
 import { formatDate, getInitial } from "../lib/helper";
+import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
 
 type OrganizationTableColumnOptions = {
@@ -38,8 +39,8 @@ function createOrganizationTableColumns({ onView, onEdit, onDelete }: Organizati
             {getInitial(record.name)}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-foreground">{record.name}</p>
-            <p className="truncate text-xs text-muted">{record.slug}.flowsync.io</p>
+            <Text as="p" weight="semibold" className="truncate">{record.name}</Text>
+            <Text as="p" size="xs" color="muted" className="truncate">{record.slug}.flowsync.io</Text>
           </div>
         </div>
       ),
@@ -50,8 +51,8 @@ function createOrganizationTableColumns({ onView, onEdit, onDelete }: Organizati
       responsive: ["md"],
       render: (_, record) => (
         <div className="min-w-0">
-          <p className="font-medium text-foreground">{record.ownerName}</p>
-          <p className="truncate text-xs text-muted">{record.ownerEmail}</p>
+          <Text as="p" weight="medium">{record.ownerName}</Text>
+          <Text as="p" size="xs" color="muted" className="truncate">{record.ownerEmail}</Text>
         </div>
       ),
     },
@@ -72,14 +73,14 @@ function createOrganizationTableColumns({ onView, onEdit, onDelete }: Organizati
       dataIndex: "users",
       key: "users",
       responsive: ["lg"],
-      render: (users: number) => <span className="font-medium text-foreground">{users}</span>,
+      render: (users: number) => <Text weight="medium">{users}</Text>,
     },
     {
       title: "Projects",
       dataIndex: "projects",
       key: "projects",
       responsive: ["xl"],
-      render: (projects: number) => <span className="font-medium text-foreground">{projects}</span>,
+      render: (projects: number) => <Text weight="medium">{projects}</Text>,
     },
     {
       title: "Status",
@@ -101,7 +102,7 @@ function createOrganizationTableColumns({ onView, onEdit, onDelete }: Organizati
       dataIndex: "createdAt",
       key: "createdAt",
       responsive: ["md"],
-      render: (date: string) => <span className="text-sm text-muted">{formatDate(date)}</span>,
+      render: (date: string) => <Text size="sm" color="muted">{formatDate(date)}</Text>,
     },
     {
       title: "Actions",

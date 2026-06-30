@@ -102,7 +102,7 @@ function ActivityFilterDrawer({ open, draftFilters, onClose, onDraftChange, onAp
                   isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25 hover:bg-background",
                 )}
               >
-                <span className="text-sm font-medium text-foreground">{tab.label}</span>
+                <Text size="sm" weight="medium">{tab.label}</Text>
                 {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
               </button>
             );
@@ -125,7 +125,7 @@ function ActivityFilterDrawer({ open, draftFilters, onClose, onDraftChange, onAp
                 )}
               >
                 <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", severityStyle.dot)} />
-                <span className="text-sm font-medium text-foreground">{severityStyle.label}</span>
+                <Text size="sm" weight="medium">{severityStyle.label}</Text>
                 {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
               </button>
             );

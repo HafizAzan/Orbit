@@ -2,6 +2,7 @@ import { MailOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-desi
 import { Avatar, Tag } from "antd";
 import React from "react";
 import { maskEmail } from "../../../lib/helper";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type ProfileSummaryProfile = {
   firstName: string;
@@ -26,15 +27,15 @@ function ProfileSummaryCard({ profile, displayName, roleLabel, accountBadge }: P
           <Avatar size={72} className="border-2 border-card bg-primary/10! text-primary! shadow-sm" src={profile.avatarUrl} />
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold text-foreground">{displayName}</h2>
+              <Title level={4} color="default" className="font-bold">{displayName}</Title>
               <Tag color="processing" className="rounded-full! border-0! px-2.5! py-0.5! text-[10px]! font-semibold! uppercase">
                 {roleLabel}
               </Tag>
             </div>
-            <p className="mt-1 flex items-center gap-2 text-sm text-muted">
+            <Paragraph size="sm" className="mt-1 mb-0! flex items-center gap-2">
               <MailOutlined />
               {maskEmail(profile.email)}
-            </p>
+            </Paragraph>
             {profile.emailVerified ? (
               <Tag icon={<SafetyCertificateOutlined />} color="success" className="mt-2 rounded-full!">
                 Verified account
@@ -45,7 +46,7 @@ function ProfileSummaryCard({ profile, displayName, roleLabel, accountBadge }: P
 
         <div className="flex items-center gap-3 rounded-xl border border-border bg-card/80 px-4 py-3 text-sm text-muted">
           <UserOutlined className="text-lg text-primary" />
-          <span>{accountBadge}</span>
+          <Text size="sm" color="muted">{accountBadge}</Text>
         </div>
       </div>
     </article>

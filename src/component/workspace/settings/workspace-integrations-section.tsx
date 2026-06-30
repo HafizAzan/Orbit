@@ -4,6 +4,7 @@ import { WORKSPACE_INTEGRATIONS } from "../../../data/workspace-settings";
 import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
 import SettingsSection from "../../admin/settings/settings-section";
+import { Paragraph, Text } from "../../ui/typography";
 
 type WorkspaceIntegrationsSectionProps = {
   expanded?: boolean;
@@ -40,8 +41,8 @@ function WorkspaceIntegrationsSection({ expanded = false }: WorkspaceIntegration
               {integration.iconText}
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-foreground">{integration.name}</p>
-              <p className="mt-1 text-sm text-muted">{integration.description}</p>
+              <Text as="p" weight="semibold">{integration.name}</Text>
+              <Paragraph size="sm" className="mt-1">{integration.description}</Paragraph>
             </div>
           </div>
         ))}

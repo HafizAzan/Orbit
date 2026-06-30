@@ -3,7 +3,7 @@ import { Button, Input, Tag } from "antd";
 import React, { useState } from "react";
 import { PROFILE_EMAIL_SECURITY_NOTE } from "../../../data/admin-profile";
 import { maskEmail } from "../../../lib/helper";
-import { Label } from "../../ui/typography";
+import { Label, Paragraph, Title } from "../../ui/typography";
 import ProfileEmailChangeModal from "./profile-email-change-modal";
 import ProfileEmailChangeRequestFlow from "./profile-email-change-request-flow";
 import type { RegisterAs } from "../../../types/auth.types";
@@ -40,8 +40,8 @@ function ProfileEmailSecurityCard({
       <article className="flex h-full w-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Email Security</h2>
-            <p className="mt-1 text-sm text-muted">{PROFILE_EMAIL_SECURITY_NOTE}</p>
+            <Title level={4} color="default">Email Security</Title>
+            <Paragraph size="sm" className="mt-1 mb-0!">{PROFILE_EMAIL_SECURITY_NOTE}</Paragraph>
           </div>
           {profile.emailVerified ? (
             <Tag icon={<SafetyCertificateOutlined />} color="success" className="rounded-full!">
@@ -82,9 +82,9 @@ function ProfileEmailSecurityCard({
               Request email change
             </Button>
           ) : (
-            <p className="mt-auto text-xs text-muted">
+            <Paragraph size="xs" className="mt-auto mb-0!">
               Only the organization owner can change their own login email. Contact your owner if you need an update.
-            </p>
+            </Paragraph>
           )}
         </div>
       </article>

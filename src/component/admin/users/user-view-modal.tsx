@@ -5,6 +5,7 @@ import { USER_ROLE_STYLES, USER_STATUS_STYLES, type UserRecord } from "../../../
 import { cn } from "../../../lib/utils";
 import DetailModal from "../../ui/detail-modal";
 import RecordDetailField from "../shared/record-detail-field";
+import { Paragraph, Text } from "../../ui/typography";
 
 type UserViewModalProps = {
   record: UserRecord | null;
@@ -31,8 +32,8 @@ function UserViewModal({ record, onClose }: UserViewModalProps) {
               src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(record.name)}`}
             />
             <div>
-              <p className="font-semibold text-foreground">{record.name}</p>
-              <p className="text-sm text-muted">{record.email}</p>
+              <Text as="p" weight="semibold">{record.name}</Text>
+              <Paragraph size="sm" className="mb-0!">{record.email}</Paragraph>
             </div>
           </div>
 

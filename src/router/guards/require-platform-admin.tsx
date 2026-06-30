@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
 import { isPlatformAdminUser } from "../../lib/auth-routing";
+import { Paragraph } from "../../component/ui/typography";
 import { UN_AUTH_ROUTES } from "../public-routes";
 
 function RequirePlatformAdmin() {
@@ -11,7 +12,7 @@ function RequirePlatformAdmin() {
   if (app?.isBootstrapping) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted">Loading...</p>
+        <Paragraph size="sm">Loading...</Paragraph>
       </div>
     );
   }

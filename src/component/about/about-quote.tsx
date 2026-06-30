@@ -1,6 +1,7 @@
 import React from "react";
 import { ABOUT_QUOTE } from "../../data/about";
 import AnimateOnScroll from "../common/animate-on-scroll";
+import { Text } from "../ui/typography";
 
 function AboutQuote() {
   return (
@@ -23,8 +24,8 @@ function AboutQuote() {
               SC
             </span>
             <div>
-              <p className="font-semibold text-white">{ABOUT_QUOTE.author}</p>
-              <p className="mt-0.5 text-sm text-white/80">{ABOUT_QUOTE.role}</p>
+              <Text as="p" weight="semibold" className="text-white">{ABOUT_QUOTE.author}</Text>
+              <Text as="p" size="sm" className="mt-0.5 text-white/80">{ABOUT_QUOTE.role}</Text>
             </div>
           </div>
         </div>

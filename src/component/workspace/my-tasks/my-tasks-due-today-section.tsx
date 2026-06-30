@@ -9,6 +9,7 @@ import { cn } from "../../../lib/utils";
 import MarkdownContent from "../../common/markdown-content";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import MyTasksSectionHeader from "./my-tasks-section-header";
+import { Text, Title } from "../../ui/typography";
 
 type MyTasksDueTodaySectionProps = {
   tasks: MyTask[];
@@ -33,7 +34,7 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
               className="rounded-2xl border border-border bg-card p-5 text-left shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-3">
-                <span className="text-[11px] font-bold tracking-[0.18em] text-muted uppercase">{task.project}</span>
+                <Text as="span" size="xs" weight="bold" color="muted" className="text-[11px]! tracking-[0.18em] uppercase">{task.project}</Text>
                 <span
                   className={cn(
                     "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
@@ -44,17 +45,17 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
                 </span>
               </div>
 
-              <h3 className="mt-3 text-lg font-semibold text-foreground">{task.title}</h3>
+              <Title level={5} color="default" className="mt-3">{task.title}</Title>
 
               {task.description ? (
                 <MarkdownContent content={task.description} className="mt-2" lineClamp={2} interactive={false} />
               ) : null}
 
               <div className="mt-5 flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+                <Text as="span" size="sm" color="muted" className="inline-flex items-center gap-1.5">
                   <CalendarOutlined />
                   {task.dueTime ?? formatDate(task.dueDate, { year: undefined })}
-                </span>
+                </Text>
 
                 {task.collaborators?.length ? (
                   <Avatar.Group max={{ count: 3 }} size={28}>
@@ -81,7 +82,7 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-feature-sync text-primary">
               <PlusOutlined className="text-xl" />
             </span>
-            <span className="mt-4 text-sm font-semibold text-foreground">Add a task for today</span>
+            <Text as="span" size="sm" weight="semibold" className="mt-4">Add a task for today</Text>
           </WorkspaceNavLink>
         ) : null}
       </div>

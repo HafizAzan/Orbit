@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteTeamMember,
+  getTeamMemberDetail,
   getTeamMembersPage,
   getTeamStats,
   inviteTeamMember,
@@ -39,6 +40,16 @@ export function useTeamMembers(params: PaginationParams = {}) {
     queryKey: [WORKSPACE_TEAM_MEMBERS_QUERY_KEY, page, limit],
     queryFn: () => getTeamMembersPage({ page, limit }),
     refetchInterval: TEAM_PRESENCE_REFETCH_INTERVAL_MS,
+  });
+}
+
+export const WORKSPACE_TEAM_MEMBER_DETAIL_QUERY_KEY = "workspace-team-member-detail";
+
+export function useTeamMemberDetail(memberId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: [WORKSPACE_TEAM_MEMBER_DETAIL_QUERY_KEY, memberId],
+    queryFn: () => getTeamMemberDetail(memberId!),
+    enabled: enabled && Boolean(memberId),
   });
 }
 

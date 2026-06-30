@@ -7,7 +7,7 @@ import type { ChangeAdminPasswordInput } from "../../../lib/admin-profile";
 import { maskEmail, validatePasswordStrength } from "../../../lib/helper";
 import { UN_AUTH_ROUTES } from "../../../router/public-routes";
 import Modal from "../../ui/modal";
-import { Label } from "../../ui/typography";
+import { Label, Paragraph, Text, Title } from "../../ui/typography";
 
 type ProfilePasswordFormProps = {
   email: string;
@@ -55,8 +55,8 @@ function ProfilePasswordForm({
     <>
       <article className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-foreground">Change Password</h2>
-          <p className="mt-1 text-sm text-muted">Know your current password? Update it here. Otherwise use the reset link flow.</p>
+          <Title level={4} color="default">Change Password</Title>
+          <Paragraph size="sm" className="mt-1 mb-0!">Know your current password? Update it here. Otherwise use the reset link flow.</Paragraph>
         </div>
 
         <ul className="mb-6 grid gap-2 sm:grid-cols-2">
@@ -163,24 +163,24 @@ function ProfilePasswordForm({
         title={
           <div className="flex items-center gap-3">
             <MailOutlined className="text-xl text-primary" />
-            <span className="text-lg font-semibold text-foreground">Reset via email</span>
+            <Text size="lg" weight="semibold">Reset via email</Text>
           </div>
         }
       >
-        <p className="mb-4 text-sm text-muted">{FORGOT_PASSWORD_NOTE}</p>
+        <Paragraph size="sm" className="mb-4">{FORGOT_PASSWORD_NOTE}</Paragraph>
 
         <ul className="mb-5 space-y-2 rounded-xl border border-border bg-background p-4">
           {FORGOT_PASSWORD_FLOW_STEPS.map((step, index) => (
             <li key={step} className="flex gap-2 text-xs text-muted">
-              <span className="font-semibold text-primary">{index + 1}.</span>
-              <span>{step}</span>
+              <Text weight="semibold" color="primary">{index + 1}.</Text>
+              <Text size="xs" color="muted">{step}</Text>
             </li>
           ))}
         </ul>
 
-        <p className="mb-4 text-sm text-foreground">
-          Reset link will be sent to: <span className="font-semibold">{maskEmail(email)}</span>
-        </p>
+        <Paragraph size="sm" color="default" className="mb-4">
+          Reset link will be sent to: <Text weight="semibold">{maskEmail(email)}</Text>
+        </Paragraph>
 
         <div className="flex flex-wrap justify-end gap-2">
           <Button onClick={() => setResetModalOpen(false)} className="font-medium!">
@@ -191,12 +191,12 @@ function ProfilePasswordForm({
           </Button>
         </div>
 
-        <p className="mt-4 text-center text-sm text-muted">
+        <Paragraph size="sm" className="mt-4 mb-0! text-center">
           Or go to{" "}
           <Link to={UN_AUTH_ROUTES.FORGOT_PASSWORD} className="font-semibold text-primary hover:opacity-80">
             forgot password page
           </Link>
-        </p>
+        </Paragraph>
       </Modal>
     </>
   );

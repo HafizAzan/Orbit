@@ -2,6 +2,7 @@ import { ArrowUpOutlined } from "@ant-design/icons";
 import React from "react";
 import { DASHBOARD_METRIC_ICONS, type DashboardMetric } from "../../../data/admin-dashboard";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 type MetricCardProps = {
   metric: DashboardMetric;
@@ -22,8 +23,8 @@ function MetricCard({ metric }: MetricCardProps) {
         </span>
       </div>
 
-      <p className="mt-4 text-sm font-medium text-muted">{metric.label}</p>
-      <p className="mt-1 text-2xl font-bold tracking-tight text-foreground lg:text-3xl">{metric.value}</p>
+      <Text as="p" size="sm" color="muted" weight="medium" className="mt-4">{metric.label}</Text>
+      <Text as="p" weight="bold" className="mt-1 text-2xl tracking-tight lg:text-3xl">{metric.value}</Text>
     </article>
   );
 }

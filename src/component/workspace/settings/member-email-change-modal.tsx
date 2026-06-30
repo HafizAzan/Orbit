@@ -2,7 +2,7 @@ import { MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import React, { useEffect } from "react";
 import Modal from "../../ui/modal";
-import { Label } from "../../ui/typography";
+import { Label, Paragraph, Text, Title } from "../../ui/typography";
 import type { OrganizationMember } from "../../../types/organization.types";
 
 type MemberEmailChangeModalProps = {
@@ -50,16 +50,18 @@ function MemberEmailChangeModal({
       title={
         <div className="flex items-center gap-3">
           <MailOutlined className="text-xl text-primary" />
-          <span className="text-lg font-semibold text-foreground">Change member email</span>
+          <Title level={5} className="text-lg text-foreground">
+            Change member email
+          </Title>
         </div>
       }
     >
       {member ? (
         <>
-          <p className="mb-4 text-sm text-muted">
-            Update the login email for <span className="font-semibold text-foreground">{member.fullName}</span>.
-            Current email: <span className="font-medium text-foreground">{member.email}</span>
-          </p>
+          <Paragraph size="sm" className="mb-4">
+            Update the login email for <Text as="span" weight="semibold">{member.fullName}</Text>.
+            Current email: <Text as="span" weight="medium">{member.email}</Text>
+          </Paragraph>
 
           <Form form={form} layout="vertical" requiredMark={false} onFinish={handleFinish}>
             <Form.Item

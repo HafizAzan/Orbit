@@ -1,9 +1,10 @@
 import { SendOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Input } from "antd";
+import { Button, Input } from "antd";
 import React, { useState } from "react";
 import type { ProjectDiscussionMessage } from "../../../data/workspace-project-detail";
 import { getInitial } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type ProjectDiscussionCardProps = {
   messages: ProjectDiscussionMessage[];
@@ -39,50 +40,40 @@ function ProjectDiscussionCard({
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-foreground">Discussion</h3>
+        <Title level={5} color="default">Discussion</Title>
         {onRefresh ? (
-          <button
-            type="button"
+          <Button
+            type="default"
             aria-label="Refresh comments"
             disabled={loading || refreshing}
             onClick={onRefresh}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ReloadOutlined spin={refreshing} />
-          </button>
+            icon={<ReloadOutlined spin={refreshing} />}
+            className="rounded-xl!"
+          />
         ) : null}
       </div>
 
       {loading ? (
-        <p className="mt-5 text-sm text-muted">Loading discussion...</p>
+        <Paragraph size="sm" className="mt-5">Loading discussion...</Paragraph>
       ) : messages.length === 0 ? (
-        <p className="mt-5 text-sm text-muted">No project comments yet. Start the conversation.</p>
+        <Paragraph size="sm" className="mt-5">No project comments yet. Start the conversation.</Paragraph>
       ) : (
-        <ul className="mt-5 max-h-80 min-h-24 space-y-4 overflow-y-auto pr-1">
+        <ul className="mt-5 max-h-60 min-h-24 space-y-4 overflow-y-auto pr-1">
           {messages.map((message) => (
             <li key={message.id} className="flex gap-3">
-              <div
-                className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                  message.avatarColor,
-                )}
-              >
+              <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold", message.avatarColor)}>
                 {getInitial(message.userName)}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-foreground">{message.userName}</span>
-                  <span className="text-xs text-muted">{message.timeAgo}</span>
+                  <Text as="span" size="sm" weight="semibold">{message.userName}</Text>
+                  <Text as="span" size="xs" color="muted">{message.timeAgo}</Text>
                 </div>
-                <p className="mt-1 rounded-2xl bg-slate-50 px-3 py-2 text-sm text-foreground">{message.message}</p>
+                <Text as="p" size="sm" className="mt-1 rounded-2xl bg-slate-50 px-3 py-2">{message.message}</Text>
                 {currentUserId && message.authorId === currentUserId && onDelete ? (
-                  <button
-                    type="button"
-                    onClick={() => onDelete(message.id)}
-                    className="mt-1 text-xs font-medium text-muted transition-colors hover:text-red-600"
-                  >
+                  <Button type="link" danger size="small" onClick={() => onDelete(message.id)} className="h-auto px-0">
                     Delete
-                  </button>
+                  </Button>
                 ) : null}
               </div>
             </li>
@@ -102,17 +93,16 @@ function ProjectDiscussionCard({
           }}
           className="rounded-xl!"
         />
-        <button
-          type="button"
+        <Button
+          type="primary"
           aria-label="Send comment"
           disabled={!onSubmit || submitting || !draft.trim()}
           onClick={() => {
             void handleSubmit();
           }}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <SendOutlined />
-        </button>
+          icon={<SendOutlined />}
+          className="h-10 w-10 shrink-0 rounded-xl!"
+        />
       </div>
     </article>
   );

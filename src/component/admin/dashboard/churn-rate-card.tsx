@@ -1,6 +1,7 @@
 import React from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { CHURN_RATE } from "../../../data/admin-dashboard";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 function ChurnRateCard() {
   const data = [
@@ -33,23 +34,23 @@ function ChurnRateCard() {
             </ResponsiveContainer>
 
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <p className="text-2xl font-bold text-foreground">{CHURN_RATE.value}%</p>
-              <p className="text-xs font-medium text-muted">{CHURN_RATE.label}</p>
+              <Text as="p" className="text-2xl font-bold">{CHURN_RATE.value}%</Text>
+              <Text as="p" size="xs" color="muted" weight="medium">{CHURN_RATE.label}</Text>
             </div>
           </div>
         </div>
 
         <div className="min-w-0 flex-1 border-t border-border pt-5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
-          <h3 className="text-lg font-semibold text-foreground">Churn Rate</h3>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{CHURN_RATE.helperText}</p>
+          <Title level={5} color="default">Churn Rate</Title>
+          <Paragraph size="sm" className="mt-2 mb-0! max-w-2xl leading-relaxed">{CHURN_RATE.helperText}</Paragraph>
           <div className="mt-4 flex flex-wrap gap-4">
             <div className="rounded-xl bg-indigo-50 px-4 py-3">
-              <p className="text-xs font-medium text-muted">Retained</p>
-              <p className="mt-0.5 text-lg font-bold text-foreground">{100 - CHURN_RATE.value}%</p>
+              <Text as="p" size="xs" color="muted" weight="medium">Retained</Text>
+              <Text as="p" className="mt-0.5 text-lg font-bold">{100 - CHURN_RATE.value}%</Text>
             </div>
             <div className="rounded-xl bg-emerald-50 px-4 py-3">
-              <p className="text-xs font-medium text-muted">vs last month</p>
-              <p className="mt-0.5 text-lg font-bold text-emerald-600">-0.3%</p>
+              <Text as="p" size="xs" color="muted" weight="medium">vs last month</Text>
+              <Text as="p" className="mt-0.5 text-lg font-bold text-emerald-600">-0.3%</Text>
             </div>
           </div>
         </div>

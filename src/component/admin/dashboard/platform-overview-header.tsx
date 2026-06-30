@@ -6,6 +6,13 @@ import { Paragraph, Title } from "../../ui/typography";
 
 export type DashboardViewTab = "dashboard" | "analytics";
 
+export const DASHBOARD_VIEW_TAB_SLUGS: Record<DashboardViewTab, string> = {
+  dashboard: "dashboard",
+  analytics: "analytics",
+};
+
+export const DEFAULT_DASHBOARD_VIEW_TAB: DashboardViewTab = "dashboard";
+
 const VIEW_TABS: { key: DashboardViewTab; label: string }[] = [
   { key: "dashboard", label: "Overview" },
   { key: "analytics", label: "Insights" },

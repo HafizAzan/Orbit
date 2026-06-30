@@ -1,11 +1,16 @@
 import { MoreOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button } from "antd";
 import React from "react";
 import type { KanbanColumn as KanbanColumnType } from "../../../data/workspace-board";
 import KanbanTaskCard from "./kanban-task-card";
+import WorkspaceNavLink from "../common/workspace-nav-link";
+import { getTaskCreatePath } from "../../../data/workspace-task-form";
+import { Text } from "../../ui/typography";
 
 type KanbanColumnProps = {
   column: KanbanColumnType;
   showAddTask?: boolean;
+  projectId: string;
 };
 
 function getColumnVariant(columnId: string): "default" | "pending" | "completed" {
@@ -14,23 +19,22 @@ function getColumnVariant(columnId: string): "default" | "pending" | "completed"
   return "default";
 }
 
-function KanbanColumn({ column, showAddTask = false }: KanbanColumnProps) {
+function KanbanColumn({ column, showAddTask = false, projectId }: KanbanColumnProps) {
   const variant = getColumnVariant(column.id);
 
   return (
     <section className="flex w-[min(100%,320px)] shrink-0 snap-start flex-col rounded-2xl bg-slate-50/80 p-4 sm:w-[300px]">
       <div className="mb-4 flex items-center justify-between px-1">
-        <h2 className="text-sm font-bold tracking-[0.12em] text-muted">
-          {column.title}{" "}
-          <span className="text-slate-400">({column.tasks.length})</span>
-        </h2>
-        <button
-          type="button"
+        <Text as="p" size="sm" weight="bold" color="muted" className="tracking-[0.12em]">
+          {column.title} <Text as="span" className="text-slate-400">({column.tasks.length})</Text>
+        </Text>
+        <Button
+          type="text"
+          size="small"
           aria-label={`${column.title} column options`}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted transition-colors hover:bg-white hover:text-foreground"
-        >
-          <MoreOutlined />
-        </button>
+          icon={<MoreOutlined />}
+          className="text-muted hover:text-foreground!"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-4">
@@ -40,13 +44,11 @@ function KanbanColumn({ column, showAddTask = false }: KanbanColumnProps) {
       </div>
 
       {showAddTask ? (
-        <button
-          type="button"
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-white/60 py-3 text-sm font-medium text-muted transition-colors hover:border-primary/40 hover:text-primary"
-        >
-          <PlusOutlined className="text-xs" />
-          Add Task
-        </button>
+        <WorkspaceNavLink to={getTaskCreatePath(projectId)} preserveReturn>
+          <Button type="dashed" block icon={<PlusOutlined />} className="mt-4 h-auto rounded-xl border-dashed py-3 font-medium!">
+            Add Task
+          </Button>
+        </WorkspaceNavLink>
       ) : null}
     </section>
   );

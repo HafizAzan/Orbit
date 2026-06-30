@@ -5,8 +5,11 @@ import MyTasksCalendarView from "../../component/workspace/my-tasks/my-tasks-cal
 import MyTasksCompletedSection from "../../component/workspace/my-tasks/my-tasks-completed-section";
 import MyTasksDueTodaySection from "../../component/workspace/my-tasks/my-tasks-due-today-section";
 import MyTasksFilterBar from "../../component/workspace/my-tasks/my-tasks-filter-bar";
-import MyTasksPageHeader from "../../component/workspace/my-tasks/my-tasks-page-header";
-import type { MyTasksViewMode } from "../../component/workspace/my-tasks/my-tasks-page-header";
+import MyTasksPageHeader, {
+  DEFAULT_MY_TASKS_VIEW,
+  MY_TASKS_VIEW_SLUGS,
+  type MyTasksViewMode,
+} from "../../component/workspace/my-tasks/my-tasks-page-header";
 import MyTasksUpcomingSection from "../../component/workspace/my-tasks/my-tasks-upcoming-section";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
@@ -19,6 +22,7 @@ import {
 } from "../../data/workspace-my-tasks";
 import { getTaskDetailPath } from "../../data/workspace-task-form";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
+import useUrlTab from "../../hooks/use-url-tab";
 import { useMyTasks, useUpdateTask } from "../../hooks/use-workspace-tasks";
 import { createWorkspaceNavState } from "../../lib/workspace-navigation";
 import {
@@ -38,7 +42,10 @@ function WorkspaceMyTasksContent() {
   const myTasksQuery = useMyTasks();
   const { data = [] } = myTasksQuery;
   const { mutateAsync: updateTask } = useUpdateTask();
-  const [viewMode, setViewMode] = useState<MyTasksViewMode>("list");
+  const { activeTab: viewMode, setActiveTab: setViewMode } = useUrlTab<MyTasksViewMode>({
+    slugToKey: MY_TASKS_VIEW_SLUGS,
+    defaultKey: DEFAULT_MY_TASKS_VIEW,
+  });
   const [filters, setFilters] = useState<MyTasksFilters>(DEFAULT_MY_TASKS_FILTERS);
 
   const tasks = useMemo(() => data.map(mapApiTaskToMyTask), [data]);

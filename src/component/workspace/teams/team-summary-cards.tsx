@@ -5,6 +5,7 @@ import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { useResendAllPendingInvites, useTeamStats } from "../../../hooks/use-workspace-team";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
+import { Text } from "../../ui/typography";
 
 function TeamSummaryCards() {
   const { can } = useWorkspacePermissions();
@@ -35,16 +36,16 @@ function TeamSummaryCards() {
       {canInvite ? (
         <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
-            <p className="text-xs font-semibold tracking-wide text-muted uppercase">Total Seats</p>
+            <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">Total Seats</Text>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-feature-sync text-primary">
               <SeatsIcon className="text-base" />
             </div>
           </div>
 
-          <p className="mt-4 text-2xl font-bold tracking-tight text-foreground lg:text-3xl">
+          <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">
             {totalSeats.used}{" "}
-            <span className="text-base font-medium text-muted">/ {totalSeats.total} available</span>
-          </p>
+            <Text as="span" size="base" weight="medium" color="muted">/ {totalSeats.total} available</Text>
+          </Text>
 
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
             <div
@@ -58,13 +59,13 @@ function TeamSummaryCards() {
       {canInvite ? (
         <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
-            <p className="text-xs font-semibold tracking-wide text-muted uppercase">Pending Invites</p>
+            <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">Pending Invites</Text>
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
               <InvitesIcon className="text-base" />
             </div>
           </div>
 
-          <p className="mt-4 text-2xl font-bold tracking-tight text-foreground lg:text-3xl">{pendingInvites}</p>
+          <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">{pendingInvites}</Text>
 
           <button
             type="button"
@@ -85,18 +86,18 @@ function TeamSummaryCards() {
         )}
       >
         <div className="flex items-start justify-between gap-3">
-          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Active Today</p>
+          <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">Active Today</Text>
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <ActiveIcon className="text-base" />
           </div>
         </div>
 
-        <p className="mt-4 text-2xl font-bold tracking-tight text-foreground lg:text-3xl">{activeToday}</p>
+        <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">{activeToday}</Text>
 
-        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-emerald-600">
+        <Text as="span" size="sm" weight="medium" className="mt-4 inline-flex items-center gap-1 text-emerald-600">
           <ArrowUpOutlined className="text-[10px]" />
           {activeTodayTrend}
-        </span>
+        </Text>
       </article>
     </div>
   );

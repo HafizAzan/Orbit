@@ -7,7 +7,7 @@ import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import type { ResetPasswordFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
-import { Label, Paragraph, Title } from "../ui/typography";
+import { Label, Paragraph, Text, Title } from "../ui/typography";
 
 function ResetPasswordForm() {
   const [form] = Form.useForm<ResetPasswordFormValues>();
@@ -88,7 +88,7 @@ function ResetPasswordForm() {
         </Title>
         <Paragraph size="sm" className="mt-2 text-muted">
           Create a new password for{" "}
-          <span className="font-medium text-foreground">{tokenValidation?.email}</span>. It must be at
+          <Text weight="medium">{tokenValidation?.email}</Text>. It must be at
           least 8 characters long.
         </Paragraph>
 

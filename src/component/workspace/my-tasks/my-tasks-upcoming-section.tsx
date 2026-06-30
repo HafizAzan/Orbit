@@ -5,6 +5,7 @@ import { TASK_PRIORITY_CONFIG } from "../../../data/workspace-tasks";
 import { formatDate } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import MyTasksSectionHeader from "./my-tasks-section-header";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type MyTasksUpcomingSectionProps = {
   tasks: MyTask[];
@@ -47,9 +48,9 @@ function MyTasksUpcomingSection({ tasks, onOpenTask }: MyTasksUpcomingSectionPro
                 </span>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold tracking-[0.18em] text-muted uppercase">{task.project}</p>
-                  <h3 className="mt-2 font-semibold text-foreground">{task.title}</h3>
-                  <p className="mt-2 text-sm text-muted">{formatDate(task.dueDate, { year: undefined })}</p>
+                  <Text as="p" size="xs" weight="bold" color="muted" className="text-[11px]! tracking-[0.18em] uppercase">{task.project}</Text>
+                  <Title level={5} color="default" className="mt-2 text-base!">{task.title}</Title>
+                  <Paragraph size="sm" className="mt-2">{formatDate(task.dueDate, { year: undefined })}</Paragraph>
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     <span

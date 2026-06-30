@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { API_KEYS, SECURITY_POLICIES, type ApiKeyRecord, type PlatformSettings } from "../../../data/admin-settings";
 import { toast } from "../../../lib/toast";
 import SettingsSection from "./settings-section";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type SettingsSecuritySectionProps = {
   settings: PlatformSettings;
@@ -27,7 +28,7 @@ function SettingsSecuritySection({ settings, onChange }: SettingsSecuritySection
       <div className="space-y-8">
         <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold tracking-wide text-muted uppercase">Active API Keys</h3>
+            <Title level={5} color="muted" className="text-sm tracking-wide uppercase">Active API Keys</Title>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => toast.info("API key creation coming soon")} className="font-semibold!">
               Create Key
             </Button>
@@ -66,13 +67,13 @@ function SettingsSecuritySection({ settings, onChange }: SettingsSecuritySection
         </div>
 
         <div>
-          <h3 className="mb-4 text-sm font-semibold tracking-wide text-muted uppercase">Security Policies</h3>
+          <Title level={5} color="muted" className="mb-4 text-sm tracking-wide uppercase">Security Policies</Title>
           <ul className="divide-y divide-border rounded-xl border border-border">
             {SECURITY_POLICIES.map((policy) => (
               <li key={policy.key} className="flex items-center justify-between gap-4 bg-card px-4 py-4 sm:px-5">
                 <div className="min-w-0">
-                  <p className="font-semibold text-foreground">{policy.title}</p>
-                  <p className="mt-0.5 text-sm text-muted">{policy.description}</p>
+                  <Text as="p" weight="semibold">{policy.title}</Text>
+                  <Paragraph size="sm" className="mt-0.5 mb-0!">{policy.description}</Paragraph>
                 </div>
                 <Switch
                   checked={settings[policy.key]}

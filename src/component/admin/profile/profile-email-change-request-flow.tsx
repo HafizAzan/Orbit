@@ -11,7 +11,7 @@ import { getApiErrorMessage } from "../../../lib/api-error";
 import { getWorkspaceRoleLabel } from "../../../lib/workspace-routing";
 import { toast } from "../../../lib/toast";
 import Modal from "../../ui/modal";
-import { Label } from "../../ui/typography";
+import { Label, Paragraph, Text } from "../../ui/typography";
 
 type RequestFormValues = {
   subject: string;
@@ -120,14 +120,14 @@ function ProfileEmailChangeRequestFlow({
         title={
           <div className="flex items-center gap-3">
             <MailOutlined className="text-xl text-primary" />
-            <span className="text-lg font-semibold text-foreground">Request email change</span>
+            <Text size="lg" weight="semibold">Request email change</Text>
           </div>
         }
       >
-        <p className="mb-4 text-sm text-muted">
+        <Paragraph size="sm" className="mb-4">
           You cannot change your login email directly. Submit a request and choose which {recipientLabel}(s)
           should receive it.
-        </p>
+        </Paragraph>
 
         <Form
           form={form}
@@ -208,13 +208,13 @@ function ProfileEmailChangeRequestFlow({
         title={
           <div className="flex items-center gap-3">
             <UserOutlined className="text-xl text-primary" />
-            <span className="text-lg font-semibold text-foreground">Select recipients</span>
+            <Text size="lg" weight="semibold">Select recipients</Text>
           </div>
         }
       >
-        <p className="mb-4 text-sm text-muted">
+        <Paragraph size="sm" className="mb-4">
           Choose who should receive your email change request. Only selected {recipientLabel}s will get the email.
-        </p>
+        </Paragraph>
 
         {loadingRecipients ? (
           <div className="flex justify-center py-10">
@@ -253,9 +253,9 @@ function ProfileEmailChangeRequestFlow({
                     }}
                   />
                   <span>
-                    <span className="block font-medium text-foreground">{recipient.fullName}</span>
-                    <span className="block text-sm text-muted">{recipient.email}</span>
-                    <span className="block text-xs text-muted">{getWorkspaceRoleLabel(recipient.role)}</span>
+                    <Text className="block" weight="medium">{recipient.fullName}</Text>
+                    <Text className="block" size="sm" color="muted">{recipient.email}</Text>
+                    <Text className="block" size="xs" color="muted">{getWorkspaceRoleLabel(recipient.role)}</Text>
                   </span>
                 </label>
               ))}

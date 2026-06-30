@@ -10,6 +10,7 @@ import { toast } from "../../../lib/toast";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
+import { Text } from "../../ui/typography";
 import ActivityViewModal from "./activity-view-modal";
 
 function ActivityReviewTable() {
@@ -68,17 +69,17 @@ function ActivityReviewTable() {
   }, [pendingResolve, resolveActivity]);
 
   const resultsSummary = (
-    <span className="text-sm text-muted">
+    <Text as="span" size="sm" color="muted">
       Showing{" "}
-      <span className="font-semibold text-foreground">
+      <Text as="span" weight="semibold">
         {filteredData.length === 0 ? 0 : (page - 1) * ACTIVITIES_PAGE_SIZE + 1}
-      </span>
+      </Text>
       {" to "}
-      <span className="font-semibold text-foreground">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</span>
+      <Text as="span" weight="semibold">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</Text>
       {" of "}
-      <span className="font-semibold text-foreground">{filteredData.length}</span> flagged{" "}
+      <Text as="span" weight="semibold">{filteredData.length}</Text> flagged{" "}
       {pluralize(filteredData.length, "event")}
-    </span>
+    </Text>
   );
 
   return (

@@ -5,6 +5,13 @@ import { cn } from "../../../lib/utils";
 
 export type MyTasksViewMode = "list" | "calendar";
 
+export const MY_TASKS_VIEW_SLUGS: Record<MyTasksViewMode, string> = {
+  list: "list",
+  calendar: "calendar",
+};
+
+export const DEFAULT_MY_TASKS_VIEW: MyTasksViewMode = "list";
+
 type MyTasksPageHeaderProps = {
   viewMode: MyTasksViewMode;
   onViewModeChange: (mode: MyTasksViewMode) => void;

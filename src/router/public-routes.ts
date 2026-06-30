@@ -47,5 +47,11 @@ const AUTH_ROUTES_LIST = createRoutes(AUTH_ROUTE_KEYS);
 const PUBLIC_ROUTES_LIST = createRoutes(PUBLIC_ROUTE_KEYS);
 const UN_AUTH_ROUTES_LIST = createRoutes(Object.keys(UN_AUTH_ROUTES));
 
+export const APP_NOT_FOUND_ROUTE: Route = {
+  path: "*",
+  name: "NOT_FOUND",
+  component: lazy(() => import("../pages/not-found")),
+};
+
 export const LIST = { AUTH_ROUTES_LIST, PUBLIC_ROUTES_LIST, UN_AUTH_ROUTES_LIST };
 export { UN_AUTH_ROUTES };

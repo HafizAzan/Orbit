@@ -11,6 +11,7 @@ import { getActivityFlagReasonLabel } from "../../../lib/activity-review";
 import { cn } from "../../../lib/utils";
 import DetailModal from "../../ui/detail-modal";
 import RecordDetailField from "../shared/record-detail-field";
+import { Paragraph, Text } from "../../ui/typography";
 
 type ActivityViewModalProps = {
   record: ActivityRecord | null;
@@ -35,7 +36,7 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
       {record && severityStyle ? (
         <>
           <div className="mb-5 rounded-2xl border border-border bg-background/60 p-4">
-            <p className="text-sm leading-relaxed text-muted">{record.description}</p>
+            <Paragraph size="sm" className="mb-0! leading-relaxed">{record.description}</Paragraph>
           </div>
 
           {isFlagged || isResolved ? (
@@ -47,9 +48,9 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
             >
               <div className="flex items-center gap-2">
                 <FlagOutlined className={cn("text-sm", isFlagged ? "text-amber-600" : "text-emerald-600")} />
-                <p className="text-sm font-semibold text-foreground">
+                <Text as="p" size="sm" weight="semibold">
                   {isFlagged ? "Flagged for manual review" : "Review resolved"}
-                </p>
+                </Text>
               </div>
 
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -61,7 +62,7 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
               </div>
 
               {record.flagNote ? (
-                <p className="mt-3 text-sm leading-relaxed text-muted">{record.flagNote}</p>
+                <Paragraph size="sm" className="mt-3 mb-0! leading-relaxed">{record.flagNote}</Paragraph>
               ) : null}
             </div>
           ) : null}

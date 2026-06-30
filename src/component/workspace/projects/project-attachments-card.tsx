@@ -3,6 +3,7 @@ import React from "react";
 import type { ProjectAttachmentItem } from "../../../data/workspace-project-detail";
 import { resolveTaskAttachmentUrl } from "../../../lib/task-attachments";
 import { cn } from "../../../lib/utils";
+import { Paragraph, Text, Title } from "../../ui/typography";
 
 type ProjectAttachmentsCardProps = {
   items: ProjectAttachmentItem[];
@@ -16,10 +17,10 @@ function getAttachmentIcon(type: ProjectAttachmentItem["type"]) {
 function ProjectAttachmentsCard({ items }: ProjectAttachmentsCardProps) {
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
-      <h3 className="mb-5 text-lg font-semibold text-foreground">Attachments</h3>
+      <Title level={5} color="default" className="mb-5">Attachments</Title>
 
       {items.length === 0 ? (
-        <p className="text-sm text-muted">No task attachments in this project yet.</p>
+        <Paragraph size="sm">No task attachments in this project yet.</Paragraph>
       ) : (
         <ul className="space-y-3">
           {items.map((item) => {
@@ -35,10 +36,10 @@ function ProjectAttachmentsCard({ items }: ProjectAttachmentsCardProps) {
                   <Icon className="text-lg" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
-                  <p className="text-xs text-muted">
+                  <Text as="p" size="sm" weight="semibold" className="truncate">{item.name}</Text>
+                  <Text as="p" size="xs" color="muted">
                     {item.size} · {item.date}
-                  </p>
+                  </Text>
                 </div>
               </>
             );

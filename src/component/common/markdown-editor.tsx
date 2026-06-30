@@ -10,6 +10,7 @@ import React, { useCallback, useRef, useState } from "react";
 import MarkdownContent, { MARKDOWN_CONTENT_CLASS } from "./markdown-content";
 import { applyMarkdownFormat, type MarkdownFormatAction } from "../../lib/markdown-format";
 import { cn } from "../../lib/utils";
+import { Paragraph } from "../ui/typography";
 
 type MarkdownEditorProps = {
   value: string;
@@ -108,7 +109,7 @@ function MarkdownEditor({
         <MarkdownContent
           content={value}
           className={cn("min-h-[200px] rounded-xl border border-border bg-background px-4 py-3 text-foreground", MARKDOWN_CONTENT_CLASS)}
-          emptyFallback={<p className="min-h-[200px] rounded-xl border border-border bg-background px-4 py-3 text-sm text-muted">{placeholder}</p>}
+          emptyFallback={<Paragraph size="sm" className="min-h-[200px] rounded-xl border border-border bg-background px-4 py-3">{placeholder}</Paragraph>}
         />
       ) : (
         <textarea
