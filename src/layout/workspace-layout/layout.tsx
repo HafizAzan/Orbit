@@ -4,7 +4,9 @@ import AppShellLayout from "../app-shell/app-shell-layout";
 import AppSidebarContent from "../app-shell/app-sidebar-content";
 import WorkspaceGlobalSearch from "../../component/workspace/layout/workspace-global-search";
 import WorkspaceNotificationsDropdown from "../../component/workspace/layout/workspace-notifications-dropdown";
+import AppUiThemeDropdown from "../../component/common/app-ui-theme-dropdown";
 import WorkspaceAuthRefresh from "../../component/workspace/workspace-auth-refresh";
+import WorkspaceRealtimeProvider from "../../component/workspace/workspace-realtime-provider";
 import { WorkspaceProfileProvider } from "../../context/workspace-profile-context";
 import { useAppContext } from "../../context/app-context";
 import { getWorkspaceNavItemsForRole } from "../../data/workspace-nav-items";
@@ -56,7 +58,12 @@ function WorkspaceHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
       profileName={user?.name ?? "Workspace User"}
       profileRole={user?.role ? getWorkspaceRoleLabel(user.role) : "User"}
       profilePath={WORKSPACE_ROUTES.PROFILE}
-      actions={<WorkspaceNotificationsDropdown />}
+      actions={
+        <>
+          <AppUiThemeDropdown />
+          <WorkspaceNotificationsDropdown />
+        </>
+      }
     />
   );
 }
@@ -65,11 +72,13 @@ function WorkspaceLayout() {
   return (
     <WorkspaceProfileProvider>
       <WorkspaceAuthRefresh />
-      <AppShellLayout
-        sidebar={<WorkspaceSidebar />}
-        mobileSidebar={(onNavigate) => <WorkspaceSidebarContent onNavigate={onNavigate} />}
-        header={<WorkspaceHeader />}
-      />
+      <WorkspaceRealtimeProvider>
+        <AppShellLayout
+          sidebar={<WorkspaceSidebar />}
+          mobileSidebar={(onNavigate) => <WorkspaceSidebarContent onNavigate={onNavigate} />}
+          header={<WorkspaceHeader />}
+        />
+      </WorkspaceRealtimeProvider>
     </WorkspaceProfileProvider>
   );
 }

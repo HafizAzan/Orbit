@@ -19,7 +19,7 @@ function ProjectPhaseProgressCard({ project }: ProjectPhaseProgressCardProps) {
         </Text>
       </div>
 
-      <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+      <div className="h-2.5 overflow-hidden rounded-full bg-progress-track">
         <div
           className="h-full rounded-full bg-primary transition-all duration-500"
           style={{ width: `${project.progress}%` }}

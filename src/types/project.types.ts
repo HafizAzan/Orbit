@@ -1,6 +1,18 @@
 import type { ProjectPriority, ProjectStatus, ProjectTeamMember, WorkspaceProject } from "../data/workspace-projects";
 import type { ProjectCategory, ProjectFormValues, ProjectVisibility } from "../data/workspace-project-form";
+import type { ProjectThemeId } from "../data/project-themes";
 import type { RegisterAs } from "./auth.types";
+
+export type ApiProjectThemeMeta = {
+  accent: string;
+  accentSoft: string;
+  accentText: string;
+  headerFrom: string;
+  headerTo: string;
+  cardBorder: string;
+  pillBg: string;
+  previewGradient: string;
+};
 
 export type ApiWorkspaceProject = {
   id: string;
@@ -11,6 +23,7 @@ export type ApiWorkspaceProject = {
   priority: ProjectPriority;
   category: ProjectCategory;
   visibility: ProjectVisibility;
+  theme: ProjectThemeId;
   teamId: string;
   progress: number;
   dueDate: string | null;
@@ -22,6 +35,7 @@ export type ApiWorkspaceProject = {
   icon: WorkspaceProject["icon"];
   iconBg: string;
   iconColor: string;
+  themeMeta: ApiProjectThemeMeta;
   leadUserId: string | null;
   createdById: string;
   members: Array<ProjectTeamMember & { email?: string; projectRole?: string }>;
@@ -72,6 +86,10 @@ export type CreateProjectRequest = {
 
 export type UpdateProjectRequest = Partial<CreateProjectRequest> & {
   progress?: number;
+};
+
+export type UpdateMyProjectThemeRequest = {
+  theme: ProjectThemeId;
 };
 
 export function mapApiProjectToWorkspaceProject(project: ApiWorkspaceProject): WorkspaceProject {

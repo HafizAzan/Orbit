@@ -47,6 +47,11 @@ const getTeamStats = async (): Promise<ApiTeamStats> => {
   return assertApiSuccess<ApiTeamStats>(response);
 };
 
+const getTeamPresence = async (): Promise<{ onlineUserIds: string[] }> => {
+  const response = await ApiService.get(API_ROUTES.TEAMS.PRESENCE, AUTH_REQUEST);
+  return assertApiSuccess<{ onlineUserIds: string[] }>(response);
+};
+
 const inviteTeamMember = async (data: InviteTeamMemberRequest): Promise<ApiTeamMember> => {
   const response = await ApiService.post(API_ROUTES.TEAMS.INVITES, data, AUTH_REQUEST);
   return assertApiSuccess<ApiTeamMember>(response);
@@ -113,6 +118,7 @@ export {
   getTeamMemberDetail,
   getTeamMembers,
   getTeamMembersPage,
+  getTeamPresence,
   getTeamStats,
   inviteTeamMember,
   removeTeamMemberFromSquad,

@@ -87,7 +87,7 @@ function SeatUsageBanner({
         </span>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-progress-track">
         <div
           className={cn("h-full rounded-full transition-all", isFull ? "bg-amber-500" : "bg-primary")}
           style={{ width: `${Math.min(seatUsagePercent, 100)}%` }}

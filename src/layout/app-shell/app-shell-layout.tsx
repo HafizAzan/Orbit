@@ -1,6 +1,7 @@
-import { ConfigProvider, Drawer } from "antd";
+import { Drawer } from "antd";
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import AppThemedConfigProvider from "../../component/common/app-themed-config-provider";
 
 type AppShellLayoutProps = {
   sidebar: React.ReactNode;
@@ -44,16 +45,7 @@ function AppShellLayout({ sidebar, mobileSidebar, header }: AppShellLayoutProps)
   }, [mobileOpen]);
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#4f46e5",
-          borderRadius: 10,
-          controlHeight: 40,
-          fontFamily: '"Roboto", ui-sans-serif, system-ui, sans-serif',
-        },
-      }}
-    >
+    <AppThemedConfigProvider>
       <div className="flex min-h-screen bg-background font-roboto [&_.font-sans]:font-roboto">
         {sidebar}
 
@@ -86,7 +78,7 @@ function AppShellLayout({ sidebar, mobileSidebar, header }: AppShellLayoutProps)
           </main>
         </div>
       </div>
-    </ConfigProvider>
+    </AppThemedConfigProvider>
   );
 }
 

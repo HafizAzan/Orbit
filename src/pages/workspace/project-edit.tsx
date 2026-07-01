@@ -9,6 +9,7 @@ import { useProject } from "../../hooks/use-workspace-projects";
 import { useAppContext } from "../../context/app-context";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
 import { mapApiProjectToFormValues } from "../../types/project.types";
+import { canDeleteWorkspaceProject } from "../../lib/project-access";
 
 function WorkspaceProjectEdit() {
   const { projectId = "" } = useParams();
@@ -21,7 +22,12 @@ function WorkspaceProjectEdit() {
     return mapApiProjectToFormValues(project);
   }, [project]);
 
-  const canDelete = project?.viewerRole === "admin" || project?.createdById === project?.leadUserId;
+  const canDelete = project
+    ? canDeleteWorkspaceProject(
+        app?.user ? { id: app.user.id, role: app.user.role } : null,
+        project,
+      )
+    : false;
 
   return (
     <QueryPageGuard
@@ -45,7 +51,7 @@ function WorkspaceProjectEdit() {
             mode="edit"
             projectId={projectId}
             initialValues={initialValues}
-            canDelete={canDelete || project.viewerRole === "admin"}
+            canDelete={canDelete}
           />
         </WorkspaceRoleGate>
       )}

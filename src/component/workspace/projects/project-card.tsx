@@ -36,7 +36,7 @@ function ProjectProgress({
         <Text as="span" size="sm" weight="medium" color="muted">Progress</Text>
         <Text as="span" size="sm" weight="bold" className="shrink-0 tabular-nums">{progress}%</Text>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="h-2 overflow-hidden rounded-full bg-progress-track">
         <div
           className={cn("h-full rounded-full transition-all duration-500", progressClass)}
           style={{ width: `${progress}%` }}

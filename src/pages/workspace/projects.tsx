@@ -6,6 +6,7 @@ import ProjectsToolbar from "../../component/workspace/projects/projects-toolbar
 import QueryPageGuard from "../../component/common/query-page-guard";
 import TablePaginationFooter from "../../component/ui/table-pagination-footer";
 import { ProjectsPageSkeleton } from "../../component/skeletons";
+import { useAppContext } from "../../context/app-context";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useDeleteProject, useProjects } from "../../hooks/use-workspace-projects";
 import type { ProjectsViewMode } from "../../data/workspace-projects";
@@ -13,12 +14,18 @@ import { buildProjectTeamFilterOptions } from "../../data/workspace-projects";
 import { DEFAULT_PROJECTS_LIST_PARAMS, DEFAULT_PROJECTS_PAGE_SIZE } from "../../types/project.types";
 import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
+import { getDeletableProjectIds } from "../../lib/project-access";
 import { pluralize } from "../../lib/helper";
 import { cn } from "../../lib/utils";
 import { Text } from "../../component/ui/typography";
 
 function WorkspaceProjects() {
+  const app = useAppContext();
   const { can } = useWorkspacePermissions();
+  const deleteActor = useMemo(
+    () => (app?.user ? { id: app.user.id, role: app.user.role } : null),
+    [app?.user],
+  );
   const [page, setPage] = useState<number>(DEFAULT_PROJECTS_LIST_PARAMS.page);
   const projectsQuery = useProjects({
     page,
@@ -28,7 +35,11 @@ function WorkspaceProjects() {
   const projects = projectsPage?.data ?? [];
   const totalProjects = projectsPage?.total ?? 0;
   const { mutateAsync: deleteProject } = useDeleteProject();
-  const canDeleteProject = can("project.delete");
+  const canBulkDeleteProjects = can("project.delete");
+  const deletableProjectIds = useMemo(
+    () => getDeletableProjectIds(deleteActor, projects),
+    [deleteActor, projects],
+  );
   const canCreateProject = can("project.create");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -69,6 +80,13 @@ function WorkspaceProjects() {
     [filteredProjects],
   );
 
+  const deletableFilteredProjectIds = useMemo(
+    () => filteredProjectIds.filter((id) => deletableProjectIds.includes(id)),
+    [deletableProjectIds, filteredProjectIds],
+  );
+
+  const canSelectProjects = canBulkDeleteProjects && deletableFilteredProjectIds.length > 0;
+
   useEffect(() => {
     setPage(1);
   }, [statusFilter, priorityFilter, teamFilter]);
@@ -92,14 +110,16 @@ function WorkspaceProjects() {
   }, []);
 
   const selectedCount = selectedProjectIds.length;
-  const allSelected = filteredProjects.length > 0 && filteredProjectIds.every((id) => selectedProjectIds.includes(id));
+  const allSelected =
+    deletableFilteredProjectIds.length > 0 &&
+    deletableFilteredProjectIds.every((id) => selectedProjectIds.includes(id));
   const indeterminate = selectedCount > 0 && !allSelected;
 
   const handleSelectAllChange = useCallback(
     (checked: boolean) => {
-      setSelectedProjectIds(checked ? filteredProjectIds : []);
+      setSelectedProjectIds(checked ? deletableFilteredProjectIds : []);
     },
-    [filteredProjectIds],
+    [deletableFilteredProjectIds],
   );
 
   const handleProjectSelectedChange = useCallback((projectId: string, selected: boolean) => {
@@ -147,7 +167,7 @@ function WorkspaceProjects() {
       <div className="mx-auto max-w-8xl">
         <ProjectsPageHeader
           selectedCount={selectedCount}
-          onBulkDelete={canDeleteProject ? handleBulkDelete : undefined}
+          onBulkDelete={canSelectProjects ? handleBulkDelete : undefined}
         />
         <ProjectsToolbar
           statusFilter={statusFilter}
@@ -159,7 +179,7 @@ function WorkspaceProjects() {
           selectedCount={selectedCount}
           allSelected={allSelected}
           indeterminate={indeterminate}
-          canSelect={canDeleteProject}
+          canSelect={canSelectProjects}
           onStatusChange={setStatusFilter}
           onPriorityChange={setPriorityFilter}
           onTeamChange={setTeamFilter}
@@ -179,7 +199,7 @@ function WorkspaceProjects() {
               key={project.id}
               project={project}
               viewMode={viewMode}
-              selectable={canDeleteProject}
+              selectable={deletableProjectIds.includes(project.id)}
               selected={selectedProjectIds.includes(project.id)}
               onSelectedChange={(selected) => handleProjectSelectedChange(project.id, selected)}
             />

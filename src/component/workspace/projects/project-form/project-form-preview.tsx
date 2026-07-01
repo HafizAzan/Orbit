@@ -103,7 +103,7 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
                 {values.dueDate ? formatDate(values.dueDate) : "Due date"}
               </Text>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className="h-2 overflow-hidden rounded-full bg-progress-track">
               <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${timelineProgress}%` }} />
             </div>
           </div>

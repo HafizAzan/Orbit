@@ -19,7 +19,9 @@ function CriticalDeadlinesCard({ items }: CriticalDeadlinesCardProps) {
             key={item.id}
             className={cn(
               "flex gap-4 rounded-2xl border p-4",
-              item.priority === "high" ? "border-red-100 bg-red-50/40" : "border-border bg-background/50",
+              item.priority === "high"
+                ? "border-danger-border bg-danger-soft"
+                : "border-border bg-muted-surface/60",
             )}
           >
             <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl border border-border bg-card text-center">
@@ -31,7 +33,7 @@ function CriticalDeadlinesCard({ items }: CriticalDeadlinesCardProps) {
               <div className="flex flex-wrap items-center gap-2">
                 <Text as="p" weight="semibold">{item.title}</Text>
                 {item.priority === "high" ? (
-                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600 uppercase">
+                  <span className="rounded-full bg-danger-badge-bg px-2 py-0.5 text-[10px] font-bold text-danger-badge-text uppercase">
                     High Priority
                   </span>
                 ) : null}

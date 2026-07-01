@@ -5,6 +5,9 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     REGISTER_RESEND_OTP: "/auth/register/resend-otp",
     REGISTER_VERIFY: "/auth/register/verify",
     ME: "/auth/me",
+    PROFILE: "/auth/me/profile",
+    PASSWORD: "/auth/me/password",
+    UI_THEME: "/auth/me/ui-theme",
     HEARTBEAT: "/auth/heartbeat",
     EMAIL_INITIATE: "/auth/me/email/initiate",
     EMAIL_CONFIRM: "/auth/me/email/confirm",
@@ -37,12 +40,14 @@ const API_ROUTES: Record<string, Record<string, string>> = {
   TEAMS: {
     MEMBERS: "/teams/members",
     STATS: "/teams/stats",
+    PRESENCE: "/teams/presence",
     INVITES: "/teams/invites",
     RESEND_PENDING: "/teams/invites/resend-pending",
   },
   PROJECTS: {
     LIST: "/projects",
     ASSIGNABLE_MEMBERS: "/projects/assignable-members",
+    THEMES: "/projects/themes/list",
   },
   CALENDAR: {
     EVENTS: "/calendar/events",
@@ -54,6 +59,11 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     DASHBOARD: "/tasks/dashboard",
     REPORTS: "/tasks/reports",
     BOARDS: "/tasks/boards",
+  },
+  NOTIFICATIONS: {
+    LIST: "/notifications",
+    UNREAD_COUNT: "/notifications/unread-count",
+    READ_ALL: "/notifications/read-all",
   },
   BILLING: {
     CATALOG: "/billing/catalog",

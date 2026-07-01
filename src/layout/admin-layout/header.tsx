@@ -4,6 +4,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import AdminGlobalSearch from "../../component/admin/layout/admin-global-search";
 import AdminNotificationsDropdown from "../../component/admin/layout/admin-notifications-dropdown";
+import AppUiThemeDropdown from "../../component/common/app-ui-theme-dropdown";
 import { PLATFORM_ADMIN_ROLE_LABEL } from "../../data/admin-profile";
 import { getAdminDisplayName } from "../../lib/admin-profile";
 import { ADMIN_ROUTES } from "../../router/admin-routes";
@@ -33,6 +34,7 @@ function AdminHeader({ onMenuOpen }: AdminHeaderProps) {
       </div>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+        <AppUiThemeDropdown />
         <AdminNotificationsDropdown />
 
         <Link

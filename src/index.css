@@ -39,6 +39,14 @@
 
   /* UI */
   --color-border: #e2e8f0;
+  --color-progress-track: #e2e8f0;
+  --color-muted-surface: #f1f5f9;
+  --color-danger-soft: rgb(254 242 242 / 0.7);
+  --color-danger-border: #fecaca;
+  --color-danger-badge-bg: #fee2e2;
+  --color-danger-badge-text: #dc2626;
+  --color-chart-grid: #e2e8f0;
+  --color-chart-axis: #64748b;
 
   /* Feature cards */
   --color-feature-sync: #ede9fe;
@@ -251,4 +259,145 @@
       transform: none !important;
     }
   }
+}
+
+/* Per-user FlowSync UI themes — accent-only light themes + one dark mode */
+html[data-app-theme="ocean"] {
+  --color-primary: #0d9488;
+  --color-secondary: #14b8a6;
+  --color-accent: #2dd4bf;
+  --color-header-background: #f0fdfacc;
+  --color-header-border: #99f6e44d;
+  --color-cta-background: #0f766e;
+  --color-cta-glow: #5eead4;
+  --color-faq-surface: #f0fdfa;
+  --color-insights-background: #f8fafc;
+  --color-feature-sync: #ecfdf5;
+  --color-feature-security: #ecfeff;
+  --color-feature-workflow: #f0fdfa;
+}
+
+html[data-app-theme="sunset"] {
+  --color-primary: #d97706;
+  --color-secondary: #f59e0b;
+  --color-accent: #fbbf24;
+  --color-header-background: #fffbebcc;
+  --color-header-border: #fcd34d4d;
+  --color-cta-background: #b45309;
+  --color-cta-glow: #fbbf24;
+  --color-faq-surface: #fffbeb;
+  --color-insights-background: #f8fafc;
+  --color-feature-sync: #fff7ed;
+  --color-feature-security: #fffbeb;
+  --color-feature-workflow: #fff7ed;
+}
+
+html[data-app-theme="forest"] {
+  --color-primary: #059669;
+  --color-secondary: #10b981;
+  --color-accent: #34d399;
+  --color-header-background: #f0fdf4cc;
+  --color-header-border: #86efac4d;
+  --color-cta-background: #047857;
+  --color-cta-glow: #6ee7b7;
+  --color-faq-surface: #f0fdf4;
+  --color-insights-background: #f8fafc;
+  --color-feature-sync: #ecfdf5;
+  --color-feature-security: #ecfdf5;
+  --color-feature-workflow: #f0fdf4;
+}
+
+html[data-app-theme="royal"] {
+  --color-primary: #7c3aed;
+  --color-secondary: #8b5cf6;
+  --color-accent: #a78bfa;
+  --color-header-background: #faf5ffcc;
+  --color-header-border: #c4b5fd4d;
+  --color-cta-background: #6d28d9;
+  --color-cta-glow: #a78bfa;
+  --color-faq-surface: #faf5ff;
+  --color-insights-background: #f8fafc;
+  --color-feature-sync: #f5f3ff;
+  --color-feature-security: #f5f3ff;
+  --color-feature-workflow: #faf5ff;
+}
+
+html[data-app-theme="midnight"] {
+  --color-primary: #6366f1;
+  --color-secondary: #818cf8;
+  --color-accent: #a5b4fc;
+  --color-background: #0b1120;
+  --color-card: #151c2f;
+  --color-header-background: #151c2fe6;
+  --color-header-border: #24304480;
+  --color-foreground: #e2e8f0;
+  --color-muted: #94a3b8;
+  --color-border: #243044;
+  --color-progress-track: #243044;
+  --color-muted-surface: #111827;
+  --color-danger-soft: rgb(127 29 29 / 0.22);
+  --color-danger-border: rgb(185 28 28 / 0.35);
+  --color-danger-badge-bg: rgb(127 29 29 / 0.45);
+  --color-danger-badge-text: #fca5a5;
+  --color-chart-grid: #243044;
+  --color-chart-axis: #94a3b8;
+  --color-hero-surface: #1e293b;
+  --color-cta-background: #4f46e5;
+  --color-cta-glow: #818cf8;
+  --color-faq-surface: #151c2f;
+  --color-insights-background: #111827;
+  --color-feature-sync: #1e1b4b;
+  --color-feature-security: #172554;
+  --color-feature-workflow: #1e1b4b;
+  --color-kanban-title: #94a3b8;
+}
+
+/* Dark theme fallbacks for legacy light-only utility classes */
+html[data-app-theme="midnight"] .bg-slate-50,
+html[data-app-theme="midnight"] .bg-slate-50\/80 {
+  background-color: rgb(17 24 39 / 0.85) !important;
+}
+
+html[data-app-theme="midnight"] .bg-slate-100 {
+  background-color: var(--color-progress-track) !important;
+}
+
+html[data-app-theme="midnight"] .bg-white {
+  background-color: var(--color-card) !important;
+}
+
+html[data-app-theme="midnight"] .bg-red-50,
+html[data-app-theme="midnight"] .bg-red-50\/40 {
+  background-color: var(--color-danger-soft) !important;
+}
+
+html[data-app-theme="midnight"] .border-red-100 {
+  border-color: var(--color-danger-border) !important;
+}
+
+html[data-app-theme="midnight"] .bg-red-100 {
+  background-color: var(--color-danger-badge-bg) !important;
+}
+
+html[data-app-theme="midnight"] .text-red-600 {
+  color: var(--color-danger-badge-text) !important;
+}
+
+html[data-app-theme="midnight"] .bg-indigo-50 {
+  background-color: rgb(99 102 241 / 0.15) !important;
+}
+
+html[data-app-theme="midnight"] .text-indigo-900 {
+  color: #c7d2fe !important;
+}
+
+html[data-app-theme="midnight"] .border-slate-200,
+html[data-app-theme="midnight"] .border-slate-800 {
+  border-color: var(--color-border) !important;
+}
+
+html[data-app-theme="midnight"] .text-slate-400,
+html[data-app-theme="midnight"] .text-slate-500,
+html[data-app-theme="midnight"] .text-slate-600 {
+  color: var(--color-muted) !important;
 }

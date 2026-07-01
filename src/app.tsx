@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route as ChildRoute, Routes } from "react-rout
 import ScrollToTop from "./component/common/scroll-to-top";
 import { queryClient } from "./config/query-client";
 import { AppProvider } from "./context/app-context";
+import { AppUiThemeProvider } from "./context/app-ui-theme-context";
 import AuthLayout from "./layout/auth-layout/layout";
 import AdminLayout from "./layout/admin-layout/layout";
 import WorkspaceLayout from "./layout/workspace-layout/layout";
@@ -19,18 +20,15 @@ import RequireWorkspaceRouteAccess from "./router/guards/require-workspace-route
 import WorkspaceHomeRedirect from "./router/guards/workspace-home-redirect";
 import RequireGuest from "./router/guards/require-guest";
 import { APP_NOT_FOUND_ROUTE, LIST, type Route } from "./router/public-routes";
-import {
-  WORKSPACE_LEGACY_REDIRECTS,
-  WORKSPACE_NOT_FOUND_ROUTE,
-  WORKSPACE_ROUTES_LIST,
-  type WorkspaceRoute,
-} from "./router/workspace-routes";
+import { WORKSPACE_LEGACY_REDIRECTS, WORKSPACE_NOT_FOUND_ROUTE, WORKSPACE_ROUTES_LIST, type WorkspaceRoute } from "./router/workspace-routes";
+import ProjectThemeLegacyRedirect from "./router/redirects/project-theme-legacy-redirect";
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <BrowserRouter>
+        <AppUiThemeProvider>
+          <BrowserRouter>
           <ScrollToTop />
           <Routes>
             <ChildRoute element={<RequirePlatformAdmin />}>
@@ -49,21 +47,19 @@ function App() {
                       <ChildRoute key={route.path} path={route.path} element={<route.component />} />
                     ))}
                     <ChildRoute
-                      path={WORKSPACE_NOT_FOUND_ROUTE.path}
-                      element={<WORKSPACE_NOT_FOUND_ROUTE.component />}
+                      path="/projects/:projectId/settings"
+                      element={<ProjectThemeLegacyRedirect />}
                     />
+                    <ChildRoute path={WORKSPACE_NOT_FOUND_ROUTE.path} element={<WORKSPACE_NOT_FOUND_ROUTE.component />} />
                   </ChildRoute>
                 </ChildRoute>
               </ChildRoute>
             </ChildRoute>
 
             {WORKSPACE_LEGACY_REDIRECTS.map((redirect) => (
-              <ChildRoute
-                key={`legacy-app-${redirect.path}`}
-                path={redirect.path}
-                element={<Navigate to={redirect.to} replace />}
-              />
+              <ChildRoute key={`legacy-app-${redirect.path}`} path={redirect.path} element={<Navigate to={redirect.to} replace />} />
             ))}
+
             <ChildRoute path="/app" element={<WorkspaceHomeRedirect />} />
 
             <ChildRoute element={<RequireGuest />}>
@@ -91,6 +87,7 @@ function App() {
             <ChildRoute path={APP_NOT_FOUND_ROUTE.path} element={<APP_NOT_FOUND_ROUTE.component />} />
           </Routes>
         </BrowserRouter>
+        </AppUiThemeProvider>
       </AppProvider>
     </QueryClientProvider>
   );

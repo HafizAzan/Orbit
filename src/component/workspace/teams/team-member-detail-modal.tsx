@@ -7,6 +7,8 @@ import { useTeamMemberDetail } from "../../../hooks/use-workspace-team";
 import { getInitial } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import WorkspaceNavLink from "../common/workspace-nav-link";
+import OnlineStatusDot from "../common/online-status-dot";
+import { useOrgPresence } from "../workspace-realtime-provider";
 import Modal from "../../ui/modal";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
@@ -23,6 +25,7 @@ type TeamMemberDetailModalProps = {
 
 function TeamMemberDetailModal({ member, onClose }: TeamMemberDetailModalProps) {
   const memberId = member?.id ?? null;
+  const { isOnline } = useOrgPresence();
   const detailQuery = useTeamMemberDetail(memberId, memberId !== null);
   const detail = detailQuery.data;
 
@@ -93,13 +96,19 @@ function TeamMemberDetailModal({ member, onClose }: TeamMemberDetailModalProps) 
       {member ? (
         <div className="space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <Avatar
-              size={64}
-              className={cn("shrink-0 font-semibold!", member.avatarColor ?? "bg-primary/10! text-primary!")}
-              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(member.name)}`}
-            >
-              {getInitial(member.name)}
-            </Avatar>
+            <div className="relative shrink-0">
+              <Avatar
+                size={64}
+                className={cn("font-semibold!", member.avatarColor ?? "bg-primary/10! text-primary!")}
+                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(member.name)}`}
+              >
+                {getInitial(member.name)}
+              </Avatar>
+              <OnlineStatusDot
+                online={isOnline(member.id)}
+                className="absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 border-card"
+              />
+            </div>
 
             <div className="min-w-0 flex-1">
               <Title level={4} className="text-xl text-foreground">
@@ -110,6 +119,17 @@ function TeamMemberDetailModal({ member, onClose }: TeamMemberDetailModalProps) 
               </Paragraph>
 
               <div className="mt-3 flex flex-wrap gap-2">
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+                    isOnline(member.id)
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-border bg-background text-muted",
+                  )}
+                >
+                  <OnlineStatusDot online={isOnline(member.id)} className="h-2 w-2 border-transparent" />
+                  {isOnline(member.id) ? "Online now" : "Offline"}
+                </span>
                 <span className="rounded-full border border-border bg-background px-2.5 py-0.5 text-xs font-semibold text-foreground">
                   {TEAM_ROLE_LABELS[member.role]}
                 </span>

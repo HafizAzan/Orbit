@@ -2,6 +2,7 @@ import { Select } from "antd";
 import React from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { VelocityPoint } from "../../../data/workspace-dashboard";
+import { useChartTheme } from "../../../lib/chart-theme";
 import { Paragraph, Title } from "../../ui/typography";
 
 type TeamVelocityChartProps = {
@@ -9,6 +10,8 @@ type TeamVelocityChartProps = {
 };
 
 function TeamVelocityChart({ data }: TeamVelocityChartProps) {
+  const chart = useChartTheme();
+
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
@@ -32,29 +35,31 @@ function TeamVelocityChart({ data }: TeamVelocityChartProps) {
           <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="velocityGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#818cf8" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#818cf8" stopOpacity={0.02} />
+                <stop offset="0%" stopColor={chart.primary} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={chart.primary} stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} width={32} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
+            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: chart.axis, fontSize: 12 }} dy={8} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: chart.axis, fontSize: 12 }} width={32} />
             <Tooltip
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.08)",
+                border: `1px solid ${chart.tooltipBorder}`,
+                backgroundColor: chart.tooltipBg,
+                color: chart.axis,
+                boxShadow: chart.tooltipShadow,
               }}
               formatter={(value) => [`${value} tasks`, "Completed"]}
             />
             <Area
               type="monotone"
               dataKey="completed"
-              stroke="#4f46e5"
+              stroke={chart.primary}
               strokeWidth={3}
               fill="url(#velocityGradient)"
               dot={false}
-              activeDot={{ r: 5, fill: "#4f46e5", stroke: "#fff", strokeWidth: 2 }}
+              activeDot={{ r: 5, fill: chart.primary, stroke: chart.activeDotStroke, strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

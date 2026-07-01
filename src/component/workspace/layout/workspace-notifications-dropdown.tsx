@@ -1,14 +1,19 @@
 import { BellOutlined, CheckOutlined } from "@ant-design/icons";
-import { Badge, Dropdown } from "antd";
+import { Badge, Button, Dropdown, Spin } from "antd";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   WORKSPACE_NOTIFICATION_ITEM_HEIGHT_PX,
   WORKSPACE_NOTIFICATION_KIND_CONFIG,
   WORKSPACE_NOTIFICATION_VISIBLE_COUNT,
-  WORKSPACE_NOTIFICATIONS,
   type WorkspaceNotification,
 } from "../../../data/workspace-notifications";
+import {
+  useMarkAllNotificationsAsRead,
+  useMarkNotificationAsRead,
+  useNotifications,
+  useUnreadNotificationCount,
+} from "../../../hooks/use-notifications";
 import { cn } from "../../../lib/utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import { Text } from "../../ui/typography";
@@ -16,23 +21,25 @@ import { Text } from "../../ui/typography";
 function WorkspaceNotificationsDropdown() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<WorkspaceNotification[]>(WORKSPACE_NOTIFICATIONS);
+  const notificationsQuery = useNotifications();
+  const unreadQuery = useUnreadNotificationCount();
+  const { mutate: markAsRead } = useMarkNotificationAsRead();
+  const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllNotificationsAsRead();
 
-  const unreadCount = useMemo(() => notifications.filter((notification) => !notification.read).length, [notifications]);
+  const notifications = notificationsQuery.data ?? [];
+  const unreadCount = unreadQuery.data ?? notifications.filter((notification) => !notification.read).length;
 
-  const markAsRead = useCallback((id: string) => {
-    setNotifications((current) =>
-      current.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
-    );
-  }, []);
-
-  const markAllAsRead = useCallback(() => {
-    setNotifications((current) => current.map((notification) => ({ ...notification, read: true })));
-  }, []);
+  const sortedNotifications = useMemo(
+    () => [...notifications].sort((a, b) => Number(a.read) - Number(b.read)),
+    [notifications],
+  );
 
   const handleNotificationClick = useCallback(
     (notification: WorkspaceNotification) => {
-      markAsRead(notification.id);
+      if (!notification.read) {
+        markAsRead(notification.id);
+      }
+
       setOpen(false);
 
       if (notification.href) {
@@ -55,14 +62,16 @@ function WorkspaceNotificationsDropdown() {
         </div>
 
         {unreadCount > 0 ? (
-          <button
-            type="button"
-            onClick={markAllAsRead}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-primary transition-colors hover:bg-feature-sync"
+          <Button
+            type="link"
+            size="small"
+            loading={isMarkingAll}
+            onClick={() => markAllAsRead()}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold!"
           >
             <CheckOutlined className="text-[10px]" />
             Mark all read
-          </button>
+          </Button>
         ) : null}
       </div>
 
@@ -70,8 +79,12 @@ function WorkspaceNotificationsDropdown() {
         className="overflow-y-auto"
         style={{ maxHeight: WORKSPACE_NOTIFICATION_VISIBLE_COUNT * WORKSPACE_NOTIFICATION_ITEM_HEIGHT_PX }}
       >
-        {notifications.length > 0 ? (
-          notifications.map((notification) => {
+        {notificationsQuery.isLoading ? (
+          <div className="flex items-center justify-center py-10">
+            <Spin />
+          </div>
+        ) : sortedNotifications.length > 0 ? (
+          sortedNotifications.map((notification) => {
             const config = WORKSPACE_NOTIFICATION_KIND_CONFIG[notification.kind];
             const Icon = config.icon;
 
@@ -123,7 +136,7 @@ function WorkspaceNotificationsDropdown() {
               No notifications
             </Text>
             <Text as="p" size="xs" color="muted" className="mt-1">
-              New workspace alerts will appear here.
+              New workspace alerts will appear here in real time.
             </Text>
           </div>
         )}
@@ -131,7 +144,7 @@ function WorkspaceNotificationsDropdown() {
 
       <div className="border-t border-border bg-background/60 px-4 py-3">
         <Link
-          to={WORKSPACE_ROUTES.DASHBOARD}
+          to={WORKSPACE_ROUTES.ACTIVITY_LOGS}
           onClick={() => setOpen(false)}
           className="block text-center text-xs font-semibold text-primary transition-colors hover:text-primary/80"
         >

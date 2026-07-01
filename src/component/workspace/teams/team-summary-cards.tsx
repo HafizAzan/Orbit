@@ -6,9 +6,11 @@ import { useResendAllPendingInvites, useTeamStats } from "../../../hooks/use-wor
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 import { Text } from "../../ui/typography";
+import { useOrgPresence } from "../workspace-realtime-provider";
 
 function TeamSummaryCards() {
   const { can } = useWorkspacePermissions();
+  const { onlineCount } = useOrgPresence();
   const canInvite = can("team.invite");
   const { data: stats } = useTeamStats();
   const { mutateAsync: resendAllPending, isPending } = useResendAllPendingInvites();
@@ -16,7 +18,6 @@ function TeamSummaryCards() {
   const totalSeats = stats?.totalSeats ?? { used: 0, total: 0 };
   const pendingInvites = stats?.pendingInvites ?? 0;
   const activeToday = stats?.activeToday ?? 0;
-  const activeTodayTrend = stats?.activeTodayTrend ?? "+0% from last week";
   const seatUsagePercent = totalSeats.total > 0 ? Math.round((totalSeats.used / totalSeats.total) * 100) : 0;
   const SeatsIcon = TEAM_SUMMARY_ICONS.seats;
   const InvitesIcon = TEAM_SUMMARY_ICONS.invites;
@@ -47,7 +48,7 @@ function TeamSummaryCards() {
             <Text as="span" size="base" weight="medium" color="muted">/ {totalSeats.total} available</Text>
           </Text>
 
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-progress-track">
             <div
               className="h-full rounded-full bg-primary transition-all"
               style={{ width: `${seatUsagePercent}%` }}
@@ -86,17 +87,21 @@ function TeamSummaryCards() {
         )}
       >
         <div className="flex items-start justify-between gap-3">
-          <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">Active Today</Text>
+          <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+            Online Now
+          </Text>
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <ActiveIcon className="text-base" />
           </div>
         </div>
 
-        <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">{activeToday}</Text>
+        <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">
+          {onlineCount}
+        </Text>
 
         <Text as="span" size="sm" weight="medium" className="mt-4 inline-flex items-center gap-1 text-emerald-600">
           <ArrowUpOutlined className="text-[10px]" />
-          {activeTodayTrend}
+          Live via socket · {activeToday} active today
         </Text>
       </article>
     </div>

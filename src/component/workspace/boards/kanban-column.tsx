@@ -23,10 +23,10 @@ function KanbanColumn({ column, showAddTask = false, projectId }: KanbanColumnPr
   const variant = getColumnVariant(column.id);
 
   return (
-    <section className="flex w-[min(100%,320px)] shrink-0 snap-start flex-col rounded-2xl bg-slate-50/80 p-4 sm:w-[300px]">
+    <section className="flex w-[min(100%,320px)] shrink-0 snap-start flex-col rounded-2xl bg-muted-surface/80 p-4 sm:w-[300px]">
       <div className="mb-4 flex items-center justify-between px-1">
         <Text as="p" size="sm" weight="bold" color="muted" className="tracking-[0.12em]">
-          {column.title} <Text as="span" className="text-slate-400">({column.tasks.length})</Text>
+          {column.title} <Text as="span" color="muted">({column.tasks.length})</Text>
         </Text>
         <Button
           type="text"

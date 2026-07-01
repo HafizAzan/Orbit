@@ -17,6 +17,7 @@ import {
   useProjectComments,
 } from "../../hooks/use-project-comments";
 import { useTasks } from "../../hooks/use-workspace-tasks";
+import useProjectDiscussionSocket from "../../hooks/use-project-discussion-socket";
 import { useAppContext } from "../../context/app-context";
 import type { WorkspaceProjectDetail } from "../../data/workspace-project-detail";
 import type { ApiWorkspaceProject } from "../../types/project.types";
@@ -24,6 +25,7 @@ import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
 import { mapApiProjectCommentToMessage } from "../../types/project-comment.types";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
+import { canDeleteWorkspaceProject } from "../../lib/project-access";
 import {
   computeRemainingDays,
   formatProjectEstimatedHours,
@@ -67,6 +69,8 @@ function WorkspaceProjectDetail() {
   const { mutateAsync: createComment, isPending: isCreatingComment } = useCreateProjectComment(projectId);
   const { mutateAsync: deleteComment } = useDeleteProjectComment(projectId);
   const { data: apiProject } = projectQuery;
+
+  useProjectDiscussionSocket(projectId);
 
   const projectTasks = useMemo(
     () => (tasksQuery.data?.data ?? []).filter((task) => task.projectId === projectId),
@@ -117,7 +121,16 @@ function WorkspaceProjectDetail() {
         <div className="mx-auto max-w-8xl">
           <ProjectDetailHeader
             project={project}
-            canDelete={apiProject!.viewerRole === "admin" || apiProject!.createdById === app?.user?.id}
+            themeId={apiProject!.theme}
+            themeMeta={apiProject!.themeMeta}
+            canDelete={
+              apiProject
+                ? canDeleteWorkspaceProject(
+                    app?.user ? { id: app.user.id, role: app.user.role } : null,
+                    apiProject,
+                  )
+                : false
+            }
           />
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { TaskStatusSlice } from "../../../data/workspace-dashboard";
+import { useChartTheme } from "../../../lib/chart-theme";
 import { Text, Title } from "../../ui/typography";
 
 type TaskStatusChartProps = {
@@ -9,6 +10,7 @@ type TaskStatusChartProps = {
 
 function TaskStatusChart({ data }: TaskStatusChartProps) {
   const totalTasks = useMemo(() => data.reduce((sum, item) => sum + item.count, 0), [data]);
+  const chart = useChartTheme();
 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
@@ -25,8 +27,10 @@ function TaskStatusChart({ data }: TaskStatusChartProps) {
             <Tooltip
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 4px 12px rgba(15, 23, 42, 0.08)",
+                border: `1px solid ${chart.tooltipBorder}`,
+                backgroundColor: chart.tooltipBg,
+                color: chart.axis,
+                boxShadow: chart.tooltipShadow,
               }}
             />
           </PieChart>

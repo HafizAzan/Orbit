@@ -19,7 +19,7 @@ function WorkspaceNotFound({
 
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center px-4 py-16 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted-surface text-muted">
         <FileSearchOutlined className="text-2xl" />
       </span>
       <Title level={3} className="mt-5 text-foreground">

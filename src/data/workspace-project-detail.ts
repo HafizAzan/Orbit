@@ -56,3 +56,12 @@ export function getProjectDetailPath(projectId: string) {
 export function getProjectBoardPath(projectId: string) {
   return `/projects/${projectId}/board`;
 }
+
+export function getProjectThemePath(projectId: string) {
+  return `/projects/${projectId}/theme`;
+}
+
+/** @deprecated Use getProjectThemePath */
+export function getProjectSettingsPath(projectId: string) {
+  return getProjectThemePath(projectId);
+}

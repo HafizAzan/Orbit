@@ -209,7 +209,7 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
             </div>
           ))}
           {(summary?.occupiedSeats ?? 0) > previewMembers.length ? (
-            <div className="-ml-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-card bg-slate-100 text-xs font-semibold text-muted">
+            <div className="-ml-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-card bg-muted-surface text-xs font-semibold text-muted">
               +{(summary?.occupiedSeats ?? 0) - previewMembers.length}
             </div>
           ) : null}

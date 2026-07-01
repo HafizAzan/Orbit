@@ -5,6 +5,7 @@ import {
   getAssignableProjectMembers,
   getProject,
   listProjects,
+  updateMyProjectTheme,
   updateProject,
 } from "../api-services/project.service";
 import type {
@@ -12,6 +13,7 @@ import type {
   ListProjectsParams,
   UpdateProjectRequest,
 } from "../types/project.types";
+import type { ProjectThemeId } from "../data/project-themes";
 import {
   DEFAULT_PROJECTS_LIST_PARAMS,
   DEFAULT_PROJECTS_PAGE,
@@ -92,6 +94,24 @@ export function useUpdateProject() {
       projectId: string;
       data: UpdateProjectRequest;
     }) => updateProject(projectId, data),
+    onSuccess: (_result, variables) => {
+      invalidateProjectLists(queryClient);
+      queryClient.invalidateQueries({ queryKey: workspaceProjectQueryKey(variables.projectId) });
+    },
+  });
+}
+
+export function useUpdateMyProjectTheme() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      projectId,
+      theme,
+    }: {
+      projectId: string;
+      theme: ProjectThemeId;
+    }) => updateMyProjectTheme(projectId, { theme }),
     onSuccess: (_result, variables) => {
       invalidateProjectLists(queryClient);
       queryClient.invalidateQueries({ queryKey: workspaceProjectQueryKey(variables.projectId) });

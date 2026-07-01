@@ -12,6 +12,7 @@ import type {
   CreateProjectRequest,
   ListProjectsParams,
   PaginatedProjectsResponse,
+  UpdateMyProjectThemeRequest,
   UpdateProjectRequest,
 } from "../types/project.types";
 import { DEFAULT_PROJECTS_PAGE, DEFAULT_PROJECTS_PAGE_SIZE } from "../types/project.types";
@@ -61,6 +62,18 @@ const updateProject = async (
   return assertApiSuccess<ApiWorkspaceProject>(response);
 };
 
+const updateMyProjectTheme = async (
+  projectId: string,
+  data: UpdateMyProjectThemeRequest,
+): Promise<ApiWorkspaceProject> => {
+  const response = await ApiService.patch(
+    `${API_ROUTES.PROJECTS.LIST}/${projectId}/my-theme`,
+    data,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<ApiWorkspaceProject>(response);
+};
+
 const deleteProject = async (projectId: string): Promise<{ message: string }> => {
   const response = await ApiService.delete(
     `${API_ROUTES.PROJECTS.LIST}/${projectId}`,
@@ -88,5 +101,6 @@ export {
   getAssignableProjectMembers,
   getProject,
   listProjects,
+  updateMyProjectTheme,
   updateProject,
 };

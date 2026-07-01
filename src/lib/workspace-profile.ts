@@ -1,10 +1,16 @@
-import { confirmEmailChange, initiateEmailChange } from "../api-services/auth.service";
-import { delay } from "./helper";
-import type { WorkspaceProfile } from "../data/workspace-profile";
+import {
+  changePassword,
+  confirmEmailChange,
+  forgotPassword,
+  initiateEmailChange,
+  updateProfile,
+} from "../api-services/auth.service";
+import {
+  buildWorkspaceProfileFromUser,
+  getWorkspaceProfileDisplayName,
+  type WorkspaceProfile,
+} from "../data/workspace-profile";
 import type { AuthUser } from "../types/auth.types";
-
-/** Mock credential for local development until password API is wired. */
-const MOCK_CURRENT_PASSWORD = "Owner@123";
 
 export type ChangeWorkspacePasswordInput = {
   currentPassword: string;
@@ -27,20 +33,16 @@ export type CompleteWorkspaceEmailChangeResult = {
 };
 
 export async function updateWorkspaceProfile(profile: WorkspaceProfile): Promise<WorkspaceProfile> {
-  await delay(500);
-  return profile;
+  const fullName = getWorkspaceProfileDisplayName(profile);
+  const user = await updateProfile({ fullName });
+  return buildWorkspaceProfileFromUser(user);
 }
 
 export async function changeWorkspacePassword(input: ChangeWorkspacePasswordInput): Promise<void> {
-  await delay(600);
-
-  if (input.currentPassword !== MOCK_CURRENT_PASSWORD) {
-    throw new Error("Current password is incorrect");
-  }
-
-  if (input.currentPassword === input.newPassword) {
-    throw new Error("New password must be different from your current password");
-  }
+  await changePassword({
+    currentPassword: input.currentPassword,
+    newPassword: input.newPassword,
+  });
 }
 
 export async function initiateWorkspaceEmailChange(input: InitiateWorkspaceEmailChangeInput) {
@@ -65,6 +67,6 @@ export async function completeWorkspaceEmailChange(
 }
 
 export async function sendWorkspacePasswordResetLink(email: string) {
-  await delay(500);
-  return email.trim().toLowerCase();
+  const result = await forgotPassword({ email });
+  return result.email;
 }

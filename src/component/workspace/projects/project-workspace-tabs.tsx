@@ -1,10 +1,9 @@
 import React from "react";
-import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
-import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
+import { getProjectBoardPath, getProjectDetailPath, getProjectThemePath } from "../../../data/workspace-project-detail";
 import { cn } from "../../../lib/utils";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 
-type ProjectWorkspaceTab = "overview" | "board";
+type ProjectWorkspaceTab = "overview" | "board" | "theme";
 
 type ProjectWorkspaceTabsProps = {
   projectId: string;
@@ -14,36 +13,33 @@ type ProjectWorkspaceTabsProps = {
 const TABS: { key: ProjectWorkspaceTab; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "board", label: "Board" },
+  { key: "theme", label: "Theme" },
 ];
 
+function resolveTabHref(projectId: string, tab: ProjectWorkspaceTab) {
+  if (tab === "overview") return getProjectDetailPath(projectId);
+  if (tab === "board") return getProjectBoardPath(projectId);
+  return getProjectThemePath(projectId);
+}
+
 function ProjectWorkspaceTabs({ projectId, active }: ProjectWorkspaceTabsProps) {
-  const { role } = useWorkspacePermissions();
-
-  if (role === "member") {
-    return null;
-  }
-
   return (
     <nav className="mt-6 flex gap-1 border-b border-border">
-      {TABS.map((tab) => {
-        const href = tab.key === "overview" ? getProjectDetailPath(projectId) : getProjectBoardPath(projectId);
-
-        return (
-          <WorkspaceNavLink
-            key={tab.key}
-            to={href}
-            preserveReturn
-            className={cn(
-              "border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors",
-              active === tab.key
-                ? "border-primary text-primary"
-                : "border-transparent text-muted hover:border-border hover:text-foreground",
-            )}
-          >
-            {tab.label}
-          </WorkspaceNavLink>
-        );
-      })}
+      {TABS.map((tab) => (
+        <WorkspaceNavLink
+          key={tab.key}
+          to={resolveTabHref(projectId, tab.key)}
+          preserveReturn
+          className={cn(
+            "border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors",
+            active === tab.key
+              ? "border-primary text-primary"
+              : "border-transparent text-muted hover:border-border hover:text-foreground",
+          )}
+        >
+          {tab.label}
+        </WorkspaceNavLink>
+      ))}
     </nav>
   );
 }

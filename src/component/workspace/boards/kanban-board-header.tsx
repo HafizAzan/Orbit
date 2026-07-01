@@ -11,6 +11,7 @@ import { getWorkspaceHomePath } from "../../../lib/workspace-routing";
 import WorkspaceBackLink from "../common/workspace-back-link";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import ProjectTeamAvatars from "../projects/project-team-avatars";
+import ProjectThemeButton from "../projects/project-theme-button";
 import ProjectWorkspaceTabs from "../projects/project-workspace-tabs";
 import { Title } from "../../ui/typography";
 
@@ -53,7 +54,8 @@ function KanbanBoardHeader({ board }: KanbanBoardHeaderProps) {
           <ProjectTeamAvatars members={board.teamMembers} maxVisible={3} />
         </div>
 
-        <div className="grid grid-cols-1 gap-2 min-[520px]:grid-cols-3 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+        <div className="grid grid-cols-1 gap-2 min-[520px]:grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3 lg:grid-cols-4">
+          <ProjectThemeButton projectId={board.projectId} className="w-full font-semibold! sm:w-auto" />
           <Button icon={<FilterOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
             Filters
           </Button>

@@ -5,7 +5,7 @@ import {
   MailOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, type MenuProps } from "antd";
+import { Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
   TEAM_DEPARTMENT_LABELS,
@@ -15,9 +15,9 @@ import {
   type TeamMember,
 } from "../data/workspace-teams";
 import { pluralize } from "../lib/helper";
-import { getInitial } from "../lib/helper";
-import { Text } from "../component/ui/typography";
 import { cn } from "../lib/utils";
+import { Text } from "../component/ui/typography";
+import TeamMemberCell from "../component/workspace/teams/team-member-cell";
 
 type WorkspaceTeamTableColumnOptions = {
   onViewDetail?: (record: TeamMember) => void;
@@ -110,21 +110,7 @@ function createWorkspaceTeamTableColumns({
       key: "member",
       width: 260,
       fixed: "left",
-      render: (_, record) => (
-        <div className="flex items-center gap-3">
-          <Avatar
-            size={40}
-            className={cn("shrink-0 font-semibold!", record.avatarColor ?? "bg-primary/10! text-primary!")}
-            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(record.name)}`}
-          >
-            {getInitial(record.name)}
-          </Avatar>
-          <div className="min-w-0">
-            <Text as="p" weight="semibold" className="truncate">{record.name}</Text>
-            <Text as="p" size="sm" color="muted" className="truncate">{record.email}</Text>
-          </div>
-        </div>
-      ),
+      render: (_, record) => <TeamMemberCell member={record} />,
     },
     {
       title: "Department",

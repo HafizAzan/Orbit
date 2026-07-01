@@ -5,7 +5,6 @@ import { useAppContext } from "../../../../context/app-context";
 import { DEFAULT_PROJECT_FORM_VALUES, type ProjectFormValues } from "../../../../data/workspace-project-form";
 import { getProjectDetailPath } from "../../../../data/workspace-project-detail";
 import { useAssignableProjectMembers, useCreateProject, useDeleteProject, useUpdateProject } from "../../../../hooks/use-workspace-projects";
-import useWorkspacePermissions from "../../../../hooks/use-workspace-permissions";
 import { showApiErrorToast, showApiSuccessToast } from "../../../../lib/api-error";
 import { useWorkspaceReturnTo } from "../../../../lib/workspace-navigation";
 import { WORKSPACE_ROUTES } from "../../../../router/workspace-routes";
@@ -27,7 +26,6 @@ type ProjectFormScreenProps = {
 function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FORM_VALUES, canDelete = false }: ProjectFormScreenProps) {
   const navigate = useNavigate();
   const app = useAppContext();
-  const { can } = useWorkspacePermissions();
   const { mutateAsync: createProject } = useCreateProject();
   const { mutateAsync: updateProject } = useUpdateProject();
   const { mutateAsync: deleteProject } = useDeleteProject();
@@ -47,7 +45,7 @@ function ProjectFormScreen({ mode, projectId, initialValues = DEFAULT_PROJECT_FO
     assignableMembers?.find((member) => member.id === values.leadUserId)?.name ?? (canAssignLead ? "Select delivery lead" : userName);
   const pageTitle = isEdit ? "Edit Project" : "Create New Project";
   const submitLabel = isEdit ? "Save Changes" : "Create Project";
-  const showDelete = isEdit && (can("project.delete") || canDelete);
+  const showDelete = isEdit && canDelete;
 
   useEffect(() => {
     setValues(initialValues);

@@ -2,6 +2,7 @@ import { ProjectOutlined } from "@ant-design/icons";
 import React from "react";
 import { Link } from "react-router-dom";
 import type { ActiveProject } from "../../../data/workspace-dashboard";
+import { resolveSurfaceClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import { cn } from "../../../lib/utils";
 import { Text, Title } from "../../ui/typography";
@@ -11,6 +12,8 @@ type ActiveProjectsCardProps = {
 };
 
 function ActiveProjectsCard({ items }: ActiveProjectsCardProps) {
+  const isDark = useIsDarkAppTheme();
+
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <div className="mb-5 flex items-center justify-between gap-3">
@@ -24,7 +27,7 @@ function ActiveProjectsCard({ items }: ActiveProjectsCardProps) {
         {items.map((project) => (
           <li key={project.id}>
             <div className="flex items-start gap-3">
-              <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", project.iconBg)}>
+              <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-primary", resolveSurfaceClass(project.iconBg, isDark))}>
                 <ProjectOutlined className="text-base" />
               </div>
               <div className="min-w-0 flex-1">
@@ -35,7 +38,7 @@ function ActiveProjectsCard({ items }: ActiveProjectsCardProps) {
                   </div>
                   <Text as="span" size="sm" weight="bold" className="shrink-0">{project.progress}%</Text>
                 </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-progress-track">
                   <div
                     className="h-full rounded-full bg-primary transition-all duration-500"
                     style={{ width: `${project.progress}%` }}

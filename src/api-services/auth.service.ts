@@ -29,6 +29,7 @@ import type {
   VerifyRegisterRequest,
   VerifyRegisterResponse,
 } from "../types/auth.types";
+import type { AppUiThemeId } from "../types/auth.types";
 
 const sendRegisterOtp = async (data: RegisterSendOtpRequest): Promise<RegisterSendOtpResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.REGISTER_SEND_OTP, data);
@@ -113,6 +114,39 @@ const getMe = async (): Promise<AuthUser> => {
   return assertApiSuccess<AuthUser>(response);
 };
 
+const updateUiTheme = async (uiTheme: AppUiThemeId): Promise<AuthUser> => {
+  const response = await ApiService.patch(
+    API_ROUTES.AUTH.UI_THEME,
+    { uiTheme },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<AuthUser>(response);
+};
+
+const updateProfile = async (data: { fullName: string }): Promise<AuthUser> => {
+  const response = await ApiService.patch(
+    API_ROUTES.AUTH.PROFILE,
+    { fullName: data.fullName.trim() },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<AuthUser>(response);
+};
+
+const changePassword = async (data: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<{ message: string }> => {
+  const response = await ApiService.patch(
+    API_ROUTES.AUTH.PASSWORD,
+    {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<{ message: string }>(response);
+};
+
 const recordActivityHeartbeat = async (): Promise<ActivityHeartbeatResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.HEARTBEAT, undefined, AUTH_REQUEST);
   return assertApiSuccess<ActivityHeartbeatResponse>(response);
@@ -169,6 +203,7 @@ const submitEmailChangeRequest = async (
 };
 
 export {
+  changePassword,
   confirmEmailChange,
   forgotPassword,
   getEmailChangeRequestRecipients,
@@ -186,4 +221,6 @@ export {
   validateInviteToken,
   verifyRegister,
   submitEmailChangeRequest,
+  updateProfile,
+  updateUiTheme,
 };

@@ -1,6 +1,7 @@
-import { ConfigProvider, Drawer } from "antd";
+import { Drawer } from "antd";
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import AppThemedConfigProvider from "../../component/common/app-themed-config-provider";
 import { AdminActivityProvider } from "../../context/admin-activity-context";
 import { AdminProfileProvider } from "../../context/admin-profile-context";
 import AdminHeader from "./header";
@@ -42,16 +43,7 @@ function AdminLayout() {
   }, [mobileOpen]);
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#4f46e5",
-          borderRadius: 10,
-          controlHeight: 40,
-          fontFamily: '"Roboto", ui-sans-serif, system-ui, sans-serif',
-        },
-      }}
-    >
+    <AppThemedConfigProvider>
       <AdminActivityProvider>
         <div className="flex min-h-screen bg-background font-roboto [&_.font-sans]:font-roboto">
           <AdminSidebar />
@@ -84,7 +76,7 @@ function AdminLayout() {
           </AdminProfileProvider>
         </div>
       </AdminActivityProvider>
-    </ConfigProvider>
+    </AppThemedConfigProvider>
   );
 }
 

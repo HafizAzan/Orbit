@@ -191,14 +191,14 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     topicId: "getting-started",
     question: "How do I create my first workspace?",
     answer:
-      "Sign up for FlowSync, choose your organization name, and follow the onboarding wizard. You can invite teammates by email or share an invite link from Settings → Team.",
+      "Sign up for FlowSync, choose your organization name, and follow the onboarding wizard. Organization owners and admins can invite teammates from the Teams page (/teams). Managers and members cannot send org invites — ask your admin if you need someone added.",
   },
   {
     id: "invite-team",
     topicId: "getting-started",
     question: "How do I invite teammates?",
     answer:
-      "Go to Settings → Team and click Invite members. Enter email addresses and assign roles (Admin, Manager, or Member). Invited users receive an email with a secure join link.",
+      "Only organization owners and admins can invite users. Go to Teams in the sidebar, open the Invites section, and send invitations with roles (Admin, Manager, or Member). Managers and members do not have access to org invites or Settings → Members — contact your admin if you need a new teammate added.",
   },
   {
     id: "import-data",

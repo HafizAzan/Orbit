@@ -15,8 +15,7 @@ type ProjectsPageHeaderProps = {
 function ProjectsPageHeader({ selectedCount = 0, onBulkDelete }: ProjectsPageHeaderProps) {
   const { can } = useWorkspacePermissions();
   const canCreateProject = can("project.create");
-  const canDeleteProject = can("project.delete");
-  const showBulkDelete = selectedCount > 0 && onBulkDelete && canDeleteProject;
+  const showBulkDelete = selectedCount > 0 && Boolean(onBulkDelete);
 
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">

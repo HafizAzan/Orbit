@@ -29,7 +29,7 @@ function ProjectTeamAvatars({ members, maxVisible = 3, className }: ProjectTeamA
         </div>
       ))}
       {remainingCount > 0 ? (
-        <div className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-slate-100 text-xs font-semibold text-muted">
+        <div className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-muted-surface text-xs font-semibold text-muted">
           +{remainingCount}
         </div>
       ) : null}

@@ -146,6 +146,8 @@ export type AuthOrganization = {
   name: string;
 };
 
+export type AppUiThemeId = "classic" | "ocean" | "sunset" | "forest" | "royal" | "midnight";
+
 export type AuthUser = {
   id: string;
   name: string;
@@ -156,6 +158,7 @@ export type AuthUser = {
   accountStatus: AccountStatus;
   organization: AuthOrganization | null;
   requiresPlanSelection: boolean;
+  uiTheme?: AppUiThemeId;
 };
 
 export type AuthSessionResponse = {

@@ -69,7 +69,7 @@ function ProjectDiscussionCard({
                   <Text as="span" size="sm" weight="semibold">{message.userName}</Text>
                   <Text as="span" size="xs" color="muted">{message.timeAgo}</Text>
                 </div>
-                <Text as="p" size="sm" className="mt-1 rounded-2xl bg-slate-50 px-3 py-2">{message.message}</Text>
+                <Text as="p" size="sm" className="mt-1 rounded-2xl bg-muted-surface px-3 py-2">{message.message}</Text>
                 {currentUserId && message.authorId === currentUserId && onDelete ? (
                   <Button type="link" danger size="small" onClick={() => onDelete(message.id)} className="h-auto px-0">
                     Delete

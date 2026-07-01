@@ -4,6 +4,7 @@ import { Button } from "antd";
 import type { ActivityFeedItem } from "../../../types/activity.types";
 import type { WorkspaceActivityItem } from "../../../data/workspace-dashboard";
 import { getInitial } from "../../../lib/helper";
+import { resolveSurfaceClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import { Paragraph, Text, Title } from "../../ui/typography";
@@ -13,6 +14,8 @@ type GlobalActivityFeedProps = {
 };
 
 function GlobalActivityFeed({ items }: GlobalActivityFeedProps) {
+  const isDark = useIsDarkAppTheme();
+
   return (
     <article className="flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <div className="flex items-start justify-between gap-3">
@@ -35,7 +38,7 @@ function GlobalActivityFeed({ items }: GlobalActivityFeedProps) {
               <div
                 className={cn(
                   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold",
-                  item.avatarColor,
+                  resolveSurfaceClass(item.avatarColor, isDark),
                 )}
               >
                 {getInitial(item.userName)}
@@ -48,7 +51,7 @@ function GlobalActivityFeed({ items }: GlobalActivityFeedProps) {
                   <Text as="span" weight="semibold">{item.target}</Text>
                 </Text>
                 {"comment" in item && item.comment ? (
-                  <Text as="p" size="sm" className="mt-2 rounded-2xl bg-indigo-50 px-3 py-2 text-indigo-900">{item.comment}</Text>
+                  <Text as="p" size="sm" className="mt-2 rounded-2xl bg-muted-surface px-3 py-2 text-foreground">{item.comment}</Text>
                 ) : null}
                 <Text as="p" size="xs" weight="medium" color="muted" className="mt-1">{item.timeAgo}</Text>
               </div>
