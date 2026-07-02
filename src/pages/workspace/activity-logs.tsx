@@ -2,10 +2,11 @@ import React from "react";
 import { Paragraph, Title } from "../../component/ui/typography";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceActivityLogsSection from "../../component/workspace/activity/workspace-activity-logs-section";
+import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import { ActivityLogsPageSkeleton } from "../../component/skeletons";
 import { useWorkspaceActivities } from "../../hooks/use-workspace-activity";
 
-function WorkspaceActivityLogsPage() {
+function WorkspaceActivityLogsContent() {
   const activitiesQuery = useWorkspaceActivities({ page: 1, limit: 20 });
 
   return (
@@ -29,6 +30,18 @@ function WorkspaceActivityLogsPage() {
         </article>
       </div>
     </QueryPageGuard>
+  );
+}
+
+function WorkspaceActivityLogsPage() {
+  return (
+    <WorkspaceRoleGate
+      permission="activity.view"
+      title="Activity logs access restricted"
+      description="Activity logs are available to owners, admins, and managers."
+    >
+      <WorkspaceActivityLogsContent />
+    </WorkspaceRoleGate>
   );
 }
 
