@@ -13,24 +13,22 @@ type ProjectOverviewHeaderProps = {
 };
 
 function ProjectOverviewHeader({ period: periodProp, onPeriodChange }: ProjectOverviewHeaderProps) {
-  const [internalPeriod, setInternalPeriod] = useState<DashboardPeriodFilter>(DEFAULT_DASHBOARD_PERIOD_FILTER);
   const [open, setOpen] = useState(false);
 
-  const period = periodProp ?? internalPeriod;
+  const period = periodProp ?? DEFAULT_DASHBOARD_PERIOD_FILTER;
 
   const selectedLabel = useMemo(() => DASHBOARD_PERIOD_FILTER_OPTIONS.find((option) => option.value === period)?.label ?? "Filters", [period]);
 
   const handleSelect = (value: DashboardPeriodFilter) => {
-    if (periodProp === undefined) {
-      setInternalPeriod(value);
-    }
     onPeriodChange?.(value);
     setOpen(false);
   };
 
   const dropdownContent = (
     <div className="w-52 overflow-hidden rounded-2xl border border-border bg-card p-2 shadow-xl">
-      <Text as="p" size="xs" weight="semibold" color="muted" className="px-2.5 py-1.5 text-[11px]! tracking-wide uppercase">Time Period</Text>
+      <Text as="p" size="xs" weight="semibold" color="muted" className="px-2.5 py-1.5 text-[11px]! tracking-wide uppercase">
+        Time Period
+      </Text>
       <div className="space-y-1">
         {DASHBOARD_PERIOD_FILTER_OPTIONS.map((option) => {
           const isSelected = option.value === period;
@@ -42,7 +40,7 @@ function ProjectOverviewHeader({ period: periodProp, onPeriodChange }: ProjectOv
               block
               onClick={() => handleSelect(option.value)}
               className={cn(
-                "h-auto justify-start rounded-xl px-3 py-2.5 text-left font-medium!",
+                "h-auto justify-start! rounded-xl px-3 py-2.5 font-medium!",
                 isSelected ? "bg-feature-sync text-primary" : "text-foreground hover:bg-background!",
               )}
             >

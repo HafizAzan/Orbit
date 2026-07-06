@@ -16,39 +16,48 @@ function PageHeaderWithActionSkeleton({ className }: WorkspacePageSkeletonProps)
 function CalendarPageSkeleton({ className }: WorkspacePageSkeletonProps) {
   return (
     <div className={cn("mx-auto max-w-8xl", className)}>
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-56 max-w-full" />
-          <Skeleton className="h-4 w-72 max-w-full" />
+      <div className="mb-6 space-y-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-4 w-full max-w-2xl" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-xl" />
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Skeleton className="h-10 w-44 rounded-xl" />
-          <Skeleton className="h-10 w-52 rounded-xl" />
-          <Skeleton className="h-10 w-28 rounded-xl" />
+
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-border px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+            <Skeleton className="h-10 w-64 rounded-xl" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-24 rounded-full" />
+              <Skeleton className="h-8 w-24 rounded-full" />
+              <Skeleton className="h-8 w-24 rounded-full" />
+            </div>
+          </div>
+          <div className="flex gap-4 px-5 py-3">
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-8 w-16" />
+            <Skeleton className="h-8 w-16" />
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-          <Skeleton className="h-5 w-28" />
-          <div className="mt-4 space-y-3">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <Skeleton className="h-4 w-4 rounded" />
-                <Skeleton className="h-4 w-full max-w-[180px]" />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+        <aside className="space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <Skeleton className="h-5 w-36" />
+              <div className="mt-4 space-y-3">
+                {Array.from({ length: 3 }).map((__, itemIndex) => (
+                  <Skeleton key={itemIndex} className="h-12 w-full rounded-xl" />
+                ))}
               </div>
-            ))}
-          </div>
-          <Skeleton className="mt-6 h-5 w-32" />
-          <div className="mt-4 space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-10 w-full rounded-xl" />
-            ))}
-          </div>
+            </div>
+          ))}
         </aside>
 
         <article className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="grid grid-cols-7 border-b border-border bg-background/60">
+          <div className="grid grid-cols-7 border-b border-border bg-background/80">
             {Array.from({ length: 7 }).map((_, index) => (
               <Skeleton key={index} className="mx-auto my-3 h-4 w-8" />
             ))}

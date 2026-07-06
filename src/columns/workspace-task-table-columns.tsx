@@ -9,6 +9,12 @@ import {
   TASK_STATUS_CONFIG,
   type WorkspaceTask,
 } from "../data/workspace-tasks";
+import {
+  resolveAccentLinkClass,
+  resolveAvatarSurfaceClass,
+  resolveBadgeClass,
+  resolveTableNameLinkClass,
+} from "../lib/app-ui-theme-utils";
 import { formatDate } from "../lib/helper";
 import { cn } from "../lib/utils";
 
@@ -18,6 +24,7 @@ type WorkspaceTaskTableColumnOptions = {
   onDelete?: (record: WorkspaceTask) => void;
   canEdit?: boolean;
   canDelete?: boolean;
+  isDark?: boolean;
 };
 
 function getActionItems(
@@ -50,8 +57,12 @@ function createWorkspaceTaskTableColumns({
   onDelete,
   canEdit = false,
   canDelete = false,
+  isDark = false,
 }: WorkspaceTaskTableColumnOptions = {}): ColumnsType<WorkspaceTask> {
   const showActions = Boolean(onView) || canEdit || canDelete;
+  const accentLinkClass = resolveAccentLinkClass(isDark);
+  const nameLinkClass = resolveTableNameLinkClass(isDark);
+  const avatarClass = resolveAvatarSurfaceClass(isDark);
 
   return [
     {
@@ -61,10 +72,7 @@ function createWorkspaceTaskTableColumns({
       width: 110,
       sorter: (a, b) => a.taskCode.localeCompare(b.taskCode),
       render: (taskCode: string, record) => (
-        <Link
-          to={getTaskDetailPath(record.id)}
-          className="font-mono text-sm font-semibold text-primary transition-opacity hover:opacity-80"
-        >
+        <Link to={getTaskDetailPath(record.id)} className={cn("font-mono text-sm font-semibold", accentLinkClass)}>
           {taskCode}
         </Link>
       ),
@@ -75,10 +83,7 @@ function createWorkspaceTaskTableColumns({
       key: "title",
       sorter: (a, b) => a.title.localeCompare(b.title),
       render: (title: string, record) => (
-        <Link
-          to={getTaskDetailPath(record.id)}
-          className="font-medium text-foreground transition-colors hover:text-primary"
-        >
+        <Link to={getTaskDetailPath(record.id)} className={cn("font-medium", nameLinkClass)}>
           {title}
         </Link>
       ),
@@ -89,10 +94,7 @@ function createWorkspaceTaskTableColumns({
       key: "project",
       responsive: ["lg"],
       render: (project: string, record) => (
-        <Link
-          to={getProjectBoardPath(record.projectId)}
-          className="text-sm font-medium text-primary transition-opacity hover:opacity-80"
-        >
+        <Link to={getProjectBoardPath(record.projectId)} className={cn("text-sm font-medium", accentLinkClass)}>
           {project}
         </Link>
       ),
@@ -103,7 +105,12 @@ function createWorkspaceTaskTableColumns({
       responsive: ["md"],
       render: (_, record) => (
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-feature-sync text-[11px] font-bold text-primary">
+          <div
+            className={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+              avatarClass,
+            )}
+          >
             {record.assignee.initials}
           </div>
           <span className="text-sm font-medium text-foreground">{record.assignee.name}</span>
@@ -122,7 +129,7 @@ function createWorkspaceTaskTableColumns({
           <span
             className={cn(
               "inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
-              config.badgeClass,
+              resolveBadgeClass(config.badgeClass, isDark),
             )}
           >
             {config.label}

@@ -1,4 +1,4 @@
-import { ArrowUpOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ArrowUpOutlined, ReloadOutlined, TeamOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import React from "react";
 import { TEAM_SUMMARY_ICONS } from "../../../data/workspace-teams";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
@@ -6,11 +6,9 @@ import { useResendAllPendingInvites, useTeamStats } from "../../../hooks/use-wor
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 import { Text } from "../../ui/typography";
-import { useOrgPresence } from "../workspace-realtime-provider";
 
 function TeamSummaryCards() {
   const { can } = useWorkspacePermissions();
-  const { onlineCount } = useOrgPresence();
   const canInvite = can("team.invite");
   const { data: stats } = useTeamStats();
   const { mutateAsync: resendAllPending, isPending } = useResendAllPendingInvites();
@@ -18,6 +16,9 @@ function TeamSummaryCards() {
   const totalSeats = stats?.totalSeats ?? { used: 0, total: 0 };
   const pendingInvites = stats?.pendingInvites ?? 0;
   const activeToday = stats?.activeToday ?? 0;
+  const activeTodayTrend = stats?.activeTodayTrend ?? "No activity yet";
+  const onlineNow = stats?.onlineNow ?? 0;
+  const squadSize = stats?.squadSize ?? totalSeats.used;
   const seatUsagePercent = totalSeats.total > 0 ? Math.round((totalSeats.used / totalSeats.total) * 100) : 0;
   const SeatsIcon = TEAM_SUMMARY_ICONS.seats;
   const InvitesIcon = TEAM_SUMMARY_ICONS.invites;
@@ -32,9 +33,9 @@ function TeamSummaryCards() {
     }
   };
 
-  return (
-    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {canInvite ? (
+  if (canInvite) {
+    return (
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">Total Seats</Text>
@@ -55,9 +56,7 @@ function TeamSummaryCards() {
             />
           </div>
         </article>
-      ) : null}
 
-      {canInvite ? (
         <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">Pending Invites</Text>
@@ -71,21 +70,78 @@ function TeamSummaryCards() {
           <button
             type="button"
             onClick={handleResendAll}
-            disabled={!canInvite || isPending || pendingInvites === 0}
+            disabled={isPending || pendingInvites === 0}
             className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-sky-600 transition-colors hover:text-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ReloadOutlined className="text-xs" />
             Resend all pending
           </button>
         </article>
-      ) : null}
 
-      <article
-        className={cn(
-          "rounded-2xl border border-border bg-card p-5 shadow-sm",
-          !canInvite ? "md:col-span-2 xl:col-span-3" : "md:col-span-2 xl:col-span-1",
-        )}
-      >
+        <article className="rounded-2xl border border-border bg-card p-5 shadow-sm md:col-span-2 xl:col-span-1">
+          <div className="flex items-start justify-between gap-3">
+            <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+              Online Now
+            </Text>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <ActiveIcon className="text-base" />
+            </div>
+          </div>
+
+          <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">
+            {onlineNow}
+          </Text>
+
+          <Text as="span" size="sm" weight="medium" className="mt-4 inline-flex items-center gap-1 text-emerald-600">
+            <ArrowUpOutlined className="text-[10px]" />
+            Live via socket · {activeToday} active today
+          </Text>
+        </article>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+            Squad Members
+          </Text>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-feature-sync text-primary">
+            <UsergroupAddOutlined className="text-base" />
+          </div>
+        </div>
+
+        <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">
+          {squadSize}
+        </Text>
+
+        <Text as="span" size="sm" weight="medium" color="muted" className="mt-4 block">
+          People across projects you lead
+        </Text>
+      </article>
+
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+            Active Today
+          </Text>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+            <TeamOutlined className="text-base" />
+          </div>
+        </div>
+
+        <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">
+          {activeToday}
+        </Text>
+
+        <Text as="span" size="sm" weight="medium" color="muted" className={cn("mt-4 block")}>
+          {activeTodayTrend}
+        </Text>
+      </article>
+
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
         <div className="flex items-start justify-between gap-3">
           <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
             Online Now
@@ -96,12 +152,16 @@ function TeamSummaryCards() {
         </div>
 
         <Text as="p" weight="bold" className="mt-4 text-2xl tracking-tight lg:text-3xl">
-          {onlineCount}
+          {onlineNow}
+          <Text as="span" size="base" weight="medium" color="muted">
+            {" "}
+            / {squadSize}
+          </Text>
         </Text>
 
         <Text as="span" size="sm" weight="medium" className="mt-4 inline-flex items-center gap-1 text-emerald-600">
           <ArrowUpOutlined className="text-[10px]" />
-          Live via socket · {activeToday} active today
+          Live squad presence
         </Text>
       </article>
     </div>

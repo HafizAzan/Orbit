@@ -18,7 +18,6 @@ import type {
   InviteValidationResponse,
   AcceptInviteRequest,
   AcceptInviteResponse,
-  ActivityHeartbeatResponse,
   ConfirmEmailChangeRequest,
   ConfirmEmailChangeResponse,
   EmailChangeRequestRecipientsResponse,
@@ -147,11 +146,6 @@ const changePassword = async (data: {
   return assertApiSuccess<{ message: string }>(response);
 };
 
-const recordActivityHeartbeat = async (): Promise<ActivityHeartbeatResponse> => {
-  const response = await ApiService.post(API_ROUTES.AUTH.HEARTBEAT, undefined, AUTH_REQUEST);
-  return assertApiSuccess<ActivityHeartbeatResponse>(response);
-};
-
 const initiateEmailChange = async (
   data: InitiateEmailChangeRequest,
 ): Promise<InitiateEmailChangeResponse> => {
@@ -209,7 +203,6 @@ export {
   getEmailChangeRequestRecipients,
   getMe,
   initiateEmailChange,
-  recordActivityHeartbeat,
   getRegisterPending,
   login,
   logout,

@@ -12,6 +12,7 @@ import {
   updateTask,
 } from "../api-services/task.service";
 import type { CreateTaskRequest, UpdateTaskRequest } from "../types/task.types";
+import type { DashboardPeriodFilter } from "../data/workspace-dashboard";
 import type { PaginationParams } from "../types/pagination.types";
 
 export const WORKSPACE_TASKS_QUERY_KEY = "workspace-tasks";
@@ -53,10 +54,10 @@ export function useTask(taskId: string | null) {
   });
 }
 
-export function useWorkspaceDashboard() {
+export function useWorkspaceDashboard(period: DashboardPeriodFilter = "this_month") {
   return useQuery({
-    queryKey: WORKSPACE_DASHBOARD_QUERY_KEY,
-    queryFn: getDashboard,
+    queryKey: [...WORKSPACE_DASHBOARD_QUERY_KEY, period],
+    queryFn: () => getDashboard(period),
   });
 }
 

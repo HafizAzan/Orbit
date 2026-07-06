@@ -1,13 +1,13 @@
-import { CalendarOutlined } from "@ant-design/icons";
-import { Checkbox } from "antd";
 import React from "react";
 import {
+  CALENDAR_EVENT_TYPE_META,
   CALENDAR_FILTER_OPTIONS,
+  type CalendarEventType,
   type CalendarFilters,
   type CalendarProject,
 } from "../../../data/workspace-calendar";
-import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
+import type { CalendarEventStats } from "./calendar-page-header";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
 type CalendarSidebarProps = {
@@ -15,6 +15,8 @@ type CalendarSidebarProps = {
   onFiltersChange: (filters: CalendarFilters) => void;
   projects?: CalendarProject[];
   projectsLoading?: boolean;
+  eventStats: CalendarEventStats;
+  readOnly?: boolean;
 };
 
 function CalendarSidebar({
@@ -22,93 +24,156 @@ function CalendarSidebar({
   onFiltersChange,
   projects = [],
   projectsLoading = false,
+  eventStats,
+  readOnly = false,
 }: CalendarSidebarProps) {
-  const handleFilterToggle = (key: keyof CalendarFilters, checked: boolean) => {
-    if (key === "deadlinesOnly" && checked) {
-      onFiltersChange({ myTasks: false, teamEvents: false, deadlinesOnly: true });
+  const handleFilterToggle = (key: keyof CalendarFilters) => {
+    const isActive = filters[key];
+
+    if (key === "deadlinesOnly") {
+      onFiltersChange(
+        isActive
+          ? { myTasks: true, teamEvents: true, deadlinesOnly: false }
+          : { myTasks: false, teamEvents: false, deadlinesOnly: true },
+      );
       return;
     }
 
-    if (key !== "deadlinesOnly" && checked) {
-      onFiltersChange({ ...filters, [key]: true, deadlinesOnly: false });
+    if (isActive) {
+      const next = { ...filters, [key]: false };
+      if (!next.myTasks && !next.teamEvents && !next.deadlinesOnly) {
+        next.deadlinesOnly = false;
+        next[key] = true;
+      }
+      onFiltersChange(next);
       return;
     }
 
-    onFiltersChange({ ...filters, [key]: checked });
+    onFiltersChange({ ...filters, [key]: true, deadlinesOnly: false });
   };
 
-  const upcomingDeadlines = projects.reduce((total, project) => total + project.eventCount, 0);
+  const totalVisible = (Object.keys(eventStats) as CalendarEventType[]).reduce(
+    (sum, type) => sum + eventStats[type],
+    0,
+  );
 
   return (
     <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
       <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <Text as="p" size="xs" weight="bold" color="muted" className="tracking-wide uppercase">
-          View Filters
-        </Text>
+        <Title level={5} className="text-sm! text-foreground">
+          What you&apos;re seeing
+        </Title>
+        <Paragraph size="sm" className="mt-1">
+          Colors match the event types shown on the grid.
+        </Paragraph>
 
-        <div className="mt-4 space-y-3">
-          {CALENDAR_FILTER_OPTIONS.map((option) => (
-            <label key={option.key} className="flex cursor-pointer items-center gap-3">
-              <Checkbox
-                checked={filters[option.key]}
-                onChange={(event) => handleFilterToggle(option.key, event.target.checked)}
-              />
-              <Text as="span" size="sm" weight="medium" className={option.colorClass}>
-                {option.label}
-              </Text>
-            </label>
-          ))}
+        <ul className="mt-4 space-y-2.5">
+          {(Object.keys(CALENDAR_EVENT_TYPE_META) as CalendarEventType[]).map((type) => {
+            const meta = CALENDAR_EVENT_TYPE_META[type];
+
+            return (
+              <li key={type} className="flex items-center justify-between gap-3 rounded-xl bg-background/70 px-3 py-2.5">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", meta.dotClass)} />
+                  <Text as="span" size="sm" weight="medium">
+                    {meta.label}
+                  </Text>
+                </div>
+                <Text as="span" size="sm" weight="semibold" color="muted" className="tabular-nums">
+                  {eventStats[type]}
+                </Text>
+              </li>
+            );
+          })}
+        </ul>
+
+        <Paragraph size="xs" className="mt-4 rounded-xl border border-dashed border-border bg-background/50 px-3 py-2.5 text-muted">
+          {readOnly
+            ? totalVisible > 0
+              ? "Tap a task or deadline to open its detail page. Team meetings are view-only."
+              : "No scheduled items in this period for your assigned projects."
+            : totalVisible > 0
+              ? "Your scheduled events open with edit and delete options. Tasks and project deadlines open their detail pages."
+              : "No items in this period. Try another date range or adjust filters."}
+        </Paragraph>
+      </article>
+
+      <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <Title level={5} className="text-sm! text-foreground">
+          Show on calendar
+        </Title>
+
+        <div className="mt-4 space-y-2">
+          {CALENDAR_FILTER_OPTIONS.map((option) => {
+            const isActive = filters[option.key];
+
+            return (
+              <button
+                key={option.key}
+                type="button"
+                onClick={() => handleFilterToggle(option.key)}
+                className={cn(
+                  "flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition-colors",
+                  isActive
+                    ? "border-primary/30 bg-feature-sync"
+                    : "border-border bg-background/50 hover:border-border hover:bg-background",
+                )}
+              >
+                <span className={cn("mt-1 h-2.5 w-2.5 shrink-0 rounded-full", option.dotClass)} />
+                <span className="min-w-0">
+                  <Text as="span" size="sm" weight="semibold" className="block text-foreground">
+                    {option.label}
+                  </Text>
+                  <Text as="span" size="xs" color="muted" className="mt-0.5 block leading-5">
+                    {option.description}
+                  </Text>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </article>
 
       <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <Text as="p" size="xs" weight="bold" color="muted" className="tracking-wide uppercase">
-          Projects
-        </Text>
+        <div className="flex items-center justify-between gap-3">
+          <Title level={5} className="text-sm! text-foreground">
+            {readOnly ? "Your projects" : "Projects"}
+          </Title>
+          <Text as="span" size="xs" color="muted">
+            {readOnly ? `${projects.length} assigned` : "Scheduled events"}
+          </Text>
+        </div>
 
         {projectsLoading ? (
-          <Paragraph size="sm" className="mt-4">Loading projects...</Paragraph>
+          <Paragraph size="sm" className="mt-4">
+            Loading projects...
+          </Paragraph>
         ) : projects.length === 0 ? (
-          <Paragraph size="sm" className="mt-4">No projects available.</Paragraph>
+          <Paragraph size="sm" className="mt-4">
+            {readOnly
+              ? "You are not assigned to any projects yet."
+              : "No projects yet. Events you create can be linked to a project."}
+          </Paragraph>
         ) : (
-          <ul className="mt-4 max-h-48 space-y-3 overflow-y-auto pr-1">
+          <ul className="mt-4 max-h-52 space-y-2 overflow-y-auto pr-1">
             {projects.map((project) => (
-              <li key={project.id} className="flex items-center justify-between gap-3">
+              <li
+                key={project.id}
+                className="flex items-center justify-between gap-3 rounded-xl bg-background/70 px-3 py-2.5"
+              >
                 <div className="flex min-w-0 items-center gap-2.5">
                   <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", project.dotClass)} />
                   <Text as="span" size="sm" weight="medium" className="truncate">
                     {project.name}
                   </Text>
                 </div>
-                <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-background px-2 text-xs font-semibold text-muted">
+                <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full border border-border bg-card px-2 text-xs font-semibold text-muted">
                   {project.eventCount}
                 </span>
               </li>
             ))}
           </ul>
         )}
-      </article>
-
-      <article className="relative overflow-hidden rounded-2xl bg-primary p-5 text-white shadow-sm">
-        <div className="relative z-10">
-          <Title level={5} className="text-white">
-            Sprint Focus
-          </Title>
-          <Paragraph size="sm" className="mt-2 leading-6 text-white/85">
-            {upcomingDeadlines > 0
-              ? `${upcomingDeadlines} scheduled project event${upcomingDeadlines === 1 ? "" : "s"} are on your calendar.`
-              : "Create team events and track deadlines alongside task due dates."}
-          </Paragraph>
-          <button
-            type="button"
-            onClick={() => toast.info("Use New Event to schedule your next milestone.")}
-            className="mt-4 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-primary transition-opacity hover:opacity-90"
-          >
-            Review Now
-          </button>
-        </div>
-
-        <CalendarOutlined className="pointer-events-none absolute -right-2 -bottom-2 text-7xl text-white/10" />
       </article>
     </aside>
   );

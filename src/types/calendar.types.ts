@@ -1,8 +1,7 @@
 import type { CalendarEvent, CalendarEventType } from "../data/workspace-calendar";
 
 export type ApiCalendarEvent = CalendarEvent & {
-  description?: string;
-  source?: "event" | "task" | "project";
+  source: "event" | "task" | "project";
 };
 
 export type ApiCalendarProjectSummary = {
@@ -20,6 +19,14 @@ export type CreateCalendarEventRequest = {
   description?: string;
 };
 
+export type UpdateCalendarEventRequest = {
+  title?: string;
+  date?: string;
+  type?: Exclude<CalendarEventType, "task">;
+  projectId?: string | null;
+  description?: string;
+};
+
 export type ListCalendarEventsParams = {
   from: string;
   to: string;
@@ -34,5 +41,8 @@ export function mapApiCalendarEvent(event: ApiCalendarEvent): CalendarEvent {
     date: event.date,
     type: event.type,
     projectId: event.projectId,
+    description: event.description,
+    source: event.source,
+    createdById: event.createdById,
   };
 }

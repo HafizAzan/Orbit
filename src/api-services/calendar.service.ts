@@ -6,6 +6,7 @@ import type {
   ApiCalendarProjectSummary,
   CreateCalendarEventRequest,
   ListCalendarEventsParams,
+  UpdateCalendarEventRequest,
 } from "../types/calendar.types";
 import {
   buildPaginationSearchParams,
@@ -49,6 +50,18 @@ const createCalendarEvent = async (
   return assertApiSuccess<ApiCalendarEvent>(response);
 };
 
+const updateCalendarEvent = async (
+  eventId: string,
+  data: UpdateCalendarEventRequest,
+): Promise<ApiCalendarEvent> => {
+  const response = await ApiService.patch(
+    `${API_ROUTES.CALENDAR.EVENTS}/${eventId}`,
+    data,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<ApiCalendarEvent>(response);
+};
+
 const deleteCalendarEvent = async (eventId: string): Promise<{ message: string }> => {
   const response = await ApiService.delete(
     `${API_ROUTES.CALENDAR.EVENTS}/${eventId}`,
@@ -62,4 +75,5 @@ export {
   deleteCalendarEvent,
   listCalendarEvents,
   listCalendarProjects,
+  updateCalendarEvent,
 };

@@ -4,10 +4,12 @@ import {
   deleteCalendarEvent,
   listCalendarEvents,
   listCalendarProjects,
+  updateCalendarEvent,
 } from "../api-services/calendar.service";
 import type {
   CreateCalendarEventRequest,
   ListCalendarEventsParams,
+  UpdateCalendarEventRequest,
 } from "../types/calendar.types";
 
 export const CALENDAR_EVENTS_QUERY_KEY = "workspace-calendar-events";
@@ -33,6 +35,19 @@ export function useCreateCalendarEvent() {
 
   return useMutation({
     mutationFn: (data: CreateCalendarEventRequest) => createCalendarEvent(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [CALENDAR_EVENTS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [CALENDAR_PROJECTS_QUERY_KEY] });
+    },
+  });
+}
+
+export function useUpdateCalendarEvent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ eventId, data }: { eventId: string; data: UpdateCalendarEventRequest }) =>
+      updateCalendarEvent(eventId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [CALENDAR_EVENTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [CALENDAR_PROJECTS_QUERY_KEY] });

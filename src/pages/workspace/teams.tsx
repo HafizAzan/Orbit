@@ -7,6 +7,7 @@ import TeamsTable from "../../component/workspace/teams/teams-table";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import { TeamsPageSkeleton } from "../../component/skeletons";
+import { useAppContext } from "../../context/app-context";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useTeamMembers } from "../../hooks/use-workspace-team";
 import { TEAM_MEMBERS_PAGE_SIZE } from "../../data/workspace-teams";
@@ -14,6 +15,8 @@ import { mapApiTeamMemberToTeamMember } from "../../types/team.types";
 import { Paragraph, Title } from "../../component/ui/typography";
 
 function WorkspaceTeamsContent() {
+  const app = useAppContext();
+  const role = app?.user?.role;
   const { can } = useWorkspacePermissions();
   const [page, setPage] = useState(1);
   const teamQuery = useTeamMembers({ page, limit: TEAM_MEMBERS_PAGE_SIZE });
@@ -22,6 +25,10 @@ function WorkspaceTeamsContent() {
   const totalMembers = membersPage?.total ?? 0;
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const canInvite = can("team.invite");
+  const teamsDescription =
+    role === "manager"
+      ? "Manage your delivery squad. Remove members from projects you lead when assignments change."
+      : "Invite teammates, manage roles, and monitor workspace activity.";
 
   const teamMembers = useMemo(() => members.map(mapApiTeamMemberToTeamMember), [members]);
 
@@ -61,7 +68,7 @@ function WorkspaceTeamsContent() {
               Team Management
             </Title>
             <Paragraph size="sm" className="mt-1 text-muted">
-              View your project squad. Managers can remove members from projects they lead.
+              {teamsDescription}
             </Paragraph>
           </div>
 

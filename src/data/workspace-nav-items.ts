@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  AuditOutlined,
   BarChartOutlined,
   CalendarOutlined,
   CheckSquareOutlined,
@@ -59,7 +60,7 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     label: "Calendar",
     path: WORKSPACE_ROUTES.CALENDAR,
     icon: CalendarOutlined,
-    roles: ["owner", "admin", "manager", "member"],
+    roles: ["owner", "admin", "manager"],
   },
   {
     key: "teams",
@@ -73,6 +74,13 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     label: "Reports",
     path: WORKSPACE_ROUTES.REPORTS,
     icon: BarChartOutlined,
+    roles: ["owner", "admin", "manager"],
+  },
+  {
+    key: "activity-logs",
+    label: "Activity Log",
+    path: WORKSPACE_ROUTES.ACTIVITY_LOGS,
+    icon: AuditOutlined,
     roles: ["owner", "admin", "manager"],
   },
   {

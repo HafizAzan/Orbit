@@ -33,10 +33,6 @@ export type LogoutResponse = {
   message: string;
 };
 
-export type ActivityHeartbeatResponse = {
-  lastActiveAt: string;
-};
-
 export type InitiateEmailChangeRequest = {
   newEmail: string;
   currentPassword: string;

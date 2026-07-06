@@ -2,12 +2,17 @@ export type CalendarViewMode = "month" | "week" | "day";
 
 export type CalendarEventType = "task" | "team" | "deadline";
 
+export type CalendarEventSource = "event" | "task" | "project";
+
 export type CalendarEvent = {
   id: string;
   title: string;
   date: string;
   type: CalendarEventType;
   projectId?: string;
+  description?: string;
+  source?: CalendarEventSource;
+  createdById?: string;
 };
 
 export type CalendarProject = {
@@ -37,32 +42,57 @@ export const CALENDAR_VIEW_OPTIONS: { value: CalendarViewMode; label: string }[]
 
 export const CALENDAR_WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
-export const CALENDAR_EVENT_STYLES: Record<CalendarEventType, { bg: string; accent: string; text: string }> = {
+export const CALENDAR_EVENT_TYPE_META: Record<
+  CalendarEventType,
+  { label: string; shortLabel: string; dotClass: string; pillClass: string; pillClassDark: string }
+> = {
   task: {
-    bg: "bg-violet-50",
-    accent: "border-l-violet-500",
-    text: "text-violet-700",
+    label: "Task due date",
+    shortLabel: "Tasks",
+    dotClass: "bg-violet-500",
+    pillClass: "border-violet-200/80 bg-violet-50 text-violet-700",
+    pillClassDark: "border-violet-500/30 bg-violet-500/15 text-violet-300",
   },
   team: {
-    bg: "bg-sky-50",
-    accent: "border-l-sky-500",
-    text: "text-sky-700",
+    label: "Team meeting",
+    shortLabel: "Meetings",
+    dotClass: "bg-sky-500",
+    pillClass: "border-sky-200/80 bg-sky-50 text-sky-700",
+    pillClassDark: "border-sky-500/30 bg-sky-500/15 text-sky-300",
   },
   deadline: {
-    bg: "bg-red-50",
-    accent: "border-l-red-500",
-    text: "text-red-700",
+    label: "Deadline",
+    shortLabel: "Deadlines",
+    dotClass: "bg-red-500",
+    pillClass: "border-red-200/80 bg-red-50 text-red-700",
+    pillClassDark: "border-red-500/30 bg-red-500/15 text-red-300",
   },
 };
 
 export const CALENDAR_FILTER_OPTIONS: {
   key: keyof CalendarFilters;
   label: string;
-  colorClass: string;
+  description: string;
+  dotClass: string;
 }[] = [
-  { key: "myTasks", label: "My Tasks", colorClass: "text-primary" },
-  { key: "teamEvents", label: "Team Events", colorClass: "text-teal-600" },
-  { key: "deadlinesOnly", label: "Deadlines Only", colorClass: "text-red-600" },
+  {
+    key: "myTasks",
+    label: "Task due dates",
+    description: "Open tasks with a due date",
+    dotClass: "bg-violet-500",
+  },
+  {
+    key: "teamEvents",
+    label: "Team meetings",
+    description: "Standups, demos, and scheduled events",
+    dotClass: "bg-sky-500",
+  },
+  {
+    key: "deadlinesOnly",
+    label: "Deadlines only",
+    description: "Critical tasks and project due dates",
+    dotClass: "bg-red-500",
+  },
 ];
 
 export const CALENDAR_PROJECTS: CalendarProject[] = [

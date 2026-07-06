@@ -100,8 +100,10 @@ const deleteTask = async (taskId: string): Promise<{ message: string }> => {
   return assertApiSuccess<{ message: string }>(response);
 };
 
-const getDashboard = async (): Promise<WorkspaceDashboardResponse> => {
-  const response = await ApiService.get(API_ROUTES.TASKS.DASHBOARD, AUTH_REQUEST);
+import type { DashboardPeriodFilter } from "../data/workspace-dashboard";
+
+const getDashboard = async (period: DashboardPeriodFilter = "this_month"): Promise<WorkspaceDashboardResponse> => {
+  const response = await ApiService.get(`${API_ROUTES.TASKS.DASHBOARD}?period=${period}`, AUTH_REQUEST);
   return assertApiSuccess<WorkspaceDashboardResponse>(response);
 };
 

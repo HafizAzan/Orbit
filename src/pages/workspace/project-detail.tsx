@@ -4,6 +4,7 @@ import ProjectActivityFeed from "../../component/workspace/projects/project-acti
 import ProjectAttachmentsCard from "../../component/workspace/projects/project-attachments-card";
 import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
 import ProjectDiscussionCard from "../../component/workspace/projects/project-discussion-card";
+import ProjectNetworkPulseCard from "../../component/workspace/projects/project-network-pulse-card";
 import ProjectPhaseProgressCard from "../../component/workspace/projects/project-phase-progress-card";
 import ProjectTasksCard from "../../component/workspace/projects/project-tasks-card";
 import ProjectTeamCard from "../../component/workspace/projects/project-team-card";
@@ -145,6 +146,7 @@ function WorkspaceProjectDetail() {
             </div>
 
             <div className="space-y-6">
+              <ProjectNetworkPulseCard members={project.teamMembers} tasks={projectTasks} />
               <ProjectTeamCard members={project.teamMembers} />
               <ProjectAttachmentsCard items={project.attachments} />
               <ProjectDiscussionCard

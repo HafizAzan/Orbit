@@ -5,6 +5,7 @@ import type { KanbanTask } from "../../../data/workspace-board";
 import { KANBAN_PRIORITY_CONFIG } from "../../../data/workspace-board";
 import { getTaskDetailPath } from "../../../data/workspace-task-form";
 import MarkdownContent from "../../common/markdown-content";
+import { resolveBadgeClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import { Text } from "../../ui/typography";
 
@@ -14,6 +15,7 @@ type KanbanTaskCardProps = {
 };
 
 function KanbanTaskCard({ task, variant = "default" }: KanbanTaskCardProps) {
+  const isDark = useIsDarkAppTheme();
   const priorityConfig = KANBAN_PRIORITY_CONFIG[task.priority];
   const isCompleted = variant === "completed";
 
@@ -22,14 +24,18 @@ function KanbanTaskCard({ task, variant = "default" }: KanbanTaskCardProps) {
       to={getTaskDetailPath(task.id)}
       className={cn(
         "block min-h-[120px] rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:min-h-[140px] sm:p-5 lg:p-6",
-        isCompleted ? "border-emerald-100 bg-emerald-50/30" : "border-border",
-        variant === "pending" && "border-amber-100 bg-amber-50/20",
+        isCompleted
+          ? isDark
+            ? "border-emerald-500/30 bg-emerald-500/10"
+            : "border-emerald-100 bg-emerald-50/30"
+          : "border-border",
+        variant === "pending" && (isDark ? "border-amber-500/30 bg-amber-500/10" : "border-amber-100 bg-amber-50/20"),
       )}
     >
       <span
         className={cn(
           "inline-flex rounded-md border px-2.5 py-1 text-xs font-bold tracking-wide",
-          priorityConfig.badgeClass,
+          resolveBadgeClass(priorityConfig.badgeClass, isDark),
         )}
       >
         {priorityConfig.label}

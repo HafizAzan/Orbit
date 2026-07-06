@@ -38,7 +38,7 @@ function ProjectsPageHeader({ selectedCount = 0, onBulkDelete }: ProjectsPageHea
         ) : null}
 
         {showBulkDelete ? (
-          <BulkDeleteProjectsButton selectedCount={selectedCount} onDelete={onBulkDelete} />
+          <BulkDeleteProjectsButton selectedCount={selectedCount} onDelete={onBulkDelete!} />
         ) : null}
       </div>
     </div>

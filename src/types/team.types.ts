@@ -42,6 +42,8 @@ export type ApiTeamStats = {
   pendingInvites: number;
   activeToday: number;
   activeTodayTrend: string;
+  onlineNow: number;
+  squadSize: number;
 };
 
 export type InviteTeamMemberRequest = {

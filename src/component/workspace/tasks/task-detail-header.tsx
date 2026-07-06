@@ -6,6 +6,7 @@ import type { ApiWorkspaceTask } from "../../../types/task.types";
 import { TASK_PRIORITY_CONFIG, TASK_STATUS_CONFIG } from "../../../data/workspace-tasks";
 import { getTaskEditPath } from "../../../data/workspace-task-form";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
+import { resolveBadgeClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import { useWorkspaceReturnTo } from "../../../lib/workspace-navigation";
 import { getWorkspaceTaskHubPath } from "../../../lib/workspace-routing";
@@ -19,7 +20,8 @@ type TaskDetailHeaderProps = {
 
 function TaskDetailHeader({ task }: TaskDetailHeaderProps) {
   const { can, role } = useWorkspacePermissions();
-  const canEditTask = can("task.edit");
+  const isDark = useIsDarkAppTheme();
+  const canEditTask = can("task.edit") && role !== "member";
   const taskHubPath = getWorkspaceTaskHubPath(role);
   const taskHubLabel = role === "member" ? "My Tasks" : "Tasks";
   const { returnPath, returnLabel } = useWorkspaceReturnTo(taskHubPath, taskHubLabel);
@@ -47,7 +49,7 @@ function TaskDetailHeader({ task }: TaskDetailHeaderProps) {
             <span
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
-                statusConfig.badgeClass,
+                resolveBadgeClass(statusConfig.badgeClass, isDark),
               )}
             >
               <span className={cn("h-1.5 w-1.5 rounded-full", statusConfig.dot)} />
@@ -57,7 +59,7 @@ function TaskDetailHeader({ task }: TaskDetailHeaderProps) {
             <span
               className={cn(
                 "inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide",
-                priorityConfig.badgeClass,
+                resolveBadgeClass(priorityConfig.badgeClass, isDark),
               )}
             >
               {priorityConfig.label}

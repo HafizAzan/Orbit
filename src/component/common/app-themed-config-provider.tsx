@@ -26,6 +26,9 @@ function AppThemedConfigProvider({ children }: AppThemedConfigProviderProps) {
                 colorBorder: "#243044",
                 colorText: "#e2e8f0",
                 colorTextSecondary: "#94a3b8",
+                colorLink: "#818cf8",
+                colorLinkHover: "#a5b4fc",
+                colorLinkActive: "#c7d2fe",
               }
             : {}),
         },
