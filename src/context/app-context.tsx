@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import ActivityHeartbeat from "../component/common/activity-heartbeat";
 import { getMe } from "../api-services/auth.service";
 import {
   clearAuthSession,
@@ -159,7 +158,6 @@ function AppProvider({ children }: AppProviderProps) {
 
   return (
     <AppContext.Provider value={value}>
-      {user !== null ? <ActivityHeartbeat /> : null}
       {children}
     </AppContext.Provider>
   );

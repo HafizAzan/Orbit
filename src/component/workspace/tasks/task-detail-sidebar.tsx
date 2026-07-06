@@ -2,8 +2,7 @@ import { CalendarOutlined, ClockCircleOutlined, FieldTimeOutlined, ProjectOutlin
 import React from "react";
 import { Link } from "react-router-dom";
 import type { ApiWorkspaceTask } from "../../../types/task.types";
-import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
-import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
+import { getProjectDetailPath } from "../../../data/workspace-project-detail";
 import { formatDate } from "../../../lib/helper";
 import { Paragraph, Text } from "../../ui/typography";
 
@@ -36,8 +35,7 @@ function DetailRow({
 }
 
 function TaskDetailSidebar({ task }: TaskDetailSidebarProps) {
-  const { role } = useWorkspacePermissions();
-  const projectPath = role === "member" ? getProjectBoardPath(task.projectId) : getProjectDetailPath(task.projectId);
+  const projectPath = getProjectDetailPath(task.projectId);
   const assignee = task.assignee;
 
   return (

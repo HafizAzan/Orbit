@@ -5,6 +5,7 @@ import type { MyTask } from "../../../data/workspace-my-tasks";
 import { getTaskCreatePath } from "../../../data/workspace-task-form";
 import { TASK_PRIORITY_CONFIG } from "../../../data/workspace-tasks";
 import { formatDate } from "../../../lib/helper";
+import { resolveBadgeClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import MarkdownContent from "../../common/markdown-content";
 import WorkspaceNavLink from "../common/workspace-nav-link";
@@ -18,6 +19,8 @@ type MyTasksDueTodaySectionProps = {
 };
 
 function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDueTodaySectionProps) {
+  const isDark = useIsDarkAppTheme();
+
   return (
     <section className="mb-8">
       <MyTasksSectionHeader title="Due Today" count={tasks.length} accentClass="bg-red-500" />
@@ -38,7 +41,7 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
                 <span
                   className={cn(
                     "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
-                    priorityConfig.badgeClass,
+                    resolveBadgeClass(priorityConfig.badgeClass, isDark),
                   )}
                 >
                   {priorityConfig.label}

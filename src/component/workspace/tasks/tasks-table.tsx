@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import createWorkspaceTaskTableColumns from "../../../columns/workspace-task-table-columns";
 import { getTaskDetailPath, getTaskEditPath } from "../../../data/workspace-task-form";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
+import { useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
 import { toast } from "../../../lib/toast";
@@ -88,6 +89,7 @@ type TasksTableProps = {
 function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask, serverPagination }: TasksTableProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const isDark = useIsDarkAppTheme();
   const { can } = useWorkspacePermissions();
   const canEditTask = can("task.edit");
   const canDeleteAnyTask = can("task.delete_any");
@@ -171,8 +173,9 @@ function TasksTable({ data, emptyAction, onBulkDelete, onDeleteTask, serverPagin
         onDelete: canDeleteAnyTask ? handleDelete : undefined,
         canEdit: canEditTask,
         canDelete: canDeleteAnyTask,
+        isDark,
       }),
-    [canDeleteAnyTask, canEditTask, handleDelete, handleEdit, handleView],
+    [canDeleteAnyTask, canEditTask, handleDelete, handleEdit, handleView, isDark],
   );
   const activeFilterCount = countActiveTaskFilters(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;

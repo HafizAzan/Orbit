@@ -38,7 +38,7 @@ function ProjectDiscussionCard({
   };
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
+    <article id="project-discussion" className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
       <div className="flex items-center justify-between gap-3">
         <Title level={5} color="default">Discussion</Title>
         {onRefresh ? (

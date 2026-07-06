@@ -1,7 +1,6 @@
-import { CalendarOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import React from "react";
+import type { MyTasksStats } from "../../../lib/workspace-my-tasks-utils";
 import { Paragraph, Title } from "../../ui/typography";
-import { cn } from "../../../lib/utils";
 
 export type MyTasksViewMode = "list" | "calendar";
 
@@ -14,44 +13,41 @@ export const DEFAULT_MY_TASKS_VIEW: MyTasksViewMode = "list";
 
 type MyTasksPageHeaderProps = {
   viewMode: MyTasksViewMode;
+  stats: MyTasksStats;
   onViewModeChange: (mode: MyTasksViewMode) => void;
 };
 
-function MyTasksPageHeader({ viewMode, onViewModeChange }: MyTasksPageHeaderProps) {
+function MyTasksPageHeader({ stats }: MyTasksPageHeaderProps) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <Title level={2} className="text-2xl text-foreground lg:text-3xl">
-          My Tasks
-        </Title>
-        <Paragraph size="sm" className="mt-1 text-muted">
-          Manage and track your personal task list across all projects.
-        </Paragraph>
+    <div className="mb-6 space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <Title level={2} className="text-2xl text-foreground lg:text-3xl">
+            My Tasks
+          </Title>
+          <Paragraph size="sm" className="mt-1 text-muted">
+            Track assigned work, update task status, and jump into project discussions.
+          </Paragraph>
+        </div>
       </div>
 
-      <div className="inline-flex rounded-xl border border-border bg-card p-1 shadow-sm">
-        <button
-          type="button"
-          onClick={() => onViewModeChange("list")}
-          className={cn(
-            "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
-            viewMode === "list" ? "bg-primary text-white" : "text-muted hover:text-foreground",
-          )}
-        >
-          <UnorderedListOutlined />
-          List
-        </button>
-        <button
-          type="button"
-          onClick={() => onViewModeChange("calendar")}
-          className={cn(
-            "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
-            viewMode === "calendar" ? "bg-primary text-white" : "text-muted hover:text-foreground",
-          )}
-        >
-          <CalendarOutlined />
-          Calendar
-        </button>
+      <div className="flex flex-wrap gap-2">
+        <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+          <span className="h-2 w-2 rounded-full bg-sky-500" />
+          {stats.assignedProjects} {stats.assignedProjects === 1 ? "project" : "projects"}
+        </span>
+        <span className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+          <span className="h-2 w-2 rounded-full bg-amber-500" />
+          {stats.dueToday} due today
+        </span>
+        <span className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
+          <span className="h-2 w-2 rounded-full bg-violet-500" />
+          {stats.inProgress} in progress
+        </span>
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          {stats.completed} completed
+        </span>
       </div>
     </div>
   );

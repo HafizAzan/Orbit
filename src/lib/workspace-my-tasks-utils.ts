@@ -28,3 +28,34 @@ export function countRemainingMyTasks(tasks: MyTask[]) {
 export function formatMyTasksRemainingLabel(count: number) {
   return `${count} ${pluralize(count, "task")} remaining`;
 }
+
+export type MyTasksStats = {
+  dueToday: number;
+  inProgress: number;
+  completed: number;
+  assignedProjects: number;
+};
+
+export function computeMyTasksStats(tasks: MyTask[]): MyTasksStats {
+  const projectIds = new Set(tasks.map((task) => task.projectId));
+
+  return {
+    dueToday: tasks.filter((task) => task.bucket === "due_today").length,
+    inProgress: tasks.filter((task) => task.status !== "done").length,
+    completed: tasks.filter((task) => task.status === "done").length,
+    assignedProjects: projectIds.size,
+  };
+}
+
+export function mapMyTaskToCalendarEvent(task: MyTask): import("../data/workspace-calendar").CalendarEvent {
+  const date = task.dueDate.includes("T") ? task.dueDate.slice(0, 10) : task.dueDate;
+
+  return {
+    id: task.id,
+    title: task.title,
+    date,
+    type: task.bucket === "due_today" && task.status !== "done" ? "deadline" : "task",
+    projectId: task.projectId,
+    source: "task",
+  };
+}

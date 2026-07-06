@@ -1,5 +1,9 @@
 import type { CalendarEvent, CalendarFilters } from "../data/workspace-calendar";
 
+export function isManageableCalendarEvent(event: CalendarEvent, userId?: string) {
+  return event.source === "event" && Boolean(userId) && event.createdById === userId;
+}
+
 export type CalendarDayCell = {
   date: Date;
   iso: string;

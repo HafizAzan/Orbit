@@ -2,24 +2,30 @@ import { BellOutlined, CheckOutlined } from "@ant-design/icons";
 import { Badge, Button, Dropdown, Spin } from "antd";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  WORKSPACE_NOTIFICATION_ITEM_HEIGHT_PX,
-  WORKSPACE_NOTIFICATION_KIND_CONFIG,
-  WORKSPACE_NOTIFICATION_VISIBLE_COUNT,
-  type WorkspaceNotification,
-} from "../../../data/workspace-notifications";
+import { useAppContext } from "../../../context/app-context";
+import type { ApiNotification } from "../../../api-services/notification.service";
+import { cn } from "../../../lib/utils";
+import { resolveWorkspaceNotificationHref } from "../../../lib/workspace-notification-routing";
+import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import {
   useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
   useNotifications,
   useUnreadNotificationCount,
 } from "../../../hooks/use-notifications";
-import { cn } from "../../../lib/utils";
-import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
+import {
+  WORKSPACE_NOTIFICATION_ITEM_HEIGHT_PX,
+  WORKSPACE_NOTIFICATION_KIND_CONFIG,
+  WORKSPACE_NOTIFICATION_VISIBLE_COUNT,
+  type WorkspaceNotification,
+} from "../../../data/workspace-notifications";
 import { Text } from "../../ui/typography";
 
 function WorkspaceNotificationsDropdown() {
   const navigate = useNavigate();
+  const app = useAppContext();
+  const role = app?.user?.role;
+  const isMember = role === "member";
   const [open, setOpen] = useState(false);
   const notificationsQuery = useNotifications();
   const unreadQuery = useUnreadNotificationCount();
@@ -35,18 +41,19 @@ function WorkspaceNotificationsDropdown() {
   );
 
   const handleNotificationClick = useCallback(
-    (notification: WorkspaceNotification) => {
+    (notification: WorkspaceNotification & Pick<ApiNotification, "resourceType" | "resourceId">) => {
       if (!notification.read) {
         markAsRead(notification.id);
       }
 
       setOpen(false);
 
-      if (notification.href) {
-        navigate(notification.href);
+      const href = resolveWorkspaceNotificationHref(notification, role);
+      if (href) {
+        navigate(href);
       }
     },
-    [markAsRead, navigate],
+    [markAsRead, navigate, role],
   );
 
   const dropdownContent = (
@@ -143,13 +150,23 @@ function WorkspaceNotificationsDropdown() {
       </div>
 
       <div className="border-t border-border bg-background/60 px-4 py-3">
-        <Link
-          to={WORKSPACE_ROUTES.ACTIVITY_LOGS}
-          onClick={() => setOpen(false)}
-          className="block text-center text-xs font-semibold text-primary transition-colors hover:text-primary/80"
-        >
-          View all activity
-        </Link>
+        {isMember ? (
+          <Link
+            to={WORKSPACE_ROUTES.MY_TASKS}
+            onClick={() => setOpen(false)}
+            className="block text-center text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+          >
+            View my tasks
+          </Link>
+        ) : (
+          <Link
+            to={WORKSPACE_ROUTES.ACTIVITY_LOGS}
+            onClick={() => setOpen(false)}
+            className="block text-center text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+          >
+            View all activity
+          </Link>
+        )}
       </div>
     </div>
   );

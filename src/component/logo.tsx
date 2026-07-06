@@ -1,4 +1,5 @@
 import React from "react";
+import { useIsDarkAppTheme } from "../lib/app-ui-theme-utils";
 import { RESOURCES } from "../lib/resources";
 import { cn } from "../lib/utils";
 
@@ -8,6 +9,8 @@ type LogoProps = {
 };
 
 function Logo({ className, animated = false }: LogoProps) {
+  const isDark = useIsDarkAppTheme();
+
   return (
     <div
       className={cn(
@@ -17,7 +20,7 @@ function Logo({ className, animated = false }: LogoProps) {
       )}
     >
       <img
-        src={RESOURCES.SVG.LOGO}
+        src={isDark ? RESOURCES.SVG.LOGO_DARK : RESOURCES.SVG.LOGO}
         alt="FlowSync"
         className="h-7 w-auto transition-opacity duration-300 nav:h-10"
       />

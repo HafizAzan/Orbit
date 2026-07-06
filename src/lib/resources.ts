@@ -1,19 +1,13 @@
-import LOGO from "../../public/svg/flow.svg";
-import DASHBOARD from "../../public/images/dashboard-img.png";
-import LAPTOP from "../../public/images/laptop.png";
-import KANBAN_LAPTOP from "../../public/images/kanban-img.png";
-import WORKSPACE from "../../public/images/workspace.png";
-import JOURNEY from "../../public/images/journey.png";
-
 export const RESOURCES = {
   SVG: {
-    LOGO,
+    LOGO: "/svg/flow.svg",
+    LOGO_DARK: "/svg/flow-dark.svg",
   },
   IMAGES: {
-    LAPTOP,
-    KANBAN_LAPTOP,
-    DASHBOARD,
-    WORKSPACE,
-    JOURNEY,
+    DASHBOARD: "/public/images/dashboard-img.png",
+    LAPTOP: "/public/images/laptop.png",
+    KANBAN_LAPTOP: "/public/images/kanban-img.png",
+    WORKSPACE: "/public/images/workspace.png",
+    JOURNEY: "/public/images/journey.png",
   },
 };

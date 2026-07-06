@@ -38,7 +38,7 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     label: "Boards",
     path: WORKSPACE_ROUTES.BOARDS,
     icon: AppstoreOutlined,
-    roles: ["owner", "admin", "manager"],
+    roles: ["owner", "admin", "manager", "member"],
   },
   {
     key: "tasks",

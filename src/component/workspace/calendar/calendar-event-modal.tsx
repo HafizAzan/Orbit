@@ -9,7 +9,9 @@ import DatePicker from "../../ui/date-picker";
 
 type CalendarEventModalProps = {
   open: boolean;
+  mode?: "create" | "edit";
   defaultDate?: string;
+  initialValues?: Partial<CalendarEventFormValues>;
   onClose: () => void;
   onSubmit: (values: CalendarEventFormValues) => Promise<void>;
   submitting?: boolean;
@@ -30,13 +32,16 @@ const EVENT_TYPE_OPTIONS = [
 
 function CalendarEventModal({
   open,
+  mode = "create",
   defaultDate = "",
+  initialValues,
   onClose,
   onSubmit,
   submitting = false,
 }: CalendarEventModalProps) {
   const [form] = Form.useForm<CalendarEventFormValues>();
   const { data: projects = [] } = useProjectsForSelect();
+  const isEdit = mode === "edit";
 
   useEffect(() => {
     if (!open) {
@@ -45,13 +50,13 @@ function CalendarEventModal({
     }
 
     form.setFieldsValue({
-      title: "",
-      date: defaultDate,
-      type: "team",
-      projectId: undefined,
-      description: "",
+      title: initialValues?.title ?? "",
+      date: initialValues?.date ?? defaultDate,
+      type: initialValues?.type ?? "team",
+      projectId: initialValues?.projectId,
+      description: initialValues?.description ?? "",
     });
-  }, [defaultDate, form, open]);
+  }, [defaultDate, form, initialValues, open]);
 
   const handleFinish = async (values: CalendarEventFormValues) => {
     try {
@@ -61,7 +66,7 @@ function CalendarEventModal({
         description: values.description?.trim() || undefined,
         projectId: values.projectId || undefined,
       });
-      showApiSuccessToast("Event created.");
+      showApiSuccessToast(isEdit ? "Event updated." : "Event created.");
       onClose();
     } catch (error) {
       showApiErrorToast(error);
@@ -89,10 +94,12 @@ function CalendarEventModal({
           </span>
           <div>
             <Title level={4} className="mb-0! text-foreground">
-              New Event
+              {isEdit ? "Edit Event" : "New Event"}
             </Title>
             <Paragraph size="sm" className="mt-1 mb-0! text-muted">
-              Schedule a team event or deadline on your workspace calendar.
+              {isEdit
+                ? "Update this scheduled team event or deadline."
+                : "Schedule a team event or deadline on your workspace calendar."}
             </Paragraph>
           </div>
         </div>
@@ -166,7 +173,7 @@ function CalendarEventModal({
           onClick={() => form.submit()}
           className="rounded-xl! font-semibold!"
         >
-          Create Event
+          {isEdit ? "Save Changes" : "Create Event"}
         </Button>
       </div>
     </Modal>

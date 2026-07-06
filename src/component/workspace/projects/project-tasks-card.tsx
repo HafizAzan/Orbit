@@ -11,6 +11,7 @@ import {
 } from "../../../data/workspace-tasks";
 import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { formatDate } from "../../../lib/helper";
+import { resolveBadgeClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import type { ApiWorkspaceTask } from "../../../types/task.types";
 import WorkspaceNavLink from "../common/workspace-nav-link";
@@ -52,6 +53,7 @@ function sortProjectTasks(tasks: ApiWorkspaceTask[]) {
 
 function ProjectTasksCard({ projectId, tasks, loading = false }: ProjectTasksCardProps) {
   const { can } = useWorkspacePermissions();
+  const isDark = useIsDarkAppTheme();
   const canCreateTask = can("task.create");
 
   const statusCounts = useMemo(() => {
@@ -135,7 +137,7 @@ function ProjectTasksCard({ projectId, tasks, loading = false }: ProjectTasksCar
                       <span
                         className={cn(
                           "inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wide",
-                          statusConfig.badgeClass,
+                          resolveBadgeClass(statusConfig.badgeClass, isDark),
                         )}
                       >
                         {statusConfig.label}
@@ -143,7 +145,7 @@ function ProjectTasksCard({ projectId, tasks, loading = false }: ProjectTasksCar
                       <span
                         className={cn(
                           "inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wide",
-                          priorityConfig.badgeClass,
+                          resolveBadgeClass(priorityConfig.badgeClass, isDark),
                         )}
                       >
                         {priorityConfig.label}

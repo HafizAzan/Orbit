@@ -4,6 +4,7 @@ import { getTeamPresence } from "../../api-services/team.service";
 import { getSocket } from "../../config/socket";
 import { useAppContext } from "../../context/app-context";
 import useRealtimeConnection from "../../hooks/use-realtime-connection";
+import usePresencePing from "../../hooks/use-presence-ping";
 import { useNotificationSocketListener } from "../../hooks/use-notifications";
 
 export type OrgPresenceSnapshot = {
@@ -39,6 +40,7 @@ function WorkspaceRealtimeProvider({ children }: WorkspaceRealtimeProviderProps)
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
 
   useRealtimeConnection(enabled);
+  usePresencePing(enabled);
   useNotificationSocketListener(enabled);
 
   const presenceQuery = useQuery({

@@ -8,7 +8,6 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     PROFILE: "/auth/me/profile",
     PASSWORD: "/auth/me/password",
     UI_THEME: "/auth/me/ui-theme",
-    HEARTBEAT: "/auth/heartbeat",
     EMAIL_INITIATE: "/auth/me/email/initiate",
     EMAIL_CONFIRM: "/auth/me/email/confirm",
     EMAIL_REQUEST_RECIPIENTS: "/auth/me/email/request-recipients",

@@ -3,24 +3,50 @@ import { CALENDAR_WEEKDAY_LABELS, type CalendarEvent } from "../../../data/works
 import { getEventsForIso, getWeekDays } from "../../../lib/calendar-utils";
 import { cn } from "../../../lib/utils";
 import CalendarEventPill from "./calendar-event-pill";
+import type { CalendarEventInteractionProps } from "./calendar-event-interaction";
 import { Paragraph, Text } from "../../ui/typography";
 
-type CalendarWeekViewProps = {
+type CalendarWeekViewProps = CalendarEventInteractionProps & {
   activeDate: Date;
   events: CalendarEvent[];
 };
 
-function CalendarWeekView({ activeDate, events }: CalendarWeekViewProps) {
+function CalendarWeekView({
+  activeDate,
+  events,
+  currentUserId,
+  onEditEvent,
+  onDeleteEvent,
+}: CalendarWeekViewProps) {
   const days = useMemo(() => getWeekDays(activeDate), [activeDate]);
 
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="hidden border-b border-border bg-background/60 sm:grid sm:grid-cols-7">
-        {CALENDAR_WEEKDAY_LABELS.map((label) => (
-          <div key={label} className="px-3 py-3 text-center text-xs font-semibold tracking-wide text-muted uppercase">
-            {label}
-          </div>
-        ))}
+      <div className="hidden border-b border-border bg-background/80 sm:grid sm:grid-cols-7">
+        {CALENDAR_WEEKDAY_LABELS.map((label, index) => {
+          const day = days[index];
+
+          return (
+            <div
+              key={label}
+              className={cn(
+                "border-r border-border px-3 py-3 text-center last:border-r-0",
+                day?.isToday && "bg-primary/5",
+              )}
+            >
+              <Text as="p" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+                {label}
+              </Text>
+              <Text
+                as="p"
+                weight="bold"
+                className={cn("mt-1 text-lg tabular-nums", day?.isToday ? "text-primary" : "text-foreground")}
+              >
+                {day?.day}
+              </Text>
+            </div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-7 sm:divide-x sm:divide-y-0">
@@ -31,29 +57,48 @@ function CalendarWeekView({ activeDate, events }: CalendarWeekViewProps) {
             <div
               key={day.iso}
               className={cn(
-                "min-h-[180px] p-3 sm:min-h-[320px]",
-                day.isToday && "bg-feature-sync/40 ring-2 ring-inset ring-primary/20",
+                "min-h-[200px] p-3 sm:min-h-[340px] sm:p-4",
+                day.isToday && "bg-primary/5 ring-1 ring-inset ring-primary/20",
               )}
             >
-              <div className="mb-3 flex items-center gap-2 sm:flex-col sm:items-start">
-                <Text as="span" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase sm:hidden">
-                  {new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day.date)}
-                </Text>
-                <span
-                  className={cn(
-                    "inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
-                    day.isToday ? "bg-primary text-white" : "text-foreground",
-                  )}
-                >
-                  {day.day}
-                </span>
+              <div className="mb-3 flex items-center justify-between gap-2 sm:hidden">
+                <div className="flex items-center gap-2">
+                  <Text as="span" size="xs" weight="semibold" color="muted" className="tracking-wide uppercase">
+                    {new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day.date)}
+                  </Text>
+                  <span
+                    className={cn(
+                      "inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
+                      day.isToday ? "bg-primary text-white" : "bg-background text-foreground",
+                    )}
+                  >
+                    {day.day}
+                  </span>
+                </div>
+                {dayEvents.length > 0 ? (
+                  <Text as="span" size="xs" weight="semibold" color="muted">
+                    {dayEvents.length}
+                  </Text>
+                ) : null}
               </div>
 
               <div className="space-y-2">
                 {dayEvents.length > 0 ? (
-                  dayEvents.map((event) => <CalendarEventPill key={event.id} event={event} />)
+                  dayEvents.map((event) => (
+                    <CalendarEventPill
+                      key={event.id}
+                      event={event}
+                      currentUserId={currentUserId}
+                      onEditEvent={onEditEvent}
+                      onDeleteEvent={onDeleteEvent}
+                    />
+                  ))
                 ) : (
-                  <Paragraph size="xs">No events</Paragraph>
+                  <div className="flex h-full min-h-[120px] items-center justify-center rounded-xl border border-dashed border-border bg-background/40 px-3 py-6 text-center sm:min-h-[240px]">
+                    <Paragraph size="xs" className="text-muted">
+                      Nothing scheduled
+                    </Paragraph>
+                  </div>
                 )}
               </div>
             </div>

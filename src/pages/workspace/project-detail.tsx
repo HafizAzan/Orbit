@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import MemberProjectDetailHeader from "../../component/workspace/projects/member-project-detail-header";
 import ProjectActivityFeed from "../../component/workspace/projects/project-activity-feed";
 import ProjectAttachmentsCard from "../../component/workspace/projects/project-attachments-card";
 import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
@@ -16,7 +17,7 @@ import {
   useDeleteProjectComment,
   useProjectComments,
 } from "../../hooks/use-project-comments";
-import { useTasks } from "../../hooks/use-workspace-tasks";
+import { useMyTasks, useTasks } from "../../hooks/use-workspace-tasks";
 import useProjectDiscussionSocket from "../../hooks/use-project-discussion-socket";
 import { useAppContext } from "../../context/app-context";
 import type { WorkspaceProjectDetail } from "../../data/workspace-project-detail";
@@ -63,19 +64,24 @@ function mapProjectToDetail(
 function WorkspaceProjectDetail() {
   const { projectId = "" } = useParams();
   const app = useAppContext();
+  const isMember = app?.user?.role === "member";
   const projectQuery = useProject(projectId);
   const commentsQuery = useProjectComments(projectId);
-  const tasksQuery = useTasks({ limit: 100 });
+  const allTasksQuery = useTasks({ limit: 100 });
+  const myTasksQuery = useMyTasks();
   const { mutateAsync: createComment, isPending: isCreatingComment } = useCreateProjectComment(projectId);
   const { mutateAsync: deleteComment } = useDeleteProjectComment(projectId);
   const { data: apiProject } = projectQuery;
 
   useProjectDiscussionSocket(projectId);
 
-  const projectTasks = useMemo(
-    () => (tasksQuery.data?.data ?? []).filter((task) => task.projectId === projectId),
-    [projectId, tasksQuery.data],
-  );
+  const projectTasks = useMemo(() => {
+    if (isMember) {
+      return (myTasksQuery.data ?? []).filter((task) => task.projectId === projectId);
+    }
+
+    return (allTasksQuery.data?.data ?? []).filter((task) => task.projectId === projectId);
+  }, [allTasksQuery.data, isMember, myTasksQuery.data, projectId]);
 
   const project = useMemo(
     () => (apiProject ? mapProjectToDetail(apiProject, projectTasks) : null),
@@ -117,6 +123,43 @@ function WorkspaceProjectDetail() {
           title="Project not found"
           description="This project does not exist or you do not have access to it."
         />
+      ) : isMember ? (
+        <div className="mx-auto max-w-8xl">
+          <MemberProjectDetailHeader
+            project={project}
+            themeId={apiProject!.theme}
+            themeMeta={apiProject!.themeMeta}
+            assignedTaskCount={projectTasks.length}
+          />
+
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <div className="space-y-6 xl:col-span-2">
+              <ProjectTasksCard
+                projectId={projectId}
+                tasks={projectTasks}
+                loading={myTasksQuery.isLoading}
+              />
+
+              <ProjectDiscussionCard
+                messages={discussionMessages}
+                currentUserId={app?.user?.id}
+                loading={commentsQuery.isLoading}
+                refreshing={commentsQuery.isFetching && !commentsQuery.isLoading}
+                submitting={isCreatingComment}
+                onSubmit={handleSubmitComment}
+                onDelete={handleDeleteComment}
+                onRefresh={() => {
+                  void commentsQuery.refetch();
+                }}
+              />
+            </div>
+
+            <div className="space-y-6">
+              <ProjectTeamCard members={project.teamMembers} />
+              <ProjectAttachmentsCard items={project.attachments} />
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="mx-auto max-w-8xl">
           <ProjectDetailHeader
@@ -140,7 +183,7 @@ function WorkspaceProjectDetail() {
               <ProjectTasksCard
                 projectId={projectId}
                 tasks={projectTasks}
-                loading={tasksQuery.isLoading}
+                loading={allTasksQuery.isLoading}
               />
             </div>
 

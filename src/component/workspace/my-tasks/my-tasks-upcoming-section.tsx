@@ -3,6 +3,7 @@ import React from "react";
 import type { MyTask, MyTaskIcon } from "../../../data/workspace-my-tasks";
 import { TASK_PRIORITY_CONFIG } from "../../../data/workspace-tasks";
 import { formatDate } from "../../../lib/helper";
+import { resolveBadgeClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import MyTasksSectionHeader from "./my-tasks-section-header";
 import { Paragraph, Text, Title } from "../../ui/typography";
@@ -26,6 +27,8 @@ function getTaskIcon(icon: MyTaskIcon = "default") {
 }
 
 function MyTasksUpcomingSection({ tasks, onOpenTask }: MyTasksUpcomingSectionProps) {
+  const isDark = useIsDarkAppTheme();
+
   return (
     <section className="mb-8">
       <MyTasksSectionHeader title="Upcoming" count={tasks.length} accentClass="bg-sky-500" />
@@ -56,7 +59,7 @@ function MyTasksUpcomingSection({ tasks, onOpenTask }: MyTasksUpcomingSectionPro
                     <span
                       className={cn(
                         "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
-                        priorityConfig.badgeClass,
+                        resolveBadgeClass(priorityConfig.badgeClass, isDark),
                       )}
                     >
                       {priorityConfig.label}

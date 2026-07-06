@@ -4,11 +4,14 @@ const MEMBER_EXACT_PATHS: readonly string[] = [
   WORKSPACE_ROUTES.MY_TASKS,
   WORKSPACE_ROUTES.CALENDAR,
   WORKSPACE_ROUTES.PROFILE,
+  WORKSPACE_ROUTES.BOARDS,
   WORKSPACE_ROUTES.TASK_CREATE,
 ];
 
 const MEMBER_PATH_PATTERNS = [
+  /^\/tasks\/[^/]+$/,
   /^\/tasks\/[^/]+\/edit$/,
+  /^\/projects\/[^/]+$/,
   /^\/projects\/[^/]+\/board$/,
 ];
 

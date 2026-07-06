@@ -4,12 +4,23 @@ import ProjectTeamAvatars from "../../component/workspace/projects/project-team-
 import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-link";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import { BoardsPageSkeleton } from "../../component/skeletons";
+import { useAppContext } from "../../context/app-context";
 import { useBoards } from "../../hooks/use-workspace-tasks";
 import { Paragraph, Text, Title } from "../../component/ui/typography";
 
 function WorkspaceBoards() {
+  const app = useAppContext();
+  const isMember = app?.user?.role === "member";
   const boardsQuery = useBoards();
   const { data: boardSummaries = [] } = boardsQuery;
+
+  const description = isMember
+    ? "Open the Kanban board for each project you are on. Drag tasks through statuses and add work from the board."
+    : "Each board belongs to a project. Open a project board to manage tasks by status — the same tasks you see in the Tasks table.";
+
+  const emptyMessage = isMember
+    ? "No project boards yet. Once you are added to a project, its board will appear here."
+    : "No project boards yet. Create a project and add tasks to see boards here.";
 
   return (
     <QueryPageGuard
@@ -23,14 +34,14 @@ function WorkspaceBoards() {
             Boards
           </Title>
           <Paragraph size="sm" className="mt-1 max-w-2xl text-muted">
-            Each board belongs to a project. Open a project board to manage tasks by status — the same tasks you see in the Tasks table.
+            {description}
           </Paragraph>
         </div>
 
         {boardSummaries.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
             <Paragraph size="sm" className="text-muted">
-              No project boards yet. Create a project and add tasks to see boards here.
+              {emptyMessage}
             </Paragraph>
           </div>
         ) : (

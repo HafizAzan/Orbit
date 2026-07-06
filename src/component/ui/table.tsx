@@ -49,6 +49,7 @@ function Table<T extends object>({
             "[&_.ant-table-thead>tr>th:before]:hidden!",
             "[&_.ant-table-tbody>tr>td]:border-border!",
             "[&_.ant-table-tbody>tr:hover>td]:bg-background/60!",
+            "[&_.ant-table-tbody_a]:no-underline!",
             className,
           )}
           locale={{
