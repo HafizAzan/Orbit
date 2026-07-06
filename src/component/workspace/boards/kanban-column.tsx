@@ -1,4 +1,4 @@
-import { MoreOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React from "react";
 import type { KanbanColumn as KanbanColumnType } from "../../../data/workspace-board";
@@ -10,7 +10,9 @@ import { Text } from "../../ui/typography";
 type KanbanColumnProps = {
   column: KanbanColumnType;
   showAddTask?: boolean;
+  showDoneTaskDelete?: boolean;
   projectId: string;
+  onDeleteTask?: (taskId: string) => void;
 };
 
 function getColumnVariant(columnId: string): "default" | "pending" | "completed" {
@@ -19,27 +21,33 @@ function getColumnVariant(columnId: string): "default" | "pending" | "completed"
   return "default";
 }
 
-function KanbanColumn({ column, showAddTask = false, projectId }: KanbanColumnProps) {
+function KanbanColumn({
+  column,
+  showAddTask = false,
+  showDoneTaskDelete = false,
+  projectId,
+  onDeleteTask,
+}: KanbanColumnProps) {
   const variant = getColumnVariant(column.id);
+  const canDeleteTask = showDoneTaskDelete && column.id === "done";
 
   return (
     <section className="flex w-[min(100%,320px)] shrink-0 snap-start flex-col rounded-2xl bg-muted-surface/80 p-4 sm:w-[300px]">
-      <div className="mb-4 flex items-center justify-between px-1">
+      <div className="mb-4 px-1">
         <Text as="p" size="sm" weight="bold" color="muted" className="tracking-[0.12em]">
           {column.title} <Text as="span" color="muted">({column.tasks.length})</Text>
         </Text>
-        <Button
-          type="text"
-          size="small"
-          aria-label={`${column.title} column options`}
-          icon={<MoreOutlined />}
-          className="text-muted hover:text-foreground!"
-        />
       </div>
 
       <div className="flex flex-1 flex-col gap-4">
         {column.tasks.map((task) => (
-          <KanbanTaskCard key={task.id} task={task} variant={variant} />
+          <KanbanTaskCard
+            key={task.id}
+            task={task}
+            variant={variant}
+            showDelete={canDeleteTask}
+            onDelete={onDeleteTask}
+          />
         ))}
       </div>
 

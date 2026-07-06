@@ -101,6 +101,7 @@ export function useCreateTask() {
       queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_REPORTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_BOARDS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["workspace-board"] });
       queryClient.invalidateQueries({ queryKey: ["workspace-projects"] });
     },
   });
@@ -119,6 +120,7 @@ export function useUpdateTask() {
       queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_REPORTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_BOARDS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["workspace-board"] });
       queryClient.invalidateQueries({ queryKey: ["workspace-projects"] });
     },
   });
@@ -135,6 +137,7 @@ export function useDeleteTask() {
       queryClient.invalidateQueries({ queryKey: WORKSPACE_DASHBOARD_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_REPORTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_BOARDS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["workspace-board"] });
       queryClient.invalidateQueries({ queryKey: ["workspace-projects"] });
     },
   });
