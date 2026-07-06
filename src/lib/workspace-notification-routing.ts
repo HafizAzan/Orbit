@@ -4,6 +4,10 @@ import { getTaskDetailPath } from "../data/workspace-task-form";
 import { WORKSPACE_ROUTES } from "../router/workspace-routes";
 import type { RegisterAs } from "../types/auth.types";
 
+function isActivityLogHref(href: string) {
+  return href === WORKSPACE_ROUTES.ACTIVITY_LOGS || href.startsWith(`${WORKSPACE_ROUTES.ACTIVITY_LOGS}/`);
+}
+
 export function resolveWorkspaceNotificationHref(
   notification: Pick<ApiNotification, "kind" | "href" | "resourceType" | "resourceId">,
   role: RegisterAs | undefined,
@@ -29,6 +33,10 @@ export function resolveWorkspaceNotificationHref(
 
     if (notification.kind === "calendar") {
       return WORKSPACE_ROUTES.CALENDAR;
+    }
+
+    if (notification.href && isActivityLogHref(notification.href)) {
+      return null;
     }
   }
 

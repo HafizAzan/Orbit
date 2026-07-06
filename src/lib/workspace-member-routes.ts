@@ -8,6 +8,8 @@ const MEMBER_EXACT_PATHS: readonly string[] = [
   WORKSPACE_ROUTES.TASK_CREATE,
 ];
 
+const MEMBER_BLOCKED_PATHS: readonly string[] = [WORKSPACE_ROUTES.ACTIVITY_LOGS];
+
 const MEMBER_PATH_PATTERNS = [
   /^\/tasks\/[^/]+$/,
   /^\/tasks\/[^/]+\/edit$/,
@@ -16,6 +18,7 @@ const MEMBER_PATH_PATTERNS = [
 ];
 
 export function isMemberAllowedPath(pathname: string) {
+  if (MEMBER_BLOCKED_PATHS.includes(pathname)) return false;
   if (MEMBER_EXACT_PATHS.includes(pathname)) return true;
   return MEMBER_PATH_PATTERNS.some((pattern) => pattern.test(pathname));
 }

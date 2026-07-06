@@ -29,13 +29,15 @@ function invalidateTeamQueries(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: ["workspace-projects"] });
 }
 
-export function useTeamMembers(params: PaginationParams = {}) {
+export function useTeamMembers(params: PaginationParams & { enabled?: boolean } = {}) {
   const page = params.page ?? 1;
   const limit = params.limit ?? 20;
+  const enabled = params.enabled ?? true;
 
   return useQuery({
     queryKey: [WORKSPACE_TEAM_MEMBERS_QUERY_KEY, page, limit],
     queryFn: () => getTeamMembersPage({ page, limit }),
+    enabled,
   });
 }
 

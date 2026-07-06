@@ -43,11 +43,12 @@ export function useProjects(params: ListProjectsParams = DEFAULT_PROJECTS_LIST_P
   });
 }
 
-export function useProjectsForSelect() {
+export function useProjectsForSelect(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: workspaceProjectsQueryKey(DEFAULT_PROJECTS_LIST_PARAMS),
     queryFn: () => listProjects(DEFAULT_PROJECTS_LIST_PARAMS),
     select: (response) => response.data,
+    enabled: options.enabled ?? true,
   });
 }
 

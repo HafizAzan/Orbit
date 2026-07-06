@@ -28,20 +28,27 @@ export function workspaceBoardQueryKey(projectId: string) {
   return ["workspace-board", projectId] as const;
 }
 
-export function useTasks(params: PaginationParams = {}) {
+export function useTasks(params: PaginationParams & { enabled?: boolean } = {}) {
   const page = params.page ?? 1;
   const limit = params.limit ?? 20;
+  const enabled = params.enabled ?? true;
 
   return useQuery({
     queryKey: [WORKSPACE_TASKS_QUERY_KEY, page, limit],
     queryFn: () => listTasksPage({ page, limit }),
+    enabled,
   });
 }
 
-export function useMyTasks() {
+export function useMyTasks(params: PaginationParams & { enabled?: boolean } = {}) {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 100;
+  const enabled = params.enabled ?? true;
+
   return useQuery({
-    queryKey: WORKSPACE_MY_TASKS_QUERY_KEY,
-    queryFn: () => listMyTasks(),
+    queryKey: [...WORKSPACE_MY_TASKS_QUERY_KEY, page, limit],
+    queryFn: () => listMyTasks({ page, limit }),
+    enabled,
   });
 }
 
@@ -67,10 +74,11 @@ export function useWorkspaceReports() {
   });
 }
 
-export function useBoards() {
+export function useBoards(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: WORKSPACE_BOARDS_QUERY_KEY,
     queryFn: listBoards,
+    enabled: options.enabled ?? true,
   });
 }
 
