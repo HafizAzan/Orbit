@@ -15,7 +15,6 @@ import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import { MyTasksPageSkeleton } from "../../component/skeletons";
 import { buildMyTasksProjectFilterOptions, DEFAULT_MY_TASKS_FILTERS, type MyTask, type MyTasksFilters } from "../../data/workspace-my-tasks";
 import { getTaskDetailPath } from "../../data/workspace-task-form";
-import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import useUrlTab from "../../hooks/use-url-tab";
 import { useMyTasks, useUpdateTask } from "../../hooks/use-workspace-tasks";
 import { createWorkspaceNavState } from "../../lib/workspace-navigation";
@@ -27,8 +26,6 @@ import { Paragraph, Text } from "../../component/ui/typography";
 
 function WorkspaceMyTasksContent() {
   const navigate = useNavigate();
-  const { can } = useWorkspacePermissions();
-  const canCreateTask = can("task.create");
   const myTasksQuery = useMyTasks();
   const { data = [] } = myTasksQuery;
   const { mutateAsync: updateTask } = useUpdateTask();
@@ -102,7 +99,7 @@ function WorkspaceMyTasksContent() {
           </div>
         ) : null}
 
-        <MyTasksDueTodaySection tasks={groupedTasks.due_today} canCreateTask={canCreateTask} onOpenTask={handleOpenTask} />
+        <MyTasksDueTodaySection tasks={groupedTasks.due_today} onOpenTask={handleOpenTask} />
 
         <MyTasksAssignedSection tasks={groupedTasks.assigned} onToggleComplete={handleToggleComplete} onOpenTask={handleOpenTask} />
 

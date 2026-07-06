@@ -5,7 +5,7 @@ import {
   type WorkspacePermission,
 } from "./workspace-permissions";
 
-const MEMBER_ALLOWED: WorkspacePermission[] = ["my_tasks.view", "task.create", "task.edit"];
+const MEMBER_ALLOWED: WorkspacePermission[] = ["my_tasks.view"];
 
 const MEMBER_DENIED: WorkspacePermission[] = [
   "billing.view",
@@ -15,6 +15,9 @@ const MEMBER_DENIED: WorkspacePermission[] = [
   "reports.view",
   "activity.view",
   "project.create",
+  "task.create",
+  "task.edit",
+  "task.delete_any",
 ];
 
 describe("member workspace permissions", () => {

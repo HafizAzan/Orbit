@@ -5,20 +5,20 @@ const MEMBER_EXACT_PATHS: readonly string[] = [
   WORKSPACE_ROUTES.CALENDAR,
   WORKSPACE_ROUTES.PROFILE,
   WORKSPACE_ROUTES.BOARDS,
+];
+
+const MEMBER_BLOCKED_PATHS: readonly string[] = [
+  WORKSPACE_ROUTES.ACTIVITY_LOGS,
   WORKSPACE_ROUTES.TASK_CREATE,
 ];
 
-const MEMBER_BLOCKED_PATHS: readonly string[] = [WORKSPACE_ROUTES.ACTIVITY_LOGS];
+const MEMBER_BLOCKED_PATH_PATTERNS = [/^\/tasks\/[^/]+\/edit$/];
 
-const MEMBER_PATH_PATTERNS = [
-  /^\/tasks\/[^/]+$/,
-  /^\/tasks\/[^/]+\/edit$/,
-  /^\/projects\/[^/]+$/,
-  /^\/projects\/[^/]+\/board$/,
-];
+const MEMBER_PATH_PATTERNS = [/^\/tasks\/[^/]+$/, /^\/projects\/[^/]+$/, /^\/projects\/[^/]+\/board$/];
 
 export function isMemberAllowedPath(pathname: string) {
   if (MEMBER_BLOCKED_PATHS.includes(pathname)) return false;
+  if (MEMBER_BLOCKED_PATH_PATTERNS.some((pattern) => pattern.test(pathname))) return false;
   if (MEMBER_EXACT_PATHS.includes(pathname)) return true;
   return MEMBER_PATH_PATTERNS.some((pattern) => pattern.test(pathname));
 }

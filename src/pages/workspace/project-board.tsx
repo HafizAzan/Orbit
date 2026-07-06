@@ -6,6 +6,7 @@ import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import { KanbanBoardSkeleton } from "../../component/skeletons";
 import { useAppContext } from "../../context/app-context";
+import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useBoard } from "../../hooks/use-workspace-tasks";
 import { getWorkspaceHomePath } from "../../lib/workspace-routing";
 import { mapApiBoardToKanbanBoard } from "../../types/task.types";
@@ -13,6 +14,8 @@ import { mapApiBoardToKanbanBoard } from "../../types/task.types";
 function WorkspaceProjectBoard() {
   const { projectId = "" } = useParams();
   const app = useAppContext();
+  const { can } = useWorkspacePermissions();
+  const canCreateTask = can("task.create");
   const boardQuery = useBoard(projectId);
   const { data } = boardQuery;
 
@@ -33,7 +36,12 @@ function WorkspaceProjectBoard() {
 
           <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
             {board.columns.map((column, index) => (
-              <KanbanColumn key={column.id} column={column} showAddTask={index === 0} projectId={board.projectId} />
+              <KanbanColumn
+                key={column.id}
+                column={column}
+                showAddTask={index === 0 && canCreateTask}
+                projectId={board.projectId}
+              />
             ))}
           </div>
         </div>
