@@ -53,7 +53,7 @@ function ProjectSettingsHeader({ project }: ProjectSettingsHeaderProps) {
         </div>
       </div>
 
-      <ProjectWorkspaceTabs projectId={project.id} active="theme" />
+      <ProjectWorkspaceTabs projectId={project.id} active="overview" />
     </div>
   );
 }
