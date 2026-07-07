@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../context/app-context";
 import { useProjectsForSelect } from "../../../hooks/use-workspace-projects";
 import { useTeamMembers } from "../../../hooks/use-workspace-team";
-import { useMyTasks, useTasks } from "../../../hooks/use-workspace-tasks";
+import { useBoards, useMyTasks, useTasks } from "../../../hooks/use-workspace-tasks";
 import {
+  buildMemberSearchProjects,
+  groupMemberWorkspaceSearchResults,
   groupWorkspaceSearchResults,
   searchMemberWorkspaceGlobal,
   searchWorkspaceGlobal,
@@ -15,43 +17,49 @@ import {
 import { createWorkspaceNavState } from "../../../lib/workspace-navigation";
 import { Text } from "../../ui/typography";
 
+const MEMBER_SEARCH_LIMIT = 200;
+
 function WorkspaceGlobalSearch() {
   const navigate = useNavigate();
   const app = useAppContext();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const { data: projects = [] } = useProjectsForSelect();
-  const { data: allTasksPage } = useTasks({ limit: 100 });
-  const { data: myTasks = [] } = useMyTasks();
-  const { data: teamMembersPage } = useTeamMembers({ limit: 100 });
+  const isMember = app?.user?.role === "member";
+
+  const { data: projects = [] } = useProjectsForSelect({ enabled: !isMember });
+  const { data: allTasksPage } = useTasks({ limit: 100, enabled: !isMember });
+  const { data: myTasks = [] } = useMyTasks({ limit: MEMBER_SEARCH_LIMIT, enabled: isMember });
+  const { data: boards = [] } = useBoards({ enabled: isMember });
+  const { data: teamMembersPage } = useTeamMembers({ limit: 100, enabled: !isMember });
+
   const allTasks = allTasksPage?.data ?? [];
   const teamMembers = teamMembersPage?.data ?? [];
 
-  const isMember = app?.user?.role === "member";
-  const tasks = isMember ? myTasks : allTasks;
-  const memberProjects = useMemo(() => {
-    const projectIds = new Set(tasks.map((task) => task.projectId));
-    return projects.filter((project) => projectIds.has(project.id));
-  }, [projects, tasks]);
+  const memberSearchProjects = useMemo(
+    () => (isMember ? buildMemberSearchProjects(boards, myTasks) : []),
+    [boards, isMember, myTasks],
+  );
 
   const results = useMemo(() => {
     if (isMember) {
       return searchMemberWorkspaceGlobal(query, {
-        projects: memberProjects,
-        tasks,
-        teamMembers: [],
+        projects: memberSearchProjects,
+        tasks: myTasks,
       });
     }
 
     return searchWorkspaceGlobal(query, {
       projects,
-      tasks,
+      tasks: allTasks,
       teamMembers,
     });
-  }, [isMember, memberProjects, projects, query, tasks, teamMembers]);
+  }, [allTasks, isMember, memberSearchProjects, myTasks, projects, query, teamMembers]);
 
   const resultMap = useMemo(() => new Map(results.map((result) => [result.id, result])), [results]);
-  const groupedOptions = useMemo(() => groupWorkspaceSearchResults(results), [results]);
+  const groupedOptions = useMemo(
+    () => (isMember ? groupMemberWorkspaceSearchResults(results) : groupWorkspaceSearchResults(results)),
+    [isMember, results],
+  );
 
   const handleSelect = (value: string) => {
     const result = resultMap.get(value);
@@ -87,6 +95,9 @@ function WorkspaceGlobalSearch() {
   }));
 
   const showDropdown = open && query.trim().length >= 2;
+  const placeholder = isMember
+    ? "Search your tasks and projects..."
+    : "Search projects, tasks, or team...";
 
   return (
     <AutoComplete
@@ -116,7 +127,7 @@ function WorkspaceGlobalSearch() {
         size="large"
         allowClear
         prefix={<SearchOutlined className="text-muted" />}
-        placeholder="Search projects, tasks, or team..."
+        placeholder={placeholder}
         className="rounded-xl! bg-background! [&_.ant-input]:text-sm! sm:[&_.ant-input]:text-base!"
         onKeyDown={(event) => {
           if (event.key !== "Enter" || !results.length) return;

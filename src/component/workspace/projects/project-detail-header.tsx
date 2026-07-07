@@ -16,7 +16,6 @@ import type { ApiProjectThemeMeta } from "../../../types/project.types";
 import WorkspaceBackLink from "../common/workspace-back-link";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import DeleteProjectButton from "./delete-project-button";
-import ProjectThemeButton from "./project-theme-button";
 import ProjectWorkspaceTabs from "./project-workspace-tabs";
 import { Paragraph, Title } from "../../ui/typography";
 
@@ -99,8 +98,6 @@ function ProjectDetailHeader({
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <ProjectThemeButton projectId={project.id} />
-
               {canEditProject ? (
                 <WorkspaceNavLink to={getProjectEditPath(project.id)} preserveReturn>
                   <Button type="primary" icon={<EditOutlined />} size="large" className="font-semibold!">

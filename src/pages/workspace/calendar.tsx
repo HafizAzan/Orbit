@@ -60,6 +60,7 @@ function toEventFormValues(event: CalendarEvent): CalendarEventFormValues {
 
 function WorkspaceCalendar() {
   const app = useAppContext();
+  const isMember = app?.user?.role === "member";
   const currentUserId = app?.user?.id;
 
   const [activeDate, setActiveDate] = useState(() => new Date());
@@ -99,8 +100,12 @@ function WorkspaceCalendar() {
 
   const eventCountLabel = view === "month" ? "this month" : view === "week" ? "this week" : "today";
 
-  const eventInteractionProps = useMemo(
-    () => ({
+  const eventInteractionProps = useMemo(() => {
+    if (isMember) {
+      return { currentUserId };
+    }
+
+    return {
       currentUserId,
       onEditEvent: (event: CalendarEvent) => {
         setEditingEvent(event);
@@ -109,9 +114,8 @@ function WorkspaceCalendar() {
       onDeleteEvent: (event: CalendarEvent) => {
         setDeletingEvent(event);
       },
-    }),
-    [currentUserId],
-  );
+    };
+  }, [currentUserId, isMember]);
 
   const handleNavigate = useCallback(
     (direction: -1 | 1) => {
@@ -204,11 +208,12 @@ function WorkspaceCalendar() {
           eventCount={eventCount}
           eventCountLabel={eventCountLabel}
           eventStats={eventStats}
+          readOnly={isMember}
           assignedProjectCount={assignedProjects.length}
           onViewChange={setView}
           onNavigate={handleNavigate}
           onToday={handleToday}
-          onNewEvent={handleOpenCreateModal}
+          onNewEvent={isMember ? undefined : handleOpenCreateModal}
         />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
@@ -218,38 +223,43 @@ function WorkspaceCalendar() {
             projects={assignedProjects}
             projectsLoading={projectsQuery.isLoading}
             eventStats={eventStats}
+            readOnly={isMember}
           />
           {calendarView}
         </div>
 
-        <CalendarEventModal
-          open={eventModalOpen}
-          mode={editingEvent ? "edit" : "create"}
-          defaultDate={formatCalendarIsoDate(activeDate)}
-          initialValues={editingEvent ? toEventFormValues(editingEvent) : undefined}
-          onClose={handleCloseModal}
-          onSubmit={handleSubmitEvent}
-          submitting={isCreatingEvent || isUpdatingEvent}
-        />
+        {!isMember ? (
+          <>
+            <CalendarEventModal
+              open={eventModalOpen}
+              mode={editingEvent ? "edit" : "create"}
+              defaultDate={formatCalendarIsoDate(activeDate)}
+              initialValues={editingEvent ? toEventFormValues(editingEvent) : undefined}
+              onClose={handleCloseModal}
+              onSubmit={handleSubmitEvent}
+              submitting={isCreatingEvent || isUpdatingEvent}
+            />
 
-        <ConfirmModal
-          open={deletingEvent !== null}
-          onClose={() => setDeletingEvent(null)}
-          onConfirm={handleConfirmDelete}
-          title="Delete event"
-          description={
-            deletingEvent ? (
-              <>
-                Delete <Text as="span" weight="semibold">{deletingEvent.title}</Text> from the calendar? This cannot be
-                undone.
-              </>
-            ) : null
-          }
-          confirmText="Delete event"
-          confirmDanger
-          confirmLoading={isDeletingEvent}
-          icon={<DeleteOutlined />}
-        />
+            <ConfirmModal
+              open={deletingEvent !== null}
+              onClose={() => setDeletingEvent(null)}
+              onConfirm={handleConfirmDelete}
+              title="Delete event"
+              description={
+                deletingEvent ? (
+                  <>
+                    Delete <Text as="span" weight="semibold">{deletingEvent.title}</Text> from the calendar? This cannot be
+                    undone.
+                  </>
+                ) : null
+              }
+              confirmText="Delete event"
+              confirmDanger
+              confirmLoading={isDeletingEvent}
+              icon={<DeleteOutlined />}
+            />
+          </>
+        ) : null}
       </div>
     </QueryPageGuard>
   );

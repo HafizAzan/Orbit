@@ -1,23 +1,23 @@
-import { CalendarOutlined, PlusOutlined } from "@ant-design/icons";
+import { CalendarOutlined } from "@ant-design/icons";
 import { Avatar } from "antd";
 import React from "react";
 import type { MyTask } from "../../../data/workspace-my-tasks";
-import { getTaskCreatePath } from "../../../data/workspace-task-form";
 import { TASK_PRIORITY_CONFIG } from "../../../data/workspace-tasks";
 import { formatDate } from "../../../lib/helper";
+import { resolveBadgeClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { cn } from "../../../lib/utils";
 import MarkdownContent from "../../common/markdown-content";
-import WorkspaceNavLink from "../common/workspace-nav-link";
 import MyTasksSectionHeader from "./my-tasks-section-header";
 import { Text, Title } from "../../ui/typography";
 
 type MyTasksDueTodaySectionProps = {
   tasks: MyTask[];
-  canCreateTask: boolean;
   onOpenTask: (task: MyTask) => void;
 };
 
-function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDueTodaySectionProps) {
+function MyTasksDueTodaySection({ tasks, onOpenTask }: MyTasksDueTodaySectionProps) {
+  const isDark = useIsDarkAppTheme();
+
   return (
     <section className="mb-8">
       <MyTasksSectionHeader title="Due Today" count={tasks.length} accentClass="bg-red-500" />
@@ -38,7 +38,7 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
                 <span
                   className={cn(
                     "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide",
-                    priorityConfig.badgeClass,
+                    resolveBadgeClass(priorityConfig.badgeClass, isDark),
                   )}
                 >
                   {priorityConfig.label}
@@ -74,17 +74,6 @@ function MyTasksDueTodaySection({ tasks, canCreateTask, onOpenTask }: MyTasksDue
           );
         })}
 
-        {canCreateTask ? (
-          <WorkspaceNavLink
-            to={getTaskCreatePath()}
-            className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card/50 p-6 text-center transition-colors hover:border-primary/40 hover:bg-card"
-          >
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-feature-sync text-primary">
-              <PlusOutlined className="text-xl" />
-            </span>
-            <Text as="span" size="sm" weight="semibold" className="mt-4">Add a task for today</Text>
-          </WorkspaceNavLink>
-        ) : null}
       </div>
     </section>
   );

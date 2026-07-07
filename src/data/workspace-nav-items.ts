@@ -39,7 +39,7 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     label: "Boards",
     path: WORKSPACE_ROUTES.BOARDS,
     icon: AppstoreOutlined,
-    roles: ["owner", "admin", "manager"],
+    roles: ["owner", "admin", "manager", "member"],
   },
   {
     key: "tasks",
@@ -60,7 +60,7 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     label: "Calendar",
     path: WORKSPACE_ROUTES.CALENDAR,
     icon: CalendarOutlined,
-    roles: ["owner", "admin", "manager"],
+    roles: ["owner", "admin", "manager", "member"],
   },
   {
     key: "teams",

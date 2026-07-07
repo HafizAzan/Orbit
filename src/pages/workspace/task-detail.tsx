@@ -5,6 +5,7 @@ import QueryPageGuard from "../../component/common/query-page-guard";
 import TaskDetailAttachments from "../../component/workspace/tasks/task-detail-attachments";
 import TaskDetailHeader from "../../component/workspace/tasks/task-detail-header";
 import TaskDetailSidebar from "../../component/workspace/tasks/task-detail-sidebar";
+import TaskDetailStatusActions from "../../component/workspace/tasks/task-detail-status-actions";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
 import { TaskDetailSkeleton } from "../../component/skeletons";
 import { useAppContext } from "../../context/app-context";
@@ -15,6 +16,7 @@ import { Paragraph, Text } from "../../component/ui/typography";
 function WorkspaceTaskDetail() {
   const { taskId = "" } = useParams();
   const app = useAppContext();
+  const isMember = app?.user?.role === "member";
   const taskQuery = useTask(taskId);
   const { data: task } = taskQuery;
 
@@ -36,6 +38,8 @@ function WorkspaceTaskDetail() {
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
             <div className="space-y-6">
+              {isMember ? <TaskDetailStatusActions task={task} /> : null}
+
               <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
                 <Text as="p" size="sm" weight="semibold">Description</Text>
 

@@ -5,49 +5,35 @@ import {
   type WorkspacePermission,
 } from "./workspace-permissions";
 
-const MANAGER_ALLOWED: WorkspacePermission[] = [
+const MEMBER_ALLOWED: WorkspacePermission[] = ["my_tasks.view"];
+
+const MEMBER_DENIED: WorkspacePermission[] = [
+  "billing.view",
+  "settings.view",
+  "tasks.view_all",
   "team.view",
-  "team.remove_squad_member",
+  "reports.view",
+  "activity.view",
   "project.create",
-  "project.edit",
-  "project.delete",
   "task.create",
   "task.edit",
   "task.delete_any",
-  "tasks.view_all",
-  "reports.view",
-  "activity.view",
 ];
 
-const MANAGER_DENIED: WorkspacePermission[] = [
-  "billing.view",
-  "settings.view",
-  "settings.general",
-  "settings.members",
-  "settings.billing",
-  "settings.integrations",
-  "settings.notifications",
-  "settings.security",
-  "team.invite",
-  "team.change_role",
-  "activity.delete",
-  "my_tasks.view",
-];
-
-describe("manager workspace permissions", () => {
-  it("grants delivery and reporting permissions", () => {
-    for (const permission of MANAGER_ALLOWED) {
-      expect(hasWorkspacePermission("manager", permission)).toBe(true);
+describe("member workspace permissions", () => {
+  it("grants personal task permissions", () => {
+    for (const permission of MEMBER_ALLOWED) {
+      expect(hasWorkspacePermission("member", permission)).toBe(true);
     }
   });
 
-  it("denies billing, settings, invites, and activity deletion", () => {
-    for (const permission of MANAGER_DENIED) {
-      expect(hasWorkspacePermission("manager", permission)).toBe(false);
+  it("denies org management and global task views", () => {
+    for (const permission of MEMBER_DENIED) {
+      expect(hasWorkspacePermission("member", permission)).toBe(false);
     }
   });
 
   it("returns the expected permission set", () => {
-    expect(getWorkspacePermissions("manager")).toEqual(MANAGER_ALLOWED);
+    expect(getWorkspacePermissions("member")).toEqual(MEMBER_ALLOWED);
   });
 });

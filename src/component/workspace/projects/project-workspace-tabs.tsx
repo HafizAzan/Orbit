@@ -1,9 +1,9 @@
 import React from "react";
-import { getProjectBoardPath, getProjectDetailPath, getProjectThemePath } from "../../../data/workspace-project-detail";
+import { getProjectBoardPath, getProjectDetailPath } from "../../../data/workspace-project-detail";
 import { cn } from "../../../lib/utils";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 
-type ProjectWorkspaceTab = "overview" | "board" | "theme";
+type ProjectWorkspaceTab = "overview" | "board";
 
 type ProjectWorkspaceTabsProps = {
   projectId: string;
@@ -13,13 +13,11 @@ type ProjectWorkspaceTabsProps = {
 const TABS: { key: ProjectWorkspaceTab; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "board", label: "Board" },
-  { key: "theme", label: "Theme" },
 ];
 
 function resolveTabHref(projectId: string, tab: ProjectWorkspaceTab) {
   if (tab === "overview") return getProjectDetailPath(projectId);
-  if (tab === "board") return getProjectBoardPath(projectId);
-  return getProjectThemePath(projectId);
+  return getProjectBoardPath(projectId);
 }
 
 function ProjectWorkspaceTabs({ projectId, active }: ProjectWorkspaceTabsProps) {

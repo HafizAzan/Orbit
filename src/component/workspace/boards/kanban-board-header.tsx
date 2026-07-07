@@ -1,4 +1,4 @@
-import { FilterOutlined, PlusOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
@@ -11,7 +11,6 @@ import { getWorkspaceHomePath } from "../../../lib/workspace-routing";
 import WorkspaceBackLink from "../common/workspace-back-link";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import ProjectTeamAvatars from "../projects/project-team-avatars";
-import ProjectThemeButton from "../projects/project-theme-button";
 import ProjectWorkspaceTabs from "../projects/project-workspace-tabs";
 import { Title } from "../../ui/typography";
 
@@ -54,22 +53,13 @@ function KanbanBoardHeader({ board }: KanbanBoardHeaderProps) {
           <ProjectTeamAvatars members={board.teamMembers} maxVisible={3} />
         </div>
 
-        <div className="grid grid-cols-1 gap-2 min-[520px]:grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3 lg:grid-cols-4">
-          <ProjectThemeButton projectId={board.projectId} className="w-full font-semibold! sm:w-auto" />
-          <Button icon={<FilterOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
-            Filters
-          </Button>
-          <Button icon={<ShareAltOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
-            Share
-          </Button>
-          {canCreateTask ? (
-            <WorkspaceNavLink to={getTaskCreatePath(board.projectId)} preserveReturn>
-              <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
-                Create Task
-              </Button>
-            </WorkspaceNavLink>
-          ) : null}
-        </div>
+        {canCreateTask ? (
+          <WorkspaceNavLink to={getTaskCreatePath(board.projectId)} preserveReturn>
+            <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full font-semibold! sm:w-auto">
+              Create Task
+            </Button>
+          </WorkspaceNavLink>
+        ) : null}
       </div>
 
       <ProjectWorkspaceTabs projectId={board.projectId} active="board" />

@@ -85,7 +85,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "reports.view",
     "activity.view",
   ],
-  member: ["my_tasks.view", "task.create", "task.edit"],
+  member: ["my_tasks.view"],
 };
 
 export const SETTINGS_SECTION_PERMISSIONS: Record<WorkspaceSettingsSectionId, WorkspacePermission> = {

@@ -48,10 +48,6 @@ export function getWorkspaceTaskHubPath(role?: RegisterAs) {
   return WORKSPACE_ROUTES.TASKS;
 }
 
-export function getProjectWorkspacePath(role: RegisterAs | undefined, projectId: string) {
-  if (role === "member") {
-    return `${WORKSPACE_ROUTES.PROJECTS}/${projectId}/board`;
-  }
-
+export function getProjectWorkspacePath(_role: RegisterAs | undefined, projectId: string) {
   return `${WORKSPACE_ROUTES.PROJECTS}/${projectId}`;
 }

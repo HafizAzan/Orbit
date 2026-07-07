@@ -10,10 +10,10 @@ import { Dropdown, type MenuProps } from "antd";
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { CALENDAR_EVENT_TYPE_META, type CalendarEvent } from "../../../data/workspace-calendar";
+import { useAppContext } from "../../../context/app-context";
 import { useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { isManageableCalendarEvent } from "../../../lib/calendar-utils";
-import { getProjectDetailPath } from "../../../data/workspace-project-detail";
-import { getTaskDetailPath } from "../../../data/workspace-task-form";
+import { resolveCalendarEventHref } from "../../../lib/workspace-calendar-routing";
 import { cn } from "../../../lib/utils";
 import type { CalendarEventInteractionProps } from "./calendar-event-interaction";
 
@@ -22,16 +22,8 @@ type CalendarEventPillProps = CalendarEventInteractionProps & {
   compact?: boolean;
 };
 
-function resolveEventHref(event: CalendarEvent) {
-  if (event.source === "task" || event.id.startsWith("task-")) {
-    return getTaskDetailPath(event.id.replace("task-", ""));
-  }
-
-  if (event.source === "project" || event.id.startsWith("project-")) {
-    return getProjectDetailPath(event.id.replace("project-", ""));
-  }
-
-  return null;
+function resolveEventHref(event: CalendarEvent, role: import("../../../types/auth.types").RegisterAs | undefined) {
+  return resolveCalendarEventHref(event, role);
 }
 
 function EventTypeIcon({ type }: { type: CalendarEvent["type"] }) {
@@ -47,10 +39,11 @@ function CalendarEventPill({
   onEditEvent,
   onDeleteEvent,
 }: CalendarEventPillProps) {
+  const app = useAppContext();
   const isDark = useIsDarkAppTheme();
   const meta = CALENDAR_EVENT_TYPE_META[event.type];
-  const href = resolveEventHref(event);
-  const canManage = isManageableCalendarEvent(event, currentUserId);
+  const href = resolveEventHref(event, app?.user?.role);
+  const canManage = isManageableCalendarEvent(event, currentUserId) && app?.user?.role !== "member";
 
   const menuItems = useMemo<MenuProps["items"]>(
     () => [
