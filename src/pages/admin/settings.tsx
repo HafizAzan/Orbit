@@ -19,7 +19,7 @@ function AdminSettings() {
           Platform Settings
         </Title>
         <Paragraph size="sm" className="mt-1 text-muted">
-          Configure platform-wide preferences, branding, security, and integrations.
+          Configure platform-wide preferences, branding, security, and billing.
         </Paragraph>
       </div>
 

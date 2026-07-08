@@ -1,13 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import useWorkspaceSettings from "../../hooks/use-workspace-settings";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
-import {
-  useUpdateWorkspaceOrganization,
-  useWorkspaceOrganization,
-} from "../../hooks/use-workspace-organization";
+import { useUpdateWorkspaceOrganization, useWorkspaceOrganization } from "../../hooks/use-workspace-organization";
 import WorkspaceBillingSection from "../../component/workspace/settings/workspace-billing-section";
 import WorkspaceGeneralSection from "../../component/workspace/settings/workspace-general-section";
-import WorkspaceIntegrationsSection from "../../component/workspace/settings/workspace-integrations-section";
 import WorkspaceMembersSection from "../../component/workspace/settings/workspace-members-section";
 import WorkspaceNotificationsSection from "../../component/workspace/settings/workspace-notifications-section";
 import WorkspaceSecuritySection from "../../component/workspace/settings/workspace-security-section";
@@ -22,6 +18,7 @@ import { DEFAULT_WORKSPACE_SETTINGS, WORKSPACE_SETTINGS_NAV_ITEMS } from "../../
 import {
   buildOrganizationUpdatePayload,
   buildWorkspaceSettingsFromOrganization,
+  isPersistableSettingsTab,
 } from "../../lib/workspace-organization-settings";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { useAppContext } from "../../context/app-context";
@@ -42,16 +39,7 @@ function WorkspaceSettingsContent() {
     };
   }, [organization]);
 
-  const {
-    settings,
-    activeTab,
-    changeCount,
-    saving,
-    handleChange,
-    handleTabChange,
-    handleDiscard,
-    handleSave,
-  } = useWorkspaceSettings({
+  const { settings, activeTab, changeCount, saving, handleChange, handleTabChange, handleDiscard, handleSave } = useWorkspaceSettings({
     initialSettings,
     onSave: async (nextSettings) => {
       await updateOrganization(buildOrganizationUpdatePayload(nextSettings));
@@ -95,23 +83,12 @@ function WorkspaceSettingsContent() {
     }
 
     if (!canAccessSettingsTab(activeTab)) {
-      return (
-        <WorkspaceAccessDenied
-          title="Settings section restricted"
-          description="You do not have permission to view this settings section."
-        />
-      );
+      return <WorkspaceAccessDenied title="Settings section restricted" description="You do not have permission to view this settings section." />;
     }
 
     if (activeTab === "general") {
       return (
-        <WorkspaceGeneralSection
-          settings={settings}
-          onChange={handleChange}
-          onDiscard={handleDiscard}
-          onSave={handleSaveWithError}
-          saving={saving}
-        />
+        <WorkspaceGeneralSection settings={settings} onChange={handleChange} onDiscard={handleDiscard} onSave={handleSaveWithError} saving={saving} />
       );
     }
 
@@ -123,16 +100,14 @@ function WorkspaceSettingsContent() {
       return <WorkspaceBillingSection expanded />;
     }
 
-    if (activeTab === "integrations") {
-      return <WorkspaceIntegrationsSection expanded />;
-    }
-
     if (activeTab === "notifications") {
       return <WorkspaceNotificationsSection settings={settings} onChange={handleChange} expanded />;
     }
 
     return <WorkspaceSecuritySection settings={settings} onChange={handleChange} expanded />;
   };
+
+  const showSaveBar = isPersistableSettingsTab(activeTab) && activeTab !== "general" && canAccessSettingsTab(activeTab);
 
   return (
     <div className="mx-auto max-w-8xl">
@@ -153,14 +128,7 @@ function WorkspaceSettingsContent() {
         <div className="min-w-0 flex-1">
           {renderContent()}
 
-          {activeTab !== "general" && canAccessSettingsTab(activeTab) ? (
-            <SettingsSaveBar
-              changeCount={changeCount}
-              onDiscard={handleDiscard}
-              onSave={handleSaveWithError}
-              saving={saving}
-            />
-          ) : null}
+          {showSaveBar ? <SettingsSaveBar changeCount={changeCount} onDiscard={handleDiscard} onSave={handleSaveWithError} saving={saving} /> : null}
         </div>
       </div>
     </div>

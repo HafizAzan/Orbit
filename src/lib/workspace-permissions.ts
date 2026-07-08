@@ -7,7 +7,6 @@ export type WorkspacePermission =
   | "settings.general"
   | "settings.members"
   | "settings.billing"
-  | "settings.integrations"
   | "settings.notifications"
   | "settings.security"
   | "team.view"
@@ -35,7 +34,6 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "settings.general",
     "settings.members",
     "settings.billing",
-    "settings.integrations",
     "settings.notifications",
     "settings.security",
     "team.view",
@@ -55,7 +53,6 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "settings.general",
     "settings.members",
     "settings.billing",
-    "settings.integrations",
     "settings.notifications",
     "settings.security",
     "team.view",
@@ -92,7 +89,6 @@ export const SETTINGS_SECTION_PERMISSIONS: Record<WorkspaceSettingsSectionId, Wo
   general: "settings.general",
   members: "settings.members",
   billing: "settings.billing",
-  integrations: "settings.integrations",
   notifications: "settings.notifications",
   security: "settings.security",
 };

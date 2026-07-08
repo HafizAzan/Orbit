@@ -94,7 +94,27 @@ export type LoginRequest = {
   remember?: boolean;
 };
 
-export type LoginResponse = AuthSessionResponse;
+export type LoginResponse = AuthSessionResponse | AuthTwoFactorChallengeResponse;
+
+export function isTwoFactorChallengeResponse(response: LoginResponse): response is AuthTwoFactorChallengeResponse {
+  return "requiresTwoFactor" in response && response.requiresTwoFactor === true;
+}
+
+export type VerifyTwoFactorRequest = {
+  challengeToken: string;
+  code: string;
+};
+
+export type TwoFactorSetupResponse = {
+  secret: string;
+  otpauthUrl: string;
+};
+
+export type TwoFactorStatusResponse = {
+  enabled: boolean;
+  requiredByWorkspace: boolean;
+  pendingSetup: boolean;
+};
 
 export type LoginFormValues = {
   email: string;
@@ -155,6 +175,13 @@ export type AuthUser = {
   organization: AuthOrganization | null;
   requiresPlanSelection: boolean;
   uiTheme?: AppUiThemeId;
+  twoFactorEnabled?: boolean;
+};
+
+export type AuthTwoFactorChallengeResponse = {
+  message: string;
+  requiresTwoFactor: true;
+  challengeToken: string;
 };
 
 export type AuthSessionResponse = {

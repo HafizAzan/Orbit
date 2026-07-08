@@ -1,15 +1,16 @@
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Divider, Form, Input } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
 import { useLogin } from "../../hooks/user-authentication";
+import { useVerifyTwoFactor } from "../../hooks/use-two-factor";
 import { AUTH_ERROR_CODES, ApiRequestError, showApiErrorToast, showApiInfoToast, showApiSuccessToast } from "../../lib/api-error";
 import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { saveAuthSession } from "../../lib/auth-session";
 import { saveOtpSession } from "../../lib/otp-session";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
-import type { LoginFormValues } from "../../types/auth.types";
+import { isTwoFactorChallengeResponse, type LoginFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Text, Title } from "../ui/typography";
@@ -18,11 +19,23 @@ function LoginForm() {
   const [form] = Form.useForm<LoginFormValues>();
   const navigate = useNavigate();
   const app = useAppContext();
-  const { mutateAsync: login, isPending } = useLogin();
+  const { mutateAsync: login, isPending: loggingIn } = useLogin();
+  const { mutateAsync: verifyTwoFactor, isPending: verifyingTwoFactor } = useVerifyTwoFactor();
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+
+  const completeSession = (accessToken: string, user: Parameters<typeof saveAuthSession>[1], remember: boolean, message: string) => {
+    saveAuthSession(accessToken, user, remember);
+    app?.setUser(user);
+    showApiSuccessToast(message);
+    navigate(getPostAuthRedirectPath(user));
+  };
 
   const handleFinish = async (values: LoginFormValues) => {
     try {
       const remember = values.remember === true;
+      setRememberMe(remember);
 
       const result = await login({
         email: values.email.trim().toLowerCase(),
@@ -30,16 +43,15 @@ function LoginForm() {
         remember,
       });
 
-      saveAuthSession(result.accessToken, result.user, remember);
-      app?.setUser(result.user);
-      showApiSuccessToast(result.message);
-      navigate(getPostAuthRedirectPath(result.user));
+      if (isTwoFactorChallengeResponse(result)) {
+        setChallengeToken(result.challengeToken);
+        showApiInfoToast(result.message);
+        return;
+      }
+
+      completeSession(result.accessToken, result.user, remember, result.message);
     } catch (error) {
-      if (
-        error instanceof ApiRequestError &&
-        error.code === AUTH_ERROR_CODES.PENDING_EMAIL_VERIFICATION &&
-        error.email
-      ) {
+      if (error instanceof ApiRequestError && error.code === AUTH_ERROR_CODES.PENDING_EMAIL_VERIFICATION && error.email) {
         const normalizedEmail = error.email.trim().toLowerCase();
         const expiresAt = error.expiresAt ?? null;
 
@@ -52,22 +64,86 @@ function LoginForm() {
         }
 
         showApiInfoToast(error.message);
-        navigate(
-          `${UN_AUTH_ROUTES.VERIFY_OTP}?email=${encodeURIComponent(normalizedEmail)}&flow=register`,
-          {
-            state: {
-              email: normalizedEmail,
-              flow: "register",
-              expiresAt: expiresAt ?? undefined,
-            },
+        navigate(`${UN_AUTH_ROUTES.VERIFY_OTP}?email=${encodeURIComponent(normalizedEmail)}&flow=register`, {
+          state: {
+            email: normalizedEmail,
+            flow: "register",
+            expiresAt: expiresAt ?? undefined,
           },
-        );
+        });
         return;
       }
 
       showApiErrorToast(error);
     }
   };
+
+  const handleVerifyTwoFactor = async () => {
+    if (!challengeToken || twoFactorCode.length !== 6) return;
+
+    try {
+      const result = await verifyTwoFactor({
+        challengeToken,
+        code: twoFactorCode,
+      });
+
+      completeSession(result.accessToken, result.user, rememberMe, result.message);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  };
+
+  if (challengeToken) {
+    return (
+      <AuthFormLayout>
+        <AuthFormCard>
+          <Title level={2} className="text-3xl text-foreground">
+            Two-factor verification
+          </Title>
+          <Paragraph size="sm" className="mt-2 text-muted">
+            Enter the 6-digit code from your authenticator app.
+          </Paragraph>
+
+          <div className="mt-8 space-y-4">
+            <Input
+              value={twoFactorCode}
+              onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="000000"
+              size="large"
+              className="rounded-lg! text-center tracking-[0.4em]!"
+              maxLength={6}
+              inputMode="numeric"
+              autoFocus
+            />
+
+            <Button
+              type="primary"
+              block
+              size="large"
+              loading={verifyingTwoFactor}
+              disabled={twoFactorCode.length !== 6}
+              className="h-11! font-semibold!"
+              onClick={() => void handleVerifyTwoFactor()}
+            >
+              Verify and continue
+            </Button>
+
+            <Button
+              block
+              size="large"
+              className="h-11! font-medium!"
+              onClick={() => {
+                setChallengeToken(null);
+                setTwoFactorCode("");
+              }}
+            >
+              Back to login
+            </Button>
+          </div>
+        </AuthFormCard>
+      </AuthFormLayout>
+    );
+  }
 
   return (
     <AuthFormLayout>
@@ -123,14 +199,7 @@ function LoginForm() {
             </Link>
           </div>
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            block
-            size="large"
-            loading={isPending}
-            className="h-11! font-semibold!"
-          >
+          <Button type="primary" htmlType="submit" block size="large" loading={loggingIn} className="h-11! font-semibold!">
             Log in
           </Button>
         </Form>

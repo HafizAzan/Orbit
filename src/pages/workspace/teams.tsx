@@ -28,7 +28,9 @@ function WorkspaceTeamsContent() {
   const teamsDescription =
     role === "manager"
       ? "Manage your delivery squad. Remove members from projects you lead when assignments change."
-      : "Invite teammates, manage roles, and monitor workspace activity.";
+      : role === "admin"
+        ? "Invite teammates, assign roles, and keep workspace access aligned with your organization."
+        : "Invite teammates, manage roles, and monitor workspace activity.";
 
   const teamMembers = useMemo(() => members.map(mapApiTeamMemberToTeamMember), [members]);
 

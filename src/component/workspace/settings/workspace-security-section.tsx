@@ -1,9 +1,9 @@
-import { Button, Switch } from "antd";
+import { InputNumber, Switch } from "antd";
 import React from "react";
 import type { WorkspaceSettings } from "../../../data/workspace-settings";
-import { toast } from "../../../lib/toast";
 import SettingsSection from "../../admin/settings/settings-section";
 import { Paragraph, Text } from "../../ui/typography";
+import WorkspaceTwoFactorPanel from "./workspace-two-factor-panel";
 
 type WorkspaceSecuritySectionProps = {
   settings: WorkspaceSettings;
@@ -13,41 +13,65 @@ type WorkspaceSecuritySectionProps = {
 
 function WorkspaceSecuritySection({ settings, onChange, expanded = false }: WorkspaceSecuritySectionProps) {
   return (
-    <SettingsSection
-      id="workspace-security"
-      title="Security & Access"
-      description="Protect your workspace with authentication and access controls."
-    >
-      <div className="space-y-4">
-        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Text as="p" weight="semibold">Two-Factor Authentication</Text>
-            <Paragraph size="sm" className="mt-1">Require an additional verification step for all workspace members.</Paragraph>
-          </div>
-          <Switch checked={settings.twoFactorEnabled} onChange={(checked) => onChange("twoFactorEnabled", checked)} />
-        </div>
-
-        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Text as="p" weight="semibold">Single Sign-On (SSO)</Text>
-            <Paragraph size="sm" className="mt-1">Connect your identity provider for enterprise login.</Paragraph>
-          </div>
-          <Button className="font-semibold!" onClick={() => toast.info("SSO configuration — coming soon")}>
-            Configure
-          </Button>
-        </div>
-
-        {expanded ? (
+    <>
+      <SettingsSection
+        id="workspace-security"
+        title="Security & Access"
+        description="Only workspace owners and admins manage security for the organization."
+      >
+        <div className="space-y-4">
           <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <Text as="p" weight="semibold">Session Timeout</Text>
-              <Paragraph size="sm" className="mt-1">Automatically sign out inactive users after 30 minutes.</Paragraph>
+              <Text as="p" weight="semibold">
+                Require Two-Factor Authentication
+              </Text>
+              <Paragraph size="sm" className="mt-1">
+                Only owners and admins can turn this on or off. Set up your authenticator below before enabling it.
+                Managers and members cannot sign in while this is on unless an owner or admin turns it off for them.
+              </Paragraph>
             </div>
-            <Switch defaultChecked onChange={() => toast.info("Session policy — coming soon")} />
+            <Switch checked={settings.twoFactorEnabled} onChange={(checked) => onChange("twoFactorEnabled", checked)} />
           </div>
-        ) : null}
-      </div>
-    </SettingsSection>
+
+          {expanded ? (
+            <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <Text as="p" weight="semibold">
+                  Session Timeout
+                </Text>
+                <Paragraph size="sm" className="mt-1">
+                  Automatically sign out inactive users after a period of inactivity.
+                </Paragraph>
+              </div>
+              <Switch checked={settings.sessionTimeoutEnabled} onChange={(checked) => onChange("sessionTimeoutEnabled", checked)} />
+            </div>
+          ) : null}
+
+          {expanded && settings.sessionTimeoutEnabled ? (
+            <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <Text as="p" weight="semibold">
+                  Timeout duration
+                </Text>
+                <Paragraph size="sm" className="mt-1">
+                  Minutes of inactivity before a session expires.
+                </Paragraph>
+              </div>
+              <InputNumber
+                min={5}
+                max={480}
+                value={settings.sessionTimeoutMinutes}
+                onChange={(value) => onChange("sessionTimeoutMinutes", value ?? 30)}
+                addonAfter="min"
+                className="w-32!"
+              />
+            </div>
+          ) : null}
+        </div>
+      </SettingsSection>
+
+      {expanded ? <WorkspaceTwoFactorPanel /> : null}
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import type {
   BillingCatalogResponse,
   BillingInvoicesResponse,
   BillingMessageResponse,
+  BillingPortalResponse,
   CancelPlanRequest,
   ChangePlanRequest,
   ConfirmCheckoutRequest,
@@ -62,6 +63,15 @@ const refundPayment = async (data: RefundPaymentRequest = {}): Promise<RefundPay
   return assertApiSuccess<RefundPaymentResponse>(response);
 };
 
+const createPortalSession = async (returnUrl?: string): Promise<BillingPortalResponse> => {
+  const response = await ApiService.post(
+    API_ROUTES.BILLING.PORTAL,
+    returnUrl ? { returnUrl } : {},
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<BillingPortalResponse>(response);
+};
+
 const listInvoices = async (params: PaginationParams = {}): Promise<BillingInvoicesResponse> => {
   const searchParams = buildPaginationSearchParams(params);
   const response = await ApiService.get(
@@ -78,6 +88,7 @@ export {
   changePlan,
   confirmCheckout,
   createCheckout,
+  createPortalSession,
   getCatalog,
   getCurrentSubscription,
   listInvoices,

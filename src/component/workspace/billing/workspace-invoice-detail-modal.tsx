@@ -14,11 +14,20 @@ import { Text } from "../../ui/typography";
 
 type WorkspaceInvoiceDetailModalProps = {
   invoice: BillingInvoice | null;
+  workspaceName?: string;
+  billingEmail?: string | null;
   onClose: () => void;
 };
 
-function WorkspaceInvoiceDetailModal({ invoice, onClose }: WorkspaceInvoiceDetailModalProps) {
-  const detail = invoice ? getWorkspaceInvoiceDetail(invoice) : null;
+function WorkspaceInvoiceDetailModal({
+  invoice,
+  workspaceName,
+  billingEmail,
+  onClose,
+}: WorkspaceInvoiceDetailModalProps) {
+  const detail = invoice
+    ? getWorkspaceInvoiceDetail(invoice, { workspaceName, billingEmail })
+    : null;
   const statusKey = detail?.status?.toLowerCase() ?? "paid";
   const statusStyle = WORKSPACE_INVOICE_STATUS_STYLES[statusKey] ?? WORKSPACE_INVOICE_STATUS_STYLES.paid;
 

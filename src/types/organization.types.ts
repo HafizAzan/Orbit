@@ -1,6 +1,15 @@
 import type { OrganizationPlan, OrganizationStatus } from "../data/admin-organizations";
 import type { RegisterAs } from "./auth.types";
 
+export type WorkspaceOrganizationSettings = {
+  dailyDigest: boolean;
+  realtimePush: boolean;
+  weeklyReport: boolean;
+  twoFactorRequired: boolean;
+  sessionTimeoutEnabled: boolean;
+  sessionTimeoutMinutes: number;
+};
+
 export type WorkspaceOrganization = {
   id: string;
   name: string;
@@ -8,6 +17,7 @@ export type WorkspaceOrganization = {
   ownerName: string;
   ownerEmail: string;
   billingEmail: string | null;
+  workspaceSettings: WorkspaceOrganizationSettings;
   plan: {
     code: OrganizationPlan;
     name: string;
@@ -44,6 +54,7 @@ export type UpdateWorkspaceOrganizationRequest = {
   name?: string;
   slug?: string;
   billingEmail?: string;
+  workspaceSettings?: Partial<WorkspaceOrganizationSettings>;
 };
 
 export type UpdateOrganizationMemberRoleRequest = {

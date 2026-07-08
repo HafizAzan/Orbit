@@ -19,6 +19,11 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     RESET_PASSWORD_VALIDATE: "/auth/reset-password/validate",
     INVITE_VALIDATE: "/auth/invites/validate",
     INVITE_ACCEPT: "/auth/invites/accept",
+    TWO_FACTOR_VERIFY: "/auth/2fa/verify",
+    TWO_FACTOR_STATUS: "/auth/2fa/status",
+    TWO_FACTOR_SETUP: "/auth/2fa/setup",
+    TWO_FACTOR_ENABLE: "/auth/2fa/enable",
+    TWO_FACTOR_DISABLE: "/auth/2fa/disable",
   },
   ADMIN: {
     ORGANIZATIONS: "/admin/organizations",
@@ -74,6 +79,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     CHANGE_PLAN: "/billing/change-plan",
     REFUND: "/billing/refund",
     INVOICES: "/billing/invoices",
+    PORTAL: "/billing/portal",
   },
 };
 

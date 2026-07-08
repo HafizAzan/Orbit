@@ -15,7 +15,7 @@ function WorkspaceNotificationsSection({ settings, onChange, expanded = false }:
     <SettingsSection
       id="workspace-notifications"
       title="Notification Preferences"
-      description="Choose how your team receives workspace updates."
+      description="Choose how your organization receives workspace updates."
     >
       <div className="space-y-4">
         <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background/50 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -40,7 +40,7 @@ function WorkspaceNotificationsSection({ settings, onChange, expanded = false }:
               <Text as="p" weight="semibold">Weekly workspace report</Text>
               <Paragraph size="sm" className="mt-1">Summary email every Monday with project health metrics.</Paragraph>
             </div>
-            <Switch defaultChecked onChange={() => undefined} />
+            <Switch checked={settings.weeklyReport} onChange={(checked) => onChange("weeklyReport", checked)} />
           </div>
         ) : null}
       </div>

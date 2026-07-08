@@ -73,6 +73,18 @@ function WorkspaceGeneralSection({
         </SettingsField>
       </div>
 
+      <div className="mt-5">
+        <SettingsField label="Billing Email" hint="Invoices and payment receipts are sent to this address.">
+          <Input
+            value={settings.billingEmail}
+            onChange={(event) => onChange("billingEmail", event.target.value)}
+            placeholder="billing@company.com"
+            size="large"
+            className="rounded-xl! bg-background!"
+          />
+        </SettingsField>
+      </div>
+
       {showActions ? (
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-end">
           <Button size="large" onClick={onDiscard} disabled={saving} className="font-medium!">

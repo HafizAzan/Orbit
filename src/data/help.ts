@@ -1,5 +1,4 @@
 import {
-  ApiOutlined,
   BookOutlined,
   CustomerServiceOutlined,
   FileTextOutlined,
@@ -113,14 +112,6 @@ export const HELP_TOPICS: HelpTopic[] = [
     articleCount: 5,
   },
   {
-    id: "integrations",
-    title: "Integrations",
-    description: "Connect Slack, Jira, GitHub, and more.",
-    icon: ApiOutlined,
-    iconBackground: "workflow",
-    articleCount: 7,
-  },
-  {
     id: "billing",
     title: "Billing & plans",
     description: "Subscriptions, invoices, and plan upgrades.",
@@ -131,7 +122,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "security",
     title: "Security & compliance",
-    description: "Data protection, SSO, and audit logs.",
+    description: "Data protection, access control, and audit logs.",
     icon: LockOutlined,
     iconBackground: "security",
     articleCount: 5,
@@ -165,7 +156,7 @@ export const HELP_GUIDES: HelpGuide[] = [
     id: "enterprise-security",
     category: "Guide",
     title: "Enterprise security checklist",
-    description: "SSO, role-based access, audit trails, and data retention — everything admins need for a secure rollout.",
+    description: "Role-based access, audit trails, and data retention — everything admins need for a secure rollout.",
     meta: "10 min read",
     href: UN_AUTH_ROUTES.CONTACT,
     ctaLabel: "Read guide",
@@ -229,25 +220,11 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
       "Admins manage billing, organization settings, invites, and all workspace members. Managers create projects, add invited members to their project squads, assign tasks, and can remove members from projects they lead. They cannot invite users, change org roles, or access billing and settings.",
   },
   {
-    id: "sso",
-    topicId: "security",
-    question: "Does FlowSync support SSO?",
-    answer:
-      "Enterprise plans include SAML SSO with providers like Okta, Azure AD, and Google Workspace. Contact sales to enable SSO for your organization.",
-  },
-  {
     id: "data-backup",
     topicId: "security",
     question: "How is my data backed up?",
     answer:
       "FlowSync performs continuous replication with daily snapshots retained for 30 days on all paid plans. Enterprise customers can request extended retention and export schedules.",
-  },
-  {
-    id: "slack-integration",
-    topicId: "integrations",
-    question: "How do I connect Slack?",
-    answer:
-      "Open Settings → Integrations, select Slack, and authorize your workspace. Choose which channels receive notifications for mentions, status changes, and daily digests.",
   },
   {
     id: "upgrade-plan",

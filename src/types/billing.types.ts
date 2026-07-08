@@ -101,6 +101,10 @@ export type BillingMessageResponse = {
   message: string;
 };
 
+export type BillingPortalResponse = BillingMessageResponse & {
+  url: string;
+};
+
 export type RefundPaymentResponse = BillingMessageResponse & {
   refundId: string;
   amount: number;

@@ -1,4 +1,4 @@
-import { EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined, UndoOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import React, { useMemo } from "react";
@@ -13,9 +13,17 @@ type WorkspaceInvoicesTableProps = {
   invoices: BillingInvoice[];
   loading?: boolean;
   onViewInvoice: (invoice: BillingInvoice) => void;
+  onRefundInvoice?: (invoice: BillingInvoice) => void;
+  refundingInvoiceId?: string | null;
 };
 
-function WorkspaceInvoicesTable({ invoices, loading = false, onViewInvoice }: WorkspaceInvoicesTableProps) {
+function WorkspaceInvoicesTable({
+  invoices,
+  loading = false,
+  onViewInvoice,
+  onRefundInvoice,
+  refundingInvoiceId = null,
+}: WorkspaceInvoicesTableProps) {
   const columns = useMemo<ColumnsType<BillingInvoice>>(
     () => [
       {
@@ -79,21 +87,34 @@ function WorkspaceInvoicesTable({ invoices, loading = false, onViewInvoice }: Wo
       {
         title: "",
         key: "actions",
-        width: 120,
+        width: 180,
         align: "right",
         render: (_, record) => (
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            className="font-semibold!"
-            onClick={() => onViewInvoice(record)}
-          >
-            View
-          </Button>
+          <div className="flex justify-end gap-1">
+            {record.refundable && onRefundInvoice ? (
+              <Button
+                type="link"
+                icon={<UndoOutlined />}
+                loading={refundingInvoiceId === record.id}
+                className="font-semibold!"
+                onClick={() => onRefundInvoice(record)}
+              >
+                Refund
+              </Button>
+            ) : null}
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              className="font-semibold!"
+              onClick={() => onViewInvoice(record)}
+            >
+              View
+            </Button>
+          </div>
         ),
       },
     ],
-    [onViewInvoice],
+    [onRefundInvoice, onViewInvoice, refundingInvoiceId],
   );
 
   return (

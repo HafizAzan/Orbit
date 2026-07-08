@@ -9,6 +9,7 @@ import {
   listInvoices,
   refundPayment,
   selectPlan,
+  createPortalSession,
 } from "../api-services/billing.service";
 import { useAppContext } from "../context/app-context";
 import { canManageBilling } from "../lib/auth-routing";
@@ -111,5 +112,11 @@ export function useRefundPayment() {
       queryClient.invalidateQueries({ queryKey: ["billing-invoices"] });
       queryClient.invalidateQueries({ queryKey: ["billing-subscription"] });
     },
+  });
+}
+
+export function useBillingPortal() {
+  return useMutation({
+    mutationFn: (returnUrl?: string) => createPortalSession(returnUrl),
   });
 }

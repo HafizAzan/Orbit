@@ -1,12 +1,7 @@
 import { useMemo } from "react";
 import { useAppContext } from "../context/app-context";
 import type { WorkspaceSettingsSectionId } from "../data/workspace-settings";
-import {
-  canAccessSettingsSection,
-  getWorkspacePermissions,
-  hasWorkspacePermission,
-  type WorkspacePermission,
-} from "../lib/workspace-permissions";
+import { canAccessSettingsSection, getWorkspacePermissions, hasWorkspacePermission, type WorkspacePermission } from "../lib/workspace-permissions";
 
 function useWorkspacePermissions() {
   const app = useAppContext();

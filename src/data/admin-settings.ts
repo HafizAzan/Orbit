@@ -4,7 +4,6 @@ export type SettingsSectionId =
   | "email"
   | "security"
   | "notifications"
-  | "integrations"
   | "billing";
 
 export type PlatformSettings = {
@@ -48,7 +47,6 @@ export const SETTINGS_TAB_SLUGS: Record<SettingsSectionId, string> = {
   email: "email-configuration",
   security: "security",
   notifications: "notifications",
-  integrations: "integrations",
   billing: "billing-settings",
 };
 
@@ -60,7 +58,6 @@ export const SETTINGS_NAV_ITEMS: { id: SettingsSectionId; label: string; tab: st
   { id: "email", label: "Email Configuration", tab: SETTINGS_TAB_SLUGS.email },
   { id: "security", label: "Security", tab: SETTINGS_TAB_SLUGS.security },
   { id: "notifications", label: "Notifications", tab: SETTINGS_TAB_SLUGS.notifications },
-  { id: "integrations", label: "Integrations", tab: SETTINGS_TAB_SLUGS.integrations },
   { id: "billing", label: "Billing Settings", tab: SETTINGS_TAB_SLUGS.billing },
 ];
 
@@ -151,19 +148,6 @@ export const NOTIFICATION_TOGGLES: SettingsToggleItem<"emailNotifications" | "we
     key: "weeklyDigest",
     title: "Weekly Digest",
     description: "Summary of growth, churn, and system events every Monday.",
-  },
-];
-
-export const INTEGRATION_TOGGLES: SettingsToggleItem<"stripeEnabled" | "sendgridEnabled">[] = [
-  {
-    key: "stripeEnabled",
-    title: "Stripe",
-    description: "Process subscriptions and one-time payments.",
-  },
-  {
-    key: "sendgridEnabled",
-    title: "SendGrid",
-    description: "Deliver transactional and marketing emails.",
   },
 ];
 

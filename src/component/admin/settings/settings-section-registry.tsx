@@ -4,7 +4,6 @@ import SettingsBillingSection from "./settings-billing-section";
 import SettingsBrandingSection from "./settings-branding-section";
 import SettingsEmailSection from "./settings-email-section";
 import SettingsGeneralSection from "./settings-general-section";
-import SettingsIntegrationsSection from "./settings-integrations-section";
 import SettingsNotificationsSection from "./settings-notifications-section";
 import SettingsSecuritySection from "./settings-security-section";
 
@@ -19,6 +18,5 @@ export const SETTINGS_SECTION_REGISTRY: Record<SettingsSectionId, ComponentType<
   email: SettingsEmailSection,
   security: SettingsSecuritySection,
   notifications: SettingsNotificationsSection,
-  integrations: SettingsIntegrationsSection,
   billing: SettingsBillingSection,
 };

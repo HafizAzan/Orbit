@@ -16,10 +16,7 @@ import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
 function WorkspaceSidebarContent(props: { onNavigate?: () => void }) {
   const app = useAppContext();
   const role = app?.user?.role;
-  const { mainItems, bottomItems } = useMemo(
-    () => (role ? getWorkspaceNavItemsForRole(role) : { mainItems: [], bottomItems: [] }),
-    [role],
-  );
+  const { mainItems, bottomItems } = useMemo(() => (role ? getWorkspaceNavItemsForRole(role) : { mainItems: [], bottomItems: [] }), [role]);
 
   const handleNavItemClick = (item: { key: string }) => {
     if (item.key === "dashboard") {

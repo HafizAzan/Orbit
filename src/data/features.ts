@@ -17,7 +17,7 @@ const FEATURE_ITEMS: FeatureItem[] = [
   },
   {
     title: "Enterprise Security",
-    description: "Bank-grade encryption, SSO, and advanced permission controls to keep your data safe.",
+    description: "Bank-grade encryption and advanced permission controls to keep your data safe.",
     icon: SafetyOutlined,
     iconBackground: "security",
   },

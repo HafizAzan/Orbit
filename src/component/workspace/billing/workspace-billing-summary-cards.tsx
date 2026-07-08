@@ -1,7 +1,9 @@
 import { CreditCardOutlined, CrownOutlined, CalendarOutlined } from "@ant-design/icons";
-import React from "react";
-import { WORKSPACE_BILLING_SUMMARY } from "../../../data/workspace-settings";
+import React, { useMemo } from "react";
+import { useBillingCatalog, useCurrentSubscription } from "../../../hooks/use-billing";
+import { resolveWorkspaceBillingSummary } from "../../../lib/workspace-billing-summary";
 import { cn } from "../../../lib/utils";
+import { StatCardsGridSkeleton } from "../../skeletons";
 import { Paragraph, Text } from "../../ui/typography";
 
 type SummaryCardProps = {
@@ -41,25 +43,37 @@ function SummaryCard({ icon, label, title, subtitle, iconClassName }: SummaryCar
 }
 
 function WorkspaceBillingSummaryCards() {
+  const { data: subscription, isLoading: subscriptionLoading } = useCurrentSubscription();
+  const { data: catalog, isLoading: catalogLoading } = useBillingCatalog();
+
+  const summary = useMemo(
+    () => resolveWorkspaceBillingSummary(subscription, catalog?.products),
+    [catalog?.products, subscription],
+  );
+
+  if (subscriptionLoading || catalogLoading) {
+    return <StatCardsGridSkeleton count={3} />;
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <SummaryCard
         icon={<CrownOutlined className="text-lg" />}
         label="Current plan"
-        title={WORKSPACE_BILLING_SUMMARY.planName}
-        subtitle={WORKSPACE_BILLING_SUMMARY.priceLabel}
+        title={summary.planName}
+        subtitle={`${summary.priceLabel} · ${summary.statusLabel}`}
       />
       <SummaryCard
         icon={<CalendarOutlined className="text-lg" />}
         label="Next payment"
-        title={WORKSPACE_BILLING_SUMMARY.nextPaymentDate}
-        subtitle="Annual renewal"
+        title={summary.nextPaymentDate}
+        subtitle={summary.nextPaymentSubtitle}
       />
       <SummaryCard
         icon={<CreditCardOutlined className="text-lg" />}
         label="Payment method"
-        title={`${WORKSPACE_BILLING_SUMMARY.cardBrand} ···· ${WORKSPACE_BILLING_SUMMARY.cardLast4}`}
-        subtitle={`Expires ${WORKSPACE_BILLING_SUMMARY.cardExpiry}`}
+        title={summary.paymentMethodTitle}
+        subtitle={summary.paymentMethodSubtitle}
       />
     </div>
   );

@@ -3,11 +3,15 @@ import { assertApiSuccess } from "../lib/api-error";
 import API_ROUTES from "../router/api-routes";
 import type {
   AuthUser,
+  AuthSessionResponse,
   ForgotPasswordRequest,
   ForgotPasswordResponse,
   LoginRequest,
   LoginResponse,
   LogoutResponse,
+  TwoFactorSetupResponse,
+  TwoFactorStatusResponse,
+  VerifyTwoFactorRequest,
   RegisterPendingResponse,
   RegisterSendOtpRequest,
   RegisterSendOtpResponse,
@@ -63,7 +67,36 @@ const login = async (data: LoginRequest): Promise<LoginResponse> => {
   return assertApiSuccess<LoginResponse>(response);
 };
 
+const verifyTwoFactor = async (data: VerifyTwoFactorRequest): Promise<AuthSessionResponse> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.TWO_FACTOR_VERIFY, data);
+  return assertApiSuccess<AuthSessionResponse>(response);
+};
+
+const getTwoFactorStatus = async (): Promise<TwoFactorStatusResponse> => {
+  const response = await ApiService.get(API_ROUTES.AUTH.TWO_FACTOR_STATUS, AUTH_REQUEST);
+  return assertApiSuccess<TwoFactorStatusResponse>(response);
+};
+
 const AUTH_REQUEST = { requireAuth: true } as const;
+
+const setupTwoFactor = async (): Promise<TwoFactorSetupResponse> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.TWO_FACTOR_SETUP, undefined, AUTH_REQUEST);
+  return assertApiSuccess<TwoFactorSetupResponse>(response);
+};
+
+const enableTwoFactor = async (code: string) => {
+  const response = await ApiService.post(
+    API_ROUTES.AUTH.TWO_FACTOR_ENABLE,
+    { code },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<{ message: string; twoFactorEnabled: boolean }>(response);
+};
+
+const disableTwoFactor = async (data: { code: string; password: string }) => {
+  const response = await ApiService.post(API_ROUTES.AUTH.TWO_FACTOR_DISABLE, data, AUTH_REQUEST);
+  return assertApiSuccess<{ message: string; twoFactorEnabled: boolean }>(response);
+};
 
 const logout = async (): Promise<LogoutResponse> => {
   const response = await ApiService.post(API_ROUTES.AUTH.LOGOUT, undefined, AUTH_REQUEST);
@@ -213,6 +246,11 @@ export {
   acceptInvite,
   validateInviteToken,
   verifyRegister,
+  verifyTwoFactor,
+  getTwoFactorStatus,
+  setupTwoFactor,
+  enableTwoFactor,
+  disableTwoFactor,
   submitEmailChangeRequest,
   updateProfile,
   updateUiTheme,

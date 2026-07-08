@@ -2,9 +2,9 @@ import React, { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PricingCard from "../../common/pricing-card";
 import { PricingCardsGridSkeleton } from "../../skeletons";
+import QueryErrorState from "../../common/query-error-state";
 import {
   getWorkspacePlanActionLabel,
-  isWorkspaceMockPriceId,
   resolveWorkspaceBillingPlans,
   type WorkspaceBillingPlan,
 } from "../../../data/workspace-billing";
@@ -19,17 +19,18 @@ import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
 import type { CatalogCtaType, PlanCode } from "../../../types/billing.types";
 import SettingsSection from "../../admin/settings/settings-section";
+import { Paragraph } from "../../ui/typography";
 
 function WorkspaceBillingPlanCards() {
   const queryClient = useQueryClient();
-  const { data: catalog, isLoading: catalogLoading } = useBillingCatalog();
+  const catalogQuery = useBillingCatalog();
   const { data: subscription } = useCurrentSubscription();
   const { mutateAsync: changePlan } = useChangePlan();
   const { mutateAsync: startCheckout } = useCreateCheckout();
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
 
-  const plans = useMemo(() => resolveWorkspaceBillingPlans(catalog?.products), [catalog?.products]);
-  const currentPlan: PlanCode = subscription?.plan ?? "ENTERPRISE";
+  const plans = useMemo(() => resolveWorkspaceBillingPlans(catalogQuery.data?.products), [catalogQuery.data?.products]);
+  const currentPlan: PlanCode = subscription?.plan ?? "FREE";
 
   const handlePlanAction = async (plan: WorkspaceBillingPlan) => {
     if (plan.plan === currentPlan) return;
@@ -42,11 +43,6 @@ function WorkspaceBillingPlanCards() {
     setPendingPriceId(plan.priceId);
 
     try {
-      if (isWorkspaceMockPriceId(plan.priceId)) {
-        toast.success(`Plan updated to ${plan.name}.`);
-        return;
-      }
-
       if (subscription?.stripeSubscriptionId) {
         const result = await changePlan({ priceId: plan.priceId });
         showApiSuccessToast(result.message);
@@ -104,8 +100,21 @@ function WorkspaceBillingPlanCards() {
       title="Plans & Pricing"
       description="Compare plans and upgrade or switch your workspace subscription."
     >
-      {catalogLoading ? (
+      {catalogQuery.isLoading ? (
         <PricingCardsGridSkeleton count={3} />
+      ) : catalogQuery.isError ? (
+        <QueryErrorState
+          error={catalogQuery.error}
+          title="Unable to load billing plans"
+          onRetry={() => {
+            void catalogQuery.refetch();
+          }}
+          isRetrying={catalogQuery.isFetching}
+        />
+      ) : plans.length === 0 ? (
+        <Paragraph size="sm" className="text-muted">
+          Billing plans are not available right now. Please try again later.
+        </Paragraph>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch">
           {plans.map((plan) => {
