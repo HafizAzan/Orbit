@@ -13,9 +13,13 @@ import { useDeleteTask, useTasks } from "../../hooks/use-workspace-tasks";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { pluralize } from "../../lib/helper";
 import { mapApiTaskToWorkspaceTask } from "../../types/task.types";
+import { isWorkspaceOwner } from "../../lib/workspace-routing";
 import { Paragraph, Title } from "../../component/ui/typography";
+import { useAppContext } from "../../context/app-context";
 
 function WorkspaceTasksContent() {
+  const app = useAppContext();
+  const isOwner = isWorkspaceOwner({ role: app?.user?.role ?? "member" });
   const { can } = useWorkspacePermissions();
   const [page, setPage] = useState(1);
   const tasksQuery = useTasks({ page, limit: WORKSPACE_TASKS_PAGE_SIZE });
@@ -76,7 +80,9 @@ function WorkspaceTasksContent() {
               Tasks
             </Title>
             <Paragraph size="sm" className="mt-1 text-muted">
-              Manage, track and assign team workflow efficiently.
+              {isOwner
+                ? "Review team delivery across projects. Owners oversee execution but do not create or edit tasks directly."
+                : "Manage, track and assign team workflow efficiently."}
             </Paragraph>
           </div>
 

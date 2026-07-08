@@ -17,12 +17,46 @@ export const PLAN_ROUTES = {
   CHECKOUT_CANCEL: "/choose-plan/checkout/cancel",
 } as const;
 
+export const SUBSCRIPTION_PENDING_ROUTES = {
+  WORKSPACE_PENDING: "/workspace-pending",
+} as const;
+
+export const PLAN_ONBOARDING_PATHS = new Set<string>([
+  PLAN_ROUTES.CHOOSE_PLAN,
+  PLAN_ROUTES.CHECKOUT_SUCCESS,
+  PLAN_ROUTES.CHECKOUT_CANCEL,
+]);
+
+export function isOrganizationAwaitingSubscription(user: AuthUser) {
+  return user.organizationAwaitingSubscription;
+}
+
+export function shouldRedirectToChoosePlan(user: AuthUser) {
+  if (user.role !== "owner" && user.role !== "admin") {
+    return false;
+  }
+
+  return user.requiresPlanSelection || user.organizationAwaitingSubscription;
+}
+
+export function shouldRedirectToWorkspacePending(user: AuthUser) {
+  if (user.role !== "manager" && user.role !== "member") {
+    return false;
+  }
+
+  return user.organizationAwaitingSubscription;
+}
+
 export function getPostAuthRedirectPath(user: AuthUser) {
   if (isPlatformAdminUser(user)) {
     return ADMIN_ROUTES.DASHBOARD;
   }
 
-  if (user.requiresPlanSelection) {
+  if (shouldRedirectToWorkspacePending(user)) {
+    return SUBSCRIPTION_PENDING_ROUTES.WORKSPACE_PENDING;
+  }
+
+  if (shouldRedirectToChoosePlan(user)) {
     return PLAN_ROUTES.CHOOSE_PLAN;
   }
 
@@ -34,6 +68,20 @@ export function getAuthenticatedHeaderAction(user: AuthUser) {
     return {
       label: "Dashboard",
       path: ADMIN_ROUTES.DASHBOARD,
+    };
+  }
+
+  if (shouldRedirectToWorkspacePending(user)) {
+    return {
+      label: "Workspace status",
+      path: SUBSCRIPTION_PENDING_ROUTES.WORKSPACE_PENDING,
+    };
+  }
+
+  if (shouldRedirectToChoosePlan(user)) {
+    return {
+      label: "Choose plan",
+      path: PLAN_ROUTES.CHOOSE_PLAN,
     };
   }
 

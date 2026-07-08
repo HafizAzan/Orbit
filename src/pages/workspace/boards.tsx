@@ -15,7 +15,7 @@ function WorkspaceBoards() {
   const { data: boardSummaries = [] } = boardsQuery;
 
   const description = isMember
-    ? "Open the Kanban board for each project you are on. Drag tasks through statuses and add work from the board."
+    ? "Open the Kanban board for each project you are on. Tap a task to update its status from the detail view."
     : "Each board belongs to a project. Open a project board to manage tasks by status — the same tasks you see in the Tasks table.";
 
   const emptyMessage = isMember

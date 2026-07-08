@@ -176,6 +176,7 @@ export type AuthUser = {
   accountStatus: AccountStatus;
   organization: AuthOrganization | null;
   requiresPlanSelection: boolean;
+  organizationAwaitingSubscription: boolean;
   uiTheme?: AppUiThemeId;
   twoFactorEnabled?: boolean;
 };

@@ -1,7 +1,8 @@
-import { Button } from "antd";
+import { Button, Input } from "antd";
 import React, { useCallback, useState } from "react";
 import {
   useConfirmOrganizationTwoFactor,
+  useDisableOrganizationTwoFactor,
   useOrganizationTwoFactorStatus,
   useSetupOrganizationTwoFactor,
 } from "../../../hooks/use-organization-two-factor";
@@ -14,10 +15,12 @@ function WorkspaceTwoFactorPanel() {
   const { data: status, refetch } = useOrganizationTwoFactorStatus();
   const { mutateAsync: setupTwoFactor, isPending: settingUp } = useSetupOrganizationTwoFactor();
   const { mutateAsync: confirmTwoFactor, isPending: confirming } = useConfirmOrganizationTwoFactor();
+  const { mutateAsync: disableTwoFactor, isPending: disabling } = useDisableOrganizationTwoFactor();
   const [setupModalOpen, setSetupModalOpen] = useState(false);
   const [setupSecret, setSetupSecret] = useState<string | null>(null);
   const [otpauthUrl, setOtpauthUrl] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
+  const [disableCode, setDisableCode] = useState("");
 
   const resetSetupState = useCallback(() => {
     setSetupModalOpen(false);
@@ -50,6 +53,17 @@ function WorkspaceTwoFactorPanel() {
     }
   }, [confirmTwoFactor, refetch, resetSetupState, verificationCode]);
 
+  const handleDisable = useCallback(async () => {
+    try {
+      const result = await disableTwoFactor(disableCode);
+      showApiSuccessToast(result.message);
+      setDisableCode("");
+      await refetch();
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  }, [disableCode, disableTwoFactor, refetch]);
+
   return (
     <>
       <SettingsSection
@@ -78,9 +92,30 @@ function WorkspaceTwoFactorPanel() {
               </Button>
             </>
           ) : (
-            <Paragraph size="sm" className="text-muted">
-              Workspace authenticator is ready. All members use this code when signing in.
-            </Paragraph>
+            <>
+              <Paragraph size="sm" className="text-muted">
+                Workspace authenticator is ready. Enter the current 6-digit code below to remove it
+                or rotate to a new device.
+              </Paragraph>
+              <div className="flex max-w-sm flex-col gap-3 sm:flex-row sm:items-center">
+                <Input
+                  value={disableCode}
+                  onChange={(event) => setDisableCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="6-digit code"
+                  maxLength={6}
+                  inputMode="numeric"
+                />
+                <Button
+                  danger
+                  loading={disabling}
+                  className="font-semibold!"
+                  onClick={() => void handleDisable()}
+                  disabled={disableCode.length !== 6}
+                >
+                  Remove authenticator
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </SettingsSection>

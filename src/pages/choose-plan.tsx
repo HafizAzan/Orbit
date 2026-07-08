@@ -4,13 +4,18 @@ import PlanCatalogGrid from "../component/billing/plan-catalog-grid";
 import { PageHeaderSkeleton, PricingCardsGridSkeleton } from "../component/skeletons";
 import { Paragraph, Title } from "../component/ui/typography";
 import { useAppContext } from "../context/app-context";
-import { WORKSPACE_ROUTES } from "../router/workspace-routes";
+import {
+  getPostAuthRedirectPath,
+  shouldRedirectToChoosePlan,
+  shouldRedirectToWorkspacePending,
+} from "../lib/auth-routing";
 import { UN_AUTH_ROUTES } from "../router/public-routes";
 
 function ChoosePlan() {
   const app = useAppContext();
 
-  if (app?.isBootstrapping) {    return (
+  if (app?.isBootstrapping) {
+    return (
       <div className="min-h-screen bg-background px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
         <div className="mx-auto max-w-7xl">
           <PageHeaderSkeleton showAction={false} className="mx-auto mb-10 max-w-2xl justify-center" />
@@ -24,8 +29,12 @@ function ChoosePlan() {
     return <Navigate to={UN_AUTH_ROUTES.LOGIN} replace />;
   }
 
-  if (!app.user.requiresPlanSelection) {
-    return <Navigate to={WORKSPACE_ROUTES.DASHBOARD} replace />;
+  if (shouldRedirectToWorkspacePending(app.user)) {
+    return <Navigate to={getPostAuthRedirectPath(app.user)} replace />;
+  }
+
+  if (!shouldRedirectToChoosePlan(app.user)) {
+    return <Navigate to={getPostAuthRedirectPath(app.user)} replace />;
   }
 
   return (
@@ -36,7 +45,8 @@ function ChoosePlan() {
             Choose your plan
           </Title>
           <Paragraph className="mt-4 text-hero-text">
-            Select a plan to activate your organization. You can start with the free trial or upgrade anytime.
+            Select a plan to activate your organization. Workspace tab tak access nahi milega jab tak
+            aap plan select ya purchase nahi kar lete.
           </Paragraph>
         </div>
 

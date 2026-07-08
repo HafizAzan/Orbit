@@ -4,11 +4,13 @@ import {
   getOrganizationAbout,
   getOrganizationMembers,
   removeOrganizationMember,
+  transferOrganizationOwnership,
   updateCurrentOrganization,
   updateOrganizationMemberEmail,
   updateOrganizationMemberRole,
 } from "../api-services/organization.service";
 import type {
+  TransferOrganizationOwnershipRequest,
   UpdateOrganizationMemberEmailRequest,
   UpdateOrganizationMemberRoleRequest,
   UpdateWorkspaceOrganizationRequest,
@@ -44,10 +46,10 @@ export function useUpdateWorkspaceOrganization() {
   });
 }
 
-export function useOrganizationMembers() {
+export function useOrganizationMembers(includeOwner = false) {
   return useQuery({
-    queryKey: WORKSPACE_ORGANIZATION_MEMBERS_QUERY_KEY,
-    queryFn: () => getOrganizationMembers(),
+    queryKey: [...WORKSPACE_ORGANIZATION_MEMBERS_QUERY_KEY, includeOwner],
+    queryFn: () => getOrganizationMembers({ isOwnerNeeded: includeOwner }),
   });
 }
 
@@ -92,6 +94,19 @@ export function useRemoveOrganizationMember() {
 
   return useMutation({
     mutationFn: (memberId: string) => removeOrganizationMember(memberId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_ORGANIZATION_MEMBERS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_ORGANIZATION_QUERY_KEY });
+    },
+  });
+}
+
+export function useTransferOrganizationOwnership() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: TransferOrganizationOwnershipRequest) =>
+      transferOrganizationOwnership(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: WORKSPACE_ORGANIZATION_MEMBERS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: WORKSPACE_ORGANIZATION_QUERY_KEY });

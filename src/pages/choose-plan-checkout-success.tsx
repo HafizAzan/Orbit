@@ -7,9 +7,8 @@ import { Paragraph, Title } from "../component/ui/typography";
 import { useAppContext } from "../context/app-context";
 import { showApiErrorToast } from "../lib/api-error";
 import { saveStoredUser } from "../lib/auth-session";
-import { PLAN_ROUTES } from "../lib/auth-routing";
+import { getPostAuthRedirectPath, PLAN_ROUTES, shouldRedirectToChoosePlan } from "../lib/auth-routing";
 import { UN_AUTH_ROUTES } from "../router/public-routes";
-import { WORKSPACE_ROUTES } from "../router/workspace-routes";
 
 async function refreshAuthenticatedUser(app: ReturnType<typeof useAppContext>) {
   const freshUser = await getMe();
@@ -35,8 +34,8 @@ function ChoosePlanCheckoutSuccess() {
         await confirmCheckout({ sessionId });
         const freshUser = await refreshAuthenticatedUser(app);
 
-        if (!freshUser.requiresPlanSelection) {
-          navigate(WORKSPACE_ROUTES.DASHBOARD, { replace: true });
+        if (!freshUser.organizationAwaitingSubscription) {
+          navigate(getPostAuthRedirectPath(freshUser), { replace: true });
         }
       } catch (error) {
         showApiErrorToast(error);
@@ -63,8 +62,8 @@ function ChoosePlanCheckoutSuccess() {
     return <Navigate to={PLAN_ROUTES.CHOOSE_PLAN} replace />;
   }
 
-  if (!app.user.requiresPlanSelection) {
-    return <Navigate to={WORKSPACE_ROUTES.DASHBOARD} replace />;
+  if (!shouldRedirectToChoosePlan(app.user)) {
+    return <Navigate to={getPostAuthRedirectPath(app.user)} replace />;
   }
 
   return (

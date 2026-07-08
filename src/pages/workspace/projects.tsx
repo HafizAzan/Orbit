@@ -4,6 +4,7 @@ import ProjectTemplateCard from "../../component/workspace/projects/project-temp
 import ProjectsPageHeader from "../../component/workspace/projects/projects-page-header";
 import ProjectsToolbar from "../../component/workspace/projects/projects-toolbar";
 import QueryPageGuard from "../../component/common/query-page-guard";
+import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import TablePaginationFooter from "../../component/ui/table-pagination-footer";
 import { ProjectsPageSkeleton } from "../../component/skeletons";
 import { useAppContext } from "../../context/app-context";
@@ -20,6 +21,18 @@ import { cn } from "../../lib/utils";
 import { Text } from "../../component/ui/typography";
 
 function WorkspaceProjects() {
+  return (
+    <WorkspaceRoleGate
+      permission="project.view"
+      title="Projects access restricted"
+      description="Members collaborate through My Tasks and project boards. Project management is for owners, admins, and managers."
+    >
+      <WorkspaceProjectsContent />
+    </WorkspaceRoleGate>
+  );
+}
+
+function WorkspaceProjectsContent() {
   const app = useAppContext();
   const { can } = useWorkspacePermissions();
   const deleteActor = useMemo(

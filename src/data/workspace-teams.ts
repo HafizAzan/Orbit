@@ -117,6 +117,18 @@ export const TEAM_ROLE_PERMISSIONS: Record<TeamInviteRole, TeamRolePermissionInf
   },
 };
 
+export const WORKSPACE_OWNER_ROLE_INFO: TeamRolePermissionInfo = {
+  title: "Owner",
+  description: "Executive oversight for the whole organization.",
+  bullets: [
+    "Manage billing, settings, and membership",
+    "Create projects and assign delivery leads",
+    "Review org-wide tasks, reports, and activity",
+    "Transfer ownership to an admin when needed",
+  ],
+  accent: "border-primary/20 bg-feature-sync text-primary",
+};
+
 export type TeamInvitePayload = {
   email: string;
   name?: string;

@@ -2,10 +2,12 @@ import { CheckOutlined, DownOutlined, FilterOutlined, PlusOutlined } from "@ant-
 import { Button, Dropdown } from "antd";
 import React, { useMemo, useState } from "react";
 import { DASHBOARD_PERIOD_FILTER_OPTIONS, DEFAULT_DASHBOARD_PERIOD_FILTER, type DashboardPeriodFilter } from "../../../data/workspace-dashboard";
+import { isWorkspaceOwner } from "../../../lib/workspace-routing";
 import { cn } from "../../../lib/utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import { Paragraph, Text, Title } from "../../ui/typography";
+import { useAppContext } from "../../../context/app-context";
 
 type ProjectOverviewHeaderProps = {
   period?: DashboardPeriodFilter;
@@ -14,6 +16,8 @@ type ProjectOverviewHeaderProps = {
 
 function ProjectOverviewHeader({ period: periodProp, onPeriodChange }: ProjectOverviewHeaderProps) {
   const [open, setOpen] = useState(false);
+  const app = useAppContext();
+  const isOwner = isWorkspaceOwner({ role: app?.user?.role ?? "member" });
 
   const period = periodProp ?? DEFAULT_DASHBOARD_PERIOD_FILTER;
 
@@ -60,7 +64,9 @@ function ProjectOverviewHeader({ period: periodProp, onPeriodChange }: ProjectOv
           Overview Dashboard
         </Title>
         <Paragraph size="sm" className="mt-1 text-muted">
-          Welcome back. Here&apos;s what&apos;s happening with your workspace today.
+          {isOwner
+            ? "Organization-wide health, billing readiness, and delivery oversight."
+            : "Welcome back. Here's what's happening with your workspace today."}
         </Paragraph>
       </div>
 

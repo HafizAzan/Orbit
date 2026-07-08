@@ -76,6 +76,17 @@ export type OrganizationTwoFactorSetupResponse = {
   otpauthUrl: string;
 };
 
+export type TransferOrganizationOwnershipRequest = {
+  targetMemberId: string;
+  password: string;
+};
+
+export type TransferOrganizationOwnershipResponse = {
+  message: string;
+  requiresReauth: boolean;
+  newOwner: OrganizationMember;
+};
+
 export type OrganizationAboutPerson = {
   id: string;
   fullName: string;

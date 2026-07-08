@@ -23,6 +23,7 @@ import { ConfirmModal } from "../../ui/modal";
 import type { RegisterAs } from "../../../types/auth.types";
 import { useAppContext } from "../../../context/app-context";
 import MemberEmailChangeModal from "./member-email-change-modal";
+import TransferOwnershipModal from "./transfer-ownership-modal";
 import { Paragraph, Text } from "../../ui/typography";
 
 type WorkspaceMembersSectionProps = {
@@ -78,13 +79,14 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
   const app = useAppContext();
   const actorRole = app?.user?.role ?? "member";
   const { can } = useWorkspacePermissions();
-  const membersQuery = useOrganizationMembers();
+  const membersQuery = useOrganizationMembers(true);
   const { data } = membersQuery;
   const { mutateAsync: removeMember, isPending: removingMember } = useRemoveOrganizationMember();
   const { mutateAsync: updateMemberEmail, isPending: updatingMemberEmail } = useUpdateOrganizationMemberEmail();
   const canManageMembers = can("team.change_role");
   const [pendingRemoveMember, setPendingRemoveMember] = useState<OrganizationMember | null>(null);
   const [pendingEmailMember, setPendingEmailMember] = useState<OrganizationMember | null>(null);
+  const [transferOwnershipOpen, setTransferOwnershipOpen] = useState(false);
 
   const summary: OrganizationMembersSummary | undefined = data;
   const previewMembers = summary?.data.slice(0, 3) ?? [];
@@ -173,13 +175,24 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
       title="Team Members"
       description="Manage seat allocation and workspace access for your organization."
       action={
-        can("team.view") ? (
-          <Link to={WORKSPACE_ROUTES.TEAMS}>
-            <Button type="default" className="font-semibold!">
-              Manage Members
+        <div className="flex flex-wrap gap-2">
+          {can("settings.transfer_ownership") ? (
+            <Button
+              type="default"
+              className="font-semibold!"
+              onClick={() => setTransferOwnershipOpen(true)}
+            >
+              Transfer ownership
             </Button>
-          </Link>
-        ) : null
+          ) : null}
+          {can("team.view") ? (
+            <Link to={WORKSPACE_ROUTES.TEAMS}>
+              <Button type="default" className="font-semibold!">
+                Manage Members
+              </Button>
+            </Link>
+          ) : null}
+        </div>
       }
     >
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -287,6 +300,12 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
             return false;
           }
         }}
+      />
+
+      <TransferOwnershipModal
+        open={transferOwnershipOpen}
+        onClose={() => setTransferOwnershipOpen(false)}
+        members={summary?.data ?? []}
       />
     </SettingsSection>
   );

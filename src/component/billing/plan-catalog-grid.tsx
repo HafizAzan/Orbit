@@ -10,8 +10,8 @@ import { getMe } from "../../api-services/auth.service";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { saveStoredUser } from "../../lib/auth-session";
 import { mapCatalogToPricingPlans } from "../../lib/pricing-catalog";
+import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { useAppContext } from "../../context/app-context";
-import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
 import type { CatalogCtaType } from "../../types/billing.types";
 
 type PlanCatalogGridProps = {
@@ -56,8 +56,8 @@ function PlanCatalogGrid({
         app?.setUser(freshUser);
         showApiSuccessToast(result.message);
 
-        if (!freshUser.requiresPlanSelection) {
-          navigate(WORKSPACE_ROUTES.DASHBOARD, { replace: true });
+        if (!freshUser.organizationAwaitingSubscription) {
+          navigate(getPostAuthRedirectPath(freshUser), { replace: true });
         }
 
         return;

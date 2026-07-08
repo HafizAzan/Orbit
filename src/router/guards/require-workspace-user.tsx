@@ -1,7 +1,13 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
-import { isPlatformAdminUser, PLAN_ROUTES } from "../../lib/auth-routing";
+import {
+  isPlatformAdminUser,
+  PLAN_ROUTES,
+  shouldRedirectToChoosePlan,
+  shouldRedirectToWorkspacePending,
+  SUBSCRIPTION_PENDING_ROUTES,
+} from "../../lib/auth-routing";
 import { isWorkspaceUser } from "../../lib/workspace-routing";
 import { ADMIN_ROUTES } from "../admin-routes";
 import { UN_AUTH_ROUTES } from "../public-routes";
@@ -23,8 +29,12 @@ function RequireWorkspaceUser() {
     return <Navigate to={ADMIN_ROUTES.DASHBOARD} replace />;
   }
 
-  if (app.user.requiresPlanSelection) {
+  if (shouldRedirectToChoosePlan(app.user)) {
     return <Navigate to={PLAN_ROUTES.CHOOSE_PLAN} replace />;
+  }
+
+  if (shouldRedirectToWorkspacePending(app.user)) {
+    return <Navigate to={SUBSCRIPTION_PENDING_ROUTES.WORKSPACE_PENDING} replace />;
   }
 
   if (!isWorkspaceUser(app.user)) {

@@ -7,6 +7,10 @@ import {
 } from "./workspace-permissions";
 
 const WORKSPACE_ROUTE_PERMISSIONS: Record<string, WorkspacePermission | WorkspacePermission[]> = {
+  [WORKSPACE_ROUTES.DASHBOARD]: "dashboard.view",
+  [WORKSPACE_ROUTES.PROJECTS]: "project.view",
+  [WORKSPACE_ROUTES.BOARDS]: "boards.view",
+  [WORKSPACE_ROUTES.CALENDAR]: "calendar.view",
   [WORKSPACE_ROUTES.BILLING]: "billing.view",
   [WORKSPACE_ROUTES.SETTINGS]: "settings.view",
   [WORKSPACE_ROUTES.MY_TASKS]: "my_tasks.view",
@@ -19,8 +23,11 @@ const WORKSPACE_ROUTE_PERMISSIONS: Record<string, WorkspacePermission | Workspac
 const WORKSPACE_ROUTE_PATTERNS: Array<{ pattern: RegExp; permission: WorkspacePermission }> = [
   { pattern: /^\/projects\/new$/, permission: "project.create" },
   { pattern: /^\/projects\/[^/]+\/edit$/, permission: "project.edit" },
+  { pattern: /^\/projects\/[^/]+$/, permission: "project.view" },
+  { pattern: /^\/projects\/[^/]+\/board$/, permission: "boards.view" },
   { pattern: /^\/tasks\/new$/, permission: "task.create" },
   { pattern: /^\/tasks\/[^/]+\/edit$/, permission: "task.edit" },
+  { pattern: /^\/tasks\/[^/]+$/, permission: "my_tasks.view" },
 ];
 
 export function getRequiredRoutePermission(pathname: string): WorkspacePermission | null {
@@ -38,6 +45,10 @@ export function canAccessWorkspacePath(role: RegisterAs | undefined, pathname: s
 
   if (!permission) {
     return true;
+  }
+
+  if (permission === "my_tasks.view" && pathname.startsWith("/tasks/")) {
+    return hasWorkspacePermission(role, "my_tasks.view") || hasWorkspacePermission(role, "tasks.view_all");
   }
 
   return hasWorkspacePermission(role, permission);

@@ -39,6 +39,8 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     TWO_FACTOR_STATUS: "/organizations/me/2fa/status",
     TWO_FACTOR_SETUP: "/organizations/me/2fa/setup",
     TWO_FACTOR_CONFIRM: "/organizations/me/2fa/confirm",
+    TWO_FACTOR_DISABLE: "/organizations/me/2fa/disable",
+    TRANSFER_OWNERSHIP: "/organizations/me/transfer-ownership",
   },
   ACTIVITY: {
     LIST: "/activity",

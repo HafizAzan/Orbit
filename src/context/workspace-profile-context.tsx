@@ -68,6 +68,7 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
       accountStatus: "pending",
       organization: null,
       requiresPlanSelection: false,
+      organizationAwaitingSubscription: false,
     }),
   );
   const [profile, setProfile] = useState<WorkspaceProfile>(savedProfile);

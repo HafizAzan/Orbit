@@ -9,17 +9,23 @@ export type WorkspacePermission =
   | "settings.billing"
   | "settings.notifications"
   | "settings.security"
+  | "settings.transfer_ownership"
   | "team.view"
   | "team.invite"
   | "team.change_role"
   | "team.remove_squad_member"
+  | "dashboard.view"
+  | "project.view"
   | "project.create"
   | "project.edit"
   | "project.complete"
   | "project.delete"
+  | "boards.view"
+  | "calendar.view"
   | "task.create"
   | "task.edit"
   | "task.delete_any"
+  | "task.status_update"
   | "my_tasks.view"
   | "tasks.view_all"
   | "reports.view"
@@ -37,13 +43,18 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "settings.billing",
     "settings.notifications",
     "settings.security",
+    "settings.transfer_ownership",
     "team.view",
     "team.invite",
     "team.change_role",
+    "dashboard.view",
+    "project.view",
     "project.create",
     "project.edit",
     "project.complete",
     "project.delete",
+    "boards.view",
+    "calendar.view",
     "tasks.view_all",
     "reports.view",
     "activity.view",
@@ -60,10 +71,14 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "team.view",
     "team.invite",
     "team.change_role",
+    "dashboard.view",
+    "project.view",
     "project.create",
     "project.edit",
     "project.complete",
     "project.delete",
+    "boards.view",
+    "calendar.view",
     "task.create",
     "task.edit",
     "task.delete_any",
@@ -75,10 +90,14 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
   manager: [
     "team.view",
     "team.remove_squad_member",
+    "dashboard.view",
+    "project.view",
     "project.create",
     "project.edit",
     "project.complete",
     "project.delete",
+    "boards.view",
+    "calendar.view",
     "task.create",
     "task.edit",
     "task.delete_any",
@@ -86,7 +105,13 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "reports.view",
     "activity.view",
   ],
-  member: ["my_tasks.view"],
+  member: [
+    "my_tasks.view",
+    "boards.view",
+    "calendar.view",
+    "project.view",
+    "task.status_update",
+  ],
 };
 
 export const SETTINGS_SECTION_PERMISSIONS: Record<WorkspaceSettingsSectionId, WorkspacePermission> = {
@@ -114,4 +139,12 @@ export function getWorkspacePermissions(role: RegisterAs | undefined) {
 export function canAccessSettingsSection(role: RegisterAs | undefined, sectionId: WorkspaceSettingsSectionId) {
   if (!hasWorkspacePermission(role, "settings.view")) return false;
   return hasWorkspacePermission(role, SETTINGS_SECTION_PERMISSIONS[sectionId]);
+}
+
+export function canTransferOwnership(role: RegisterAs | undefined) {
+  return hasWorkspacePermission(role, "settings.transfer_ownership");
+}
+
+export function canUpdateTaskStatus(role: RegisterAs | undefined) {
+  return hasWorkspacePermission(role, "task.status_update");
 }

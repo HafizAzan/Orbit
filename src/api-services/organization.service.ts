@@ -6,6 +6,8 @@ import type {
   OrganizationMembersSummary,
   OrganizationTwoFactorSetupResponse,
   OrganizationTwoFactorStatusResponse,
+  TransferOrganizationOwnershipRequest,
+  TransferOrganizationOwnershipResponse,
   UpdateOrganizationMemberEmailRequest,
   UpdateOrganizationMemberRoleRequest,
   UpdateWorkspaceOrganizationRequest,
@@ -14,7 +16,6 @@ import type {
 import {
   buildPaginationSearchParams,
   normalizePaginatedResponse,
-  type PaginationParams,
 } from "../types/pagination.types";
 
 const AUTH_REQUEST = { requireAuth: true } as const;
@@ -37,9 +38,12 @@ const updateCurrentOrganization = async (
 };
 
 const getOrganizationMembers = async (
-  params: PaginationParams = {},
+  params: { isOwnerNeeded?: boolean } = {},
 ): Promise<OrganizationMembersSummary> => {
-  const searchParams = buildPaginationSearchParams(params);
+  const searchParams = buildPaginationSearchParams({});
+  if (params.isOwnerNeeded) {
+    searchParams.set("isOwnerNeeded", "true");
+  }
   const response = await ApiService.get(
     `${API_ROUTES.ORGANIZATIONS.MEMBERS}?${searchParams.toString()}`,
     AUTH_REQUEST,
@@ -110,14 +114,37 @@ const confirmOrganizationTwoFactor = async (code: string) => {
   return assertApiSuccess<{ message: string; configured: boolean }>(response);
 };
 
+const disableOrganizationTwoFactor = async (code: string) => {
+  const response = await ApiService.post(
+    API_ROUTES.ORGANIZATIONS.TWO_FACTOR_DISABLE,
+    { code },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<{ message: string; configured: boolean }>(response);
+};
+
+const transferOrganizationOwnership = async (data: TransferOrganizationOwnershipRequest) => {
+  const response = await ApiService.post(
+    API_ROUTES.ORGANIZATIONS.TRANSFER_OWNERSHIP,
+    {
+      targetMemberId: data.targetMemberId,
+      password: data.password,
+    },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<TransferOrganizationOwnershipResponse>(response);
+};
+
 export {
   confirmOrganizationTwoFactor,
+  disableOrganizationTwoFactor,
   getCurrentOrganization,
   getOrganizationAbout,
   getOrganizationMembers,
   getOrganizationTwoFactorStatus,
   removeOrganizationMember,
   setupOrganizationTwoFactor,
+  transferOrganizationOwnership,
   updateCurrentOrganization,
   updateOrganizationMemberEmail,
   updateOrganizationMemberRole,
