@@ -6,7 +6,7 @@ import {
 } from "@ant-design/icons";
 import type { ComponentType } from "react";
 
-export type ProjectStatus = "on_track" | "in_progress" | "delayed";
+export type ProjectStatus = "on_track" | "in_progress" | "delayed" | "completed";
 export type ProjectPriority = "high" | "medium" | "low";
 export type ProjectsViewMode = "grid" | "list";
 
@@ -52,6 +52,11 @@ export const PROJECT_STATUS_CONFIG: Record<
     badgeClass: "bg-red-50 text-red-700 border-red-100",
     progressClass: "bg-red-500",
   },
+  completed: {
+    label: "Done",
+    badgeClass: "bg-violet-50 text-violet-700 border-violet-100",
+    progressClass: "bg-violet-500",
+  },
 };
 
 export const PROJECT_ICON_MAP: Record<
@@ -69,6 +74,7 @@ export const PROJECT_STATUS_FILTER_OPTIONS = [
   { value: "on_track", label: "On Track" },
   { value: "in_progress", label: "In Progress" },
   { value: "delayed", label: "Delayed" },
+  { value: "completed", label: "Done" },
 ] as const;
 
 export const PROJECT_PRIORITY_FILTER_OPTIONS = [

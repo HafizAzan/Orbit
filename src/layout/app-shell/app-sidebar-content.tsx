@@ -73,7 +73,7 @@ function AppSidebarContent({
       <NavLink
         key={item.key}
         to={item.path}
-        end={item.end ?? true}
+        end={item.end ?? false}
         onClick={() => {
           onNavItemClick?.(item);
           handleNavClick();

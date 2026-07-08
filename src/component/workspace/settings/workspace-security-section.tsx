@@ -26,8 +26,8 @@ function WorkspaceSecuritySection({ settings, onChange, expanded = false }: Work
                 Require Two-Factor Authentication
               </Text>
               <Paragraph size="sm" className="mt-1">
-                Only owners and admins can turn this on or off. Set up your authenticator below before enabling it.
-                Managers and members cannot sign in while this is on unless an owner or admin turns it off for them.
+                Only owners and admins can turn this on or off. Configure the workspace authenticator
+                below first. All members then enter the same org code at sign-in.
               </Paragraph>
             </div>
             <Switch checked={settings.twoFactorEnabled} onChange={(checked) => onChange("twoFactorEnabled", checked)} />

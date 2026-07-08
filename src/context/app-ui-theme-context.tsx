@@ -6,7 +6,7 @@ import {
   clearAppUiTheme,
   DEFAULT_APP_UI_THEME,
   getAppUiTheme,
-  isAppUiTheme,
+  normalizeAppUiThemeId,
   type AppUiThemeId,
 } from "../data/app-ui-themes";
 import { showApiErrorToast } from "../lib/api-error";
@@ -25,11 +25,7 @@ type AppUiThemeProviderProps = {
 };
 
 function resolveThemeId(value?: string | null): AppUiThemeId {
-  if (value && isAppUiTheme(value)) {
-    return value;
-  }
-
-  return DEFAULT_APP_UI_THEME;
+  return normalizeAppUiThemeId(value);
 }
 
 function AppUiThemeProvider({ children }: AppUiThemeProviderProps) {

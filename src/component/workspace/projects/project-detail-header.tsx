@@ -16,6 +16,7 @@ import type { ApiProjectThemeMeta } from "../../../types/project.types";
 import WorkspaceBackLink from "../common/workspace-back-link";
 import WorkspaceNavLink from "../common/workspace-nav-link";
 import DeleteProjectButton from "./delete-project-button";
+import ProjectStatusActions from "./project-status-actions";
 import ProjectWorkspaceTabs from "./project-workspace-tabs";
 import { Paragraph, Title } from "../../ui/typography";
 
@@ -24,6 +25,7 @@ type ProjectDetailHeaderProps = {
   themeId?: ProjectThemeId;
   themeMeta?: ApiProjectThemeMeta;
   canDelete?: boolean;
+  completedTaskCount: number;
 };
 
 function ProjectDetailHeader({
@@ -31,6 +33,7 @@ function ProjectDetailHeader({
   themeId = "classic",
   themeMeta,
   canDelete = false,
+  completedTaskCount,
 }: ProjectDetailHeaderProps) {
   const navigate = useNavigate();
   const { can } = useWorkspacePermissions();
@@ -98,6 +101,14 @@ function ProjectDetailHeader({
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+              <ProjectStatusActions
+                projectId={project.id}
+                projectName={project.title}
+                status={project.status}
+                completedTaskCount={completedTaskCount}
+                taskCount={project.taskCount}
+              />
+
               {canEditProject ? (
                 <WorkspaceNavLink to={getProjectEditPath(project.id)} preserveReturn>
                   <Button type="primary" icon={<EditOutlined />} size="large" className="font-semibold!">

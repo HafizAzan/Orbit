@@ -15,6 +15,7 @@ export type WorkspacePermission =
   | "team.remove_squad_member"
   | "project.create"
   | "project.edit"
+  | "project.complete"
   | "project.delete"
   | "task.create"
   | "task.edit"
@@ -41,6 +42,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "team.change_role",
     "project.create",
     "project.edit",
+    "project.complete",
     "project.delete",
     "tasks.view_all",
     "reports.view",
@@ -60,6 +62,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "team.change_role",
     "project.create",
     "project.edit",
+    "project.complete",
     "project.delete",
     "task.create",
     "task.edit",
@@ -74,6 +77,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "team.remove_squad_member",
     "project.create",
     "project.edit",
+    "project.complete",
     "project.delete",
     "task.create",
     "task.edit",

@@ -68,10 +68,7 @@ function ProjectFormFields({
   }, [assignableMembers, canAssignLead, currentUserId, values.leadUserId]);
 
   const selectedMembers = useMemo(
-    () =>
-      assignableMembers.filter(
-        (member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId,
-      ),
+    () => assignableMembers.filter((member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId),
     [assignableMembers, values.leadUserId, values.memberIds],
   );
 
@@ -264,11 +261,7 @@ function ProjectFormFields({
 
           <div>
             <label className="mb-2 block text-sm font-medium text-foreground">Due Date</label>
-            <DatePicker
-              value={values.dueDate || undefined}
-              onChange={(dueDate) => updateValues({ dueDate: dueDate ?? "" })}
-              className="w-full"
-            />
+            <DatePicker value={values.dueDate || undefined} onChange={(dueDate) => updateValues({ dueDate: dueDate ?? "" })} className="w-full" />
           </div>
         </div>
       </section>
@@ -287,19 +280,18 @@ function ProjectFormFields({
               <Button
                 key={option.value}
                 type="default"
+                block
                 onClick={() => updateValues({ visibility: option.value })}
                 className={cn(
-                  "h-auto rounded-2xl border px-4 py-4 text-left whitespace-normal shadow-none",
-                  isSelected
-                    ? "border-primary bg-feature-sync shadow-sm"
-                    : "border-border bg-background hover:border-primary/25",
+                  "flex! h-auto! min-h-32 w-full flex-col items-start justify-start rounded-2xl border px-5 py-5 text-left whitespace-normal shadow-none",
+                  isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-background hover:border-primary/25",
                 )}
               >
                 <Text as="span" size="sm" weight="semibold" className="flex items-center gap-2">
                   <Icon className={isSelected ? "text-primary" : "text-muted"} />
                   {option.label}
                 </Text>
-                <Paragraph size="sm" className="mt-2 font-normal">
+                <Paragraph size="sm" className="mt-2 font-normal text-muted">
                   {option.description}
                 </Paragraph>
               </Button>
@@ -315,24 +307,15 @@ function ProjectFormFields({
               Execution Squad
             </Text>
             <Paragraph size="sm" className="mt-1">
-              Add the people who will do the work. The delivery lead is added automatically and does not need to be
-              selected here.
+              Add the people who will do the work. The delivery lead is added automatically and does not need to be selected here.
             </Paragraph>
           </div>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
           {selectedMembers.map((member) => (
-            <span
-              key={member.id}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm"
-            >
-              <span
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold",
-                  member.avatarColor,
-                )}
-              >
+            <span key={member.id} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm">
+              <span className={cn("flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold", member.avatarColor)}>
                 {getInitial(member.name)}
               </span>
               {member.name}
@@ -372,22 +355,17 @@ function ProjectFormFields({
                 type="default"
                 block
                 onClick={() => handleAddMember(member.id)}
-                className="h-auto justify-between rounded-xl border-border bg-background px-4 py-3 text-left shadow-none hover:border-primary/25 hover:bg-feature-sync/40!"
+                className="h-auto w-fit! justify-between rounded-xl border-border bg-background px-4 py-8! text-left shadow-none hover:border-primary/25 hover:bg-feature-sync/40!"
               >
-                <span className="flex items-center gap-3">
-                  <span
-                    className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold",
-                      member.avatarColor,
-                    )}
-                  >
+                <span className="flex items-start gap-3">
+                  <span className={cn("flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold shadow-sm", member.avatarColor)}>
                     {getInitial(member.name)}
                   </span>
                   <span>
-                    <Text as="span" size="sm" weight="semibold" className="block">
+                    <Text as="span" size="sm" weight="semibold" className="block text-start">
                       {member.name}
                     </Text>
-                    <Text as="span" size="xs" color="muted" className="block">
+                    <Text as="span" size="xs" color="muted" className="block text-start">
                       {member.email}
                     </Text>
                   </span>

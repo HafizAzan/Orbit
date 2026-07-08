@@ -112,6 +112,27 @@ function WorkspaceProjectDetail() {
     }
   };
 
+  const discussionCardProps = {
+    messages: discussionMessages,
+    currentUserId: app?.user?.id,
+    loading: commentsQuery.isLoading,
+    refreshing: commentsQuery.isFetching && !commentsQuery.isLoading,
+    submitting: isCreatingComment,
+    onSubmit: handleSubmitComment,
+    onDelete: handleDeleteComment,
+    onRefresh: () => {
+      void commentsQuery.refetch();
+    },
+    messagesClassName: "max-h-80 lg:max-h-96",
+  };
+
+  const projectCollaborationSection = (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <ProjectAttachmentsCard items={project?.attachments ?? []} />
+      <ProjectDiscussionCard {...discussionCardProps} className="flex h-full flex-col" />
+    </div>
+  );
+
   return (
     <QueryPageGuard
       query={projectQuery}
@@ -141,23 +162,11 @@ function WorkspaceProjectDetail() {
                 loading={myTasksQuery.isLoading}
               />
 
-              <ProjectDiscussionCard
-                messages={discussionMessages}
-                currentUserId={app?.user?.id}
-                loading={commentsQuery.isLoading}
-                refreshing={commentsQuery.isFetching && !commentsQuery.isLoading}
-                submitting={isCreatingComment}
-                onSubmit={handleSubmitComment}
-                onDelete={handleDeleteComment}
-                onRefresh={() => {
-                  void commentsQuery.refetch();
-                }}
-              />
+              {projectCollaborationSection}
             </div>
 
             <div className="space-y-6">
               <ProjectTeamCard members={project.teamMembers} />
-              <ProjectAttachmentsCard items={project.attachments} />
             </div>
           </div>
         </div>
@@ -167,6 +176,7 @@ function WorkspaceProjectDetail() {
             project={project}
             themeId={apiProject!.theme}
             themeMeta={apiProject!.themeMeta}
+            completedTaskCount={apiProject!.completedTaskCount}
             canDelete={
               apiProject
                 ? canDeleteWorkspaceProject(
@@ -180,30 +190,21 @@ function WorkspaceProjectDetail() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div className="space-y-6 xl:col-span-2">
               <ProjectPhaseProgressCard project={project} />
-              <ProjectActivityFeed items={project.activities} />
-              <ProjectTasksCard
-                projectId={projectId}
-                tasks={projectTasks}
-                loading={allTasksQuery.isLoading}
-              />
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <ProjectActivityFeed items={project.activities} />
+                <ProjectTasksCard
+                  projectId={projectId}
+                  tasks={projectTasks}
+                  loading={allTasksQuery.isLoading}
+                />
+              </div>
+
+              {projectCollaborationSection}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
               <ProjectNetworkPulseCard members={project.teamMembers} tasks={projectTasks} />
               <ProjectTeamCard members={project.teamMembers} />
-              <ProjectAttachmentsCard items={project.attachments} />
-              <ProjectDiscussionCard
-                messages={discussionMessages}
-                currentUserId={app?.user?.id}
-                loading={commentsQuery.isLoading}
-                refreshing={commentsQuery.isFetching && !commentsQuery.isLoading}
-                submitting={isCreatingComment}
-                onSubmit={handleSubmitComment}
-                onDelete={handleDeleteComment}
-                onRefresh={() => {
-                  void commentsQuery.refetch();
-                }}
-              />
             </div>
           </div>
         </div>

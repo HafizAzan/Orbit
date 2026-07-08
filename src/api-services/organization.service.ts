@@ -4,6 +4,8 @@ import API_ROUTES from "../router/api-routes";
 import type {
   OrganizationAbout,
   OrganizationMembersSummary,
+  OrganizationTwoFactorSetupResponse,
+  OrganizationTwoFactorStatusResponse,
   UpdateOrganizationMemberEmailRequest,
   UpdateOrganizationMemberRoleRequest,
   UpdateWorkspaceOrganizationRequest,
@@ -89,11 +91,33 @@ const removeOrganizationMember = async (memberId: string): Promise<{ message: st
   return assertApiSuccess<{ message: string }>(response);
 };
 
+const getOrganizationTwoFactorStatus = async (): Promise<OrganizationTwoFactorStatusResponse> => {
+  const response = await ApiService.get(API_ROUTES.ORGANIZATIONS.TWO_FACTOR_STATUS, AUTH_REQUEST);
+  return assertApiSuccess<OrganizationTwoFactorStatusResponse>(response);
+};
+
+const setupOrganizationTwoFactor = async (): Promise<OrganizationTwoFactorSetupResponse> => {
+  const response = await ApiService.post(API_ROUTES.ORGANIZATIONS.TWO_FACTOR_SETUP, undefined, AUTH_REQUEST);
+  return assertApiSuccess<OrganizationTwoFactorSetupResponse>(response);
+};
+
+const confirmOrganizationTwoFactor = async (code: string) => {
+  const response = await ApiService.post(
+    API_ROUTES.ORGANIZATIONS.TWO_FACTOR_CONFIRM,
+    { code },
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<{ message: string; configured: boolean }>(response);
+};
+
 export {
+  confirmOrganizationTwoFactor,
   getCurrentOrganization,
   getOrganizationAbout,
   getOrganizationMembers,
+  getOrganizationTwoFactorStatus,
   removeOrganizationMember,
+  setupOrganizationTwoFactor,
   updateCurrentOrganization,
   updateOrganizationMemberEmail,
   updateOrganizationMemberRole,

@@ -2,7 +2,7 @@ import { SendOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import React, { useState } from "react";
 import type { ProjectDiscussionMessage } from "../../../data/workspace-project-detail";
-import { getInitial } from "../../../lib/helper";
+import { getInitial, formatRelativeTime } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
@@ -15,6 +15,8 @@ type ProjectDiscussionCardProps = {
   onSubmit?: (message: string) => Promise<void> | void;
   onDelete?: (commentId: string) => Promise<void> | void;
   onRefresh?: () => void;
+  className?: string;
+  messagesClassName?: string;
 };
 
 function ProjectDiscussionCard({
@@ -26,6 +28,8 @@ function ProjectDiscussionCard({
   onSubmit,
   onDelete,
   onRefresh,
+  className,
+  messagesClassName,
 }: ProjectDiscussionCardProps) {
   const [draft, setDraft] = useState("");
 
@@ -38,7 +42,7 @@ function ProjectDiscussionCard({
   };
 
   return (
-    <article id="project-discussion" className="rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6">
+    <article id="project-discussion" className={cn("rounded-2xl border border-border bg-card p-5 shadow-sm lg:p-6", className)}>
       <div className="flex items-center justify-between gap-3">
         <Title level={5} color="default">Discussion</Title>
         {onRefresh ? (
@@ -58,8 +62,11 @@ function ProjectDiscussionCard({
       ) : messages.length === 0 ? (
         <Paragraph size="sm" className="mt-5">No project comments yet. Start the conversation.</Paragraph>
       ) : (
-        <ul className="mt-5 max-h-60 min-h-24 space-y-4 overflow-y-auto pr-1">
-          {messages.map((message) => (
+        <ul className={cn("mt-5 min-h-32 space-y-4 overflow-y-auto pr-1 max-h-60", messagesClassName)}>
+          {messages.map((message) => {
+            const relativeTime = formatRelativeTime(message.createdAt);
+
+            return (
             <li key={message.id} className="flex gap-3">
               <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold", message.avatarColor)}>
                 {getInitial(message.userName)}
@@ -67,7 +74,9 @@ function ProjectDiscussionCard({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <Text as="span" size="sm" weight="semibold">{message.userName}</Text>
-                  <Text as="span" size="xs" color="muted">{message.timeAgo}</Text>
+                  {relativeTime ? (
+                    <Text as="span" size="xs" color="muted">{relativeTime}</Text>
+                  ) : null}
                 </div>
                 <Text as="p" size="sm" className="mt-1 rounded-2xl bg-muted-surface px-3 py-2">{message.message}</Text>
                 {currentUserId && message.authorId === currentUserId && onDelete ? (
@@ -77,7 +86,8 @@ function ProjectDiscussionCard({
                 ) : null}
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
 

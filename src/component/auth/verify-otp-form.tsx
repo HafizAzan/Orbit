@@ -9,12 +9,13 @@ import {
   useResendRegisterOtp,
   useVerifyRegister,
 } from "../../hooks/user-authentication";
+import { showApiErrorToast, showApiInfoToast, showApiSuccessToast } from "../../lib/api-error";
 import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { saveAuthSession } from "../../lib/auth-session";
-import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
+import { navigateToTwoFactorChallenge } from "../../lib/auth-two-factor-navigation";
 import { clearOtpSession, getOtpSession, saveOtpSession } from "../../lib/otp-session";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
-import type { VerifyOtpLocationState } from "../../types/auth.types";
+import { isTwoFactorChallengeResponse, type VerifyOtpLocationState } from "../../types/auth.types";
 import AnimateOnScroll from "../common/animate-on-scroll";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
@@ -97,6 +98,13 @@ function VerifyOtpForm() {
     try {
       const result = await verifyRegister({ email, otp: values.otp });
       clearOtpSession(email);
+
+      if (isTwoFactorChallengeResponse(result)) {
+        showApiInfoToast(result.message);
+        navigateToTwoFactorChallenge(navigate, result, { replace: true });
+        return;
+      }
+
       saveAuthSession(result.accessToken, result.user);
       app?.setUser(result.user);
       showApiSuccessToast(result.message);

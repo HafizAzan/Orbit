@@ -31,7 +31,7 @@ export type ProjectDiscussionMessage = {
   id: string;
   userName: string;
   message: string;
-  timeAgo: string;
+  createdAt: string;
   avatarColor: string;
   authorId?: string;
 };

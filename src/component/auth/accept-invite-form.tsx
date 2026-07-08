@@ -9,13 +9,14 @@ import React, { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
 import { useAcceptInvite, useValidateInviteToken } from "../../hooks/user-authentication";
-import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
+import { showApiErrorToast, showApiInfoToast, showApiSuccessToast } from "../../lib/api-error";
 import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { saveAuthSession } from "../../lib/auth-session";
+import { navigateToTwoFactorChallenge } from "../../lib/auth-two-factor-navigation";
 import { getInitial } from "../../lib/helper";
 import { cn } from "../../lib/utils";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
-import type { AcceptInviteFormValues } from "../../types/auth.types";
+import { isTwoFactorChallengeResponse, type AcceptInviteFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Text, Title } from "../ui/typography";
@@ -96,6 +97,12 @@ function AcceptInviteForm() {
         password: values.password,
         fullName: values.fullName.trim(),
       });
+
+      if (isTwoFactorChallengeResponse(result)) {
+        showApiInfoToast(result.message);
+        navigateToTwoFactorChallenge(navigate, result, { replace: true });
+        return;
+      }
 
       saveAuthSession(result.accessToken, result.user, false);
       app?.setUser(result.user);

@@ -4,13 +4,13 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
 import { useLogin } from "../../hooks/user-authentication";
-import { useVerifyTwoFactor } from "../../hooks/use-two-factor";
 import { AUTH_ERROR_CODES, ApiRequestError, showApiErrorToast, showApiInfoToast, showApiSuccessToast } from "../../lib/api-error";
 import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { saveAuthSession } from "../../lib/auth-session";
 import { saveOtpSession } from "../../lib/otp-session";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
 import { isTwoFactorChallengeResponse, type LoginFormValues } from "../../types/auth.types";
+import TwoFactorChallengeScreen from "./two-factor-challenge-screen";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Text, Title } from "../ui/typography";
@@ -20,16 +20,18 @@ function LoginForm() {
   const navigate = useNavigate();
   const app = useAppContext();
   const { mutateAsync: login, isPending: loggingIn } = useLogin();
-  const { mutateAsync: verifyTwoFactor, isPending: verifyingTwoFactor } = useVerifyTwoFactor();
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(true);
-  const [twoFactorCode, setTwoFactorCode] = useState("");
 
   const completeSession = (accessToken: string, user: Parameters<typeof saveAuthSession>[1], remember: boolean, message: string) => {
     saveAuthSession(accessToken, user, remember);
     app?.setUser(user);
     showApiSuccessToast(message);
     navigate(getPostAuthRedirectPath(user));
+  };
+
+  const resetTwoFactorState = () => {
+    setChallengeToken(null);
   };
 
   const handleFinish = async (values: LoginFormValues) => {
@@ -78,70 +80,15 @@ function LoginForm() {
     }
   };
 
-  const handleVerifyTwoFactor = async () => {
-    if (!challengeToken || twoFactorCode.length !== 6) return;
-
-    try {
-      const result = await verifyTwoFactor({
-        challengeToken,
-        code: twoFactorCode,
-      });
-
-      completeSession(result.accessToken, result.user, rememberMe, result.message);
-    } catch (error) {
-      showApiErrorToast(error);
-    }
-  };
-
   if (challengeToken) {
     return (
-      <AuthFormLayout>
-        <AuthFormCard>
-          <Title level={2} className="text-3xl text-foreground">
-            Two-factor verification
-          </Title>
-          <Paragraph size="sm" className="mt-2 text-muted">
-            Enter the 6-digit code from your authenticator app.
-          </Paragraph>
-
-          <div className="mt-8 space-y-4">
-            <Input
-              value={twoFactorCode}
-              onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="000000"
-              size="large"
-              className="rounded-lg! text-center tracking-[0.4em]!"
-              maxLength={6}
-              inputMode="numeric"
-              autoFocus
-            />
-
-            <Button
-              type="primary"
-              block
-              size="large"
-              loading={verifyingTwoFactor}
-              disabled={twoFactorCode.length !== 6}
-              className="h-11! font-semibold!"
-              onClick={() => void handleVerifyTwoFactor()}
-            >
-              Verify and continue
-            </Button>
-
-            <Button
-              block
-              size="large"
-              className="h-11! font-medium!"
-              onClick={() => {
-                setChallengeToken(null);
-                setTwoFactorCode("");
-              }}
-            >
-              Back to login
-            </Button>
-          </div>
-        </AuthFormCard>
-      </AuthFormLayout>
+      <TwoFactorChallengeScreen
+        challengeToken={challengeToken}
+        onBack={resetTwoFactorState}
+        onComplete={(session) => {
+          completeSession(session.accessToken, session.user, rememberMe, session.message);
+        }}
+      />
     );
   }
 

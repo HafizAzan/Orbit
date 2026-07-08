@@ -4,10 +4,10 @@ export const RESOURCES = {
     LOGO_DARK: "/svg/flow-dark.svg",
   },
   IMAGES: {
-    DASHBOARD: "/public/images/dashboard-img.png",
-    LAPTOP: "/public/images/laptop.png",
-    KANBAN_LAPTOP: "/public/images/kanban-img.png",
-    WORKSPACE: "/public/images/workspace.png",
-    JOURNEY: "/public/images/journey.png",
+    DASHBOARD: "/images/dashboard-img.png",
+    LAPTOP: "/images/laptop.png",
+    KANBAN_LAPTOP: "/images/kanban-img.png",
+    WORKSPACE: "/images/workspace.png",
+    JOURNEY: "/images/journey.png",
   },
 };

@@ -162,7 +162,9 @@ export type AuthOrganization = {
   name: string;
 };
 
-export type AppUiThemeId = "classic" | "ocean" | "sunset" | "forest" | "royal" | "midnight";
+import type { AppUiThemeId } from "../data/app-ui-themes";
+
+export type { AppUiThemeId };
 
 export type AuthUser = {
   id: string;
@@ -190,7 +192,7 @@ export type AuthSessionResponse = {
   user: AuthUser;
 };
 
-export type VerifyRegisterResponse = AuthSessionResponse;
+export type VerifyRegisterResponse = AuthSessionResponse | AuthTwoFactorChallengeResponse;
 
 export type InviteValidationResponse = {
   isValid: true;
@@ -212,7 +214,7 @@ export type AcceptInviteRequest = {
   fullName?: string;
 };
 
-export type AcceptInviteResponse = AuthSessionResponse;
+export type AcceptInviteResponse = AuthSessionResponse | AuthTwoFactorChallengeResponse;
 
 export type AcceptInviteFormValues = {
   fullName: string;
@@ -227,6 +229,11 @@ export type RegisterFormValues = {
   email: string;
   password: string;
   confirmPassword: string;
+};
+
+export type TwoFactorChallengeLocationState = {
+  challengeToken: string;
+  remember?: boolean;
 };
 
 export type VerifyOtpLocationState = {

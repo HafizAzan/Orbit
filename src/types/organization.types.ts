@@ -65,6 +65,17 @@ export type UpdateOrganizationMemberEmailRequest = {
   email: string;
 };
 
+export type OrganizationTwoFactorStatusResponse = {
+  configured: boolean;
+  requiredByWorkspace: boolean;
+  pendingSetup: boolean;
+};
+
+export type OrganizationTwoFactorSetupResponse = {
+  secret: string;
+  otpauthUrl: string;
+};
+
 export type OrganizationAboutPerson = {
   id: string;
   fullName: string;

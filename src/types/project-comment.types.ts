@@ -1,9 +1,6 @@
 import type { ProjectDiscussionMessage } from "../data/workspace-project-detail";
 
-export type ApiProjectComment = ProjectDiscussionMessage & {
-  createdAt: string;
-  authorId: string;
-};
+export type ApiProjectComment = ProjectDiscussionMessage;
 
 export type CreateProjectCommentRequest = {
   body: string;
@@ -14,7 +11,7 @@ export function mapApiProjectCommentToMessage(comment: ApiProjectComment): Proje
     id: comment.id,
     userName: comment.userName,
     message: comment.message,
-    timeAgo: comment.timeAgo,
+    createdAt: comment.createdAt,
     avatarColor: comment.avatarColor,
     authorId: comment.authorId,
   };

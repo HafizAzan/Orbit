@@ -1,8 +1,9 @@
 import { useAppUiTheme } from "../context/app-ui-theme-context";
+import { isDarkAppUiTheme } from "../data/app-ui-themes";
 
 export function useIsDarkAppTheme() {
   const { themeId } = useAppUiTheme();
-  return themeId === "midnight";
+  return isDarkAppUiTheme(themeId);
 }
 
 const LIGHT_SURFACE_TO_DARK: Record<string, string> = {

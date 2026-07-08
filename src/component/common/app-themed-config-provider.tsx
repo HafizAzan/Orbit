@@ -1,6 +1,7 @@
 import { ConfigProvider, theme as antdTheme } from "antd";
 import React, { type ReactNode } from "react";
 import { useAppUiTheme } from "../../context/app-ui-theme-context";
+import { isDarkAppUiTheme } from "../../data/app-ui-themes";
 
 type AppThemedConfigProviderProps = {
   children: ReactNode;
@@ -8,7 +9,7 @@ type AppThemedConfigProviderProps = {
 
 function AppThemedConfigProvider({ children }: AppThemedConfigProviderProps) {
   const { antdPrimary, themeId } = useAppUiTheme();
-  const isDark = themeId === "midnight";
+  const isDark = isDarkAppUiTheme(themeId);
 
   return (
     <ConfigProvider

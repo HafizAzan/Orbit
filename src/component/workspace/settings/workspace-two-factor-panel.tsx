@@ -1,15 +1,19 @@
 import { Button } from "antd";
 import React, { useCallback, useState } from "react";
-import { useEnableTwoFactor, useSetupTwoFactor, useTwoFactorStatus } from "../../../hooks/use-two-factor";
+import {
+  useConfirmOrganizationTwoFactor,
+  useOrganizationTwoFactorStatus,
+  useSetupOrganizationTwoFactor,
+} from "../../../hooks/use-organization-two-factor";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import TwoFactorSetupModal from "../../auth/two-factor-setup-modal";
 import SettingsSection from "../../admin/settings/settings-section";
 import { Paragraph, Text } from "../../ui/typography";
 
 function WorkspaceTwoFactorPanel() {
-  const { data: status, refetch } = useTwoFactorStatus();
-  const { mutateAsync: setupTwoFactor, isPending: settingUp } = useSetupTwoFactor();
-  const { mutateAsync: enableTwoFactor, isPending: enabling } = useEnableTwoFactor();
+  const { data: status, refetch } = useOrganizationTwoFactorStatus();
+  const { mutateAsync: setupTwoFactor, isPending: settingUp } = useSetupOrganizationTwoFactor();
+  const { mutateAsync: confirmTwoFactor, isPending: confirming } = useConfirmOrganizationTwoFactor();
   const [setupModalOpen, setSetupModalOpen] = useState(false);
   const [setupSecret, setSetupSecret] = useState<string | null>(null);
   const [otpauthUrl, setOtpauthUrl] = useState<string | null>(null);
@@ -35,41 +39,47 @@ function WorkspaceTwoFactorPanel() {
     }
   }, [resetSetupState, setupTwoFactor]);
 
-  const handleEnable = useCallback(async () => {
+  const handleConfirm = useCallback(async () => {
     try {
-      const result = await enableTwoFactor(verificationCode);
+      const result = await confirmTwoFactor(verificationCode);
       showApiSuccessToast(result.message);
       resetSetupState();
       await refetch();
     } catch (error) {
       showApiErrorToast(error);
     }
-  }, [enableTwoFactor, refetch, resetSetupState, verificationCode]);
+  }, [confirmTwoFactor, refetch, resetSetupState, verificationCode]);
 
   return (
     <>
       <SettingsSection
         id="workspace-two-factor"
-        title="Owner / admin authenticator"
-        description="Set up your personal authenticator here before turning on workspace 2FA. Other roles must contact an owner or admin if they cannot sign in."
+        title="Workspace authenticator"
+        description="One shared authenticator for the whole organization. Every member enters this same 6-digit code at sign-in after org 2FA is enabled."
       >
         <div className="space-y-4 rounded-2xl border border-border bg-background/50 p-4">
           <Text as="p" weight="semibold">
-            Status: {status?.enabled ? "Enabled" : status?.pendingSetup ? "Setup in progress" : "Not enabled"}
+            Status:{" "}
+            {status?.configured
+              ? "Configured"
+              : status?.pendingSetup
+                ? "Setup in progress"
+                : "Not configured"}
           </Text>
 
-          {!status?.enabled ? (
+          {!status?.configured ? (
             <>
               <Paragraph size="sm" className="text-muted">
-                Scan the QR code in your authenticator app, then save the workspace setting to require 2FA.
+                Scan the QR code in your authenticator app, confirm the code, then turn on
+                &quot;Require Two-Factor Authentication&quot; above.
               </Paragraph>
               <Button type="primary" className="font-semibold!" onClick={() => void handleOpenSetup()}>
-                {status?.pendingSetup ? "Continue 2FA setup" : "Set up authenticator"}
+                {status?.pendingSetup ? "Continue workspace 2FA setup" : "Set up workspace authenticator"}
               </Button>
             </>
           ) : (
             <Paragraph size="sm" className="text-muted">
-              Your authenticator is ready. After workspace 2FA is enabled, sign-in will ask for your 6-digit code.
+              Workspace authenticator is ready. All members use this code when signing in.
             </Paragraph>
           )}
         </div>
@@ -81,12 +91,12 @@ function WorkspaceTwoFactorPanel() {
         secret={setupSecret}
         otpauthUrl={otpauthUrl}
         loading={settingUp && !setupSecret}
-        submitting={enabling}
+        submitting={confirming}
         verificationCode={verificationCode}
         onVerificationCodeChange={setVerificationCode}
-        onConfirm={() => void handleEnable()}
-        title="Set up authenticator app"
-        description="Scan the QR code or add the setup key manually, then enter the 6-digit code to finish."
+        onConfirm={() => void handleConfirm()}
+        title="Set up workspace authenticator"
+        description="This code is shared by everyone in the organization. Scan the QR code or add the setup key manually, then enter the 6-digit code to confirm."
       />
     </>
   );

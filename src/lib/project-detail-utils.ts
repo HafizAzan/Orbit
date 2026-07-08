@@ -4,7 +4,7 @@ import type {
 } from "../data/workspace-project-detail";
 import type { ApiWorkspaceTask } from "../types/task.types";
 import { TASK_STATUS_CONFIG } from "../data/workspace-tasks";
-import { formatDate } from "./helper";
+import { formatDate, formatRelativeTime } from "./helper";
 
 export function computeRemainingDays(dueDate: string | null | undefined) {
   if (!dueDate) return 0;
@@ -20,24 +20,6 @@ export function computeRemainingDays(dueDate: string | null | undefined) {
 export function formatProjectEstimatedHours(hours: number) {
   if (hours <= 0) return "0h";
   return `${hours}h`;
-}
-
-function formatRelativeTime(isoDate: string) {
-  const date = new Date(isoDate);
-  const diffMs = Date.now() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / 60_000);
-
-  if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
-
-  const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-
-  return formatDate(isoDate);
 }
 
 function formatAttachmentSize(bytes: number) {
@@ -64,7 +46,7 @@ export function mapProjectTasksToActivities(tasks: ApiWorkspaceTask[]): ProjectA
           ? "completed task"
           : `moved task to ${TASK_STATUS_CONFIG[task.status].label.toLowerCase()}`,
       target: task.title,
-      timeAgo: formatRelativeTime(task.updatedAt),
+      timeAgo: formatRelativeTime(task.updatedAt) ?? "",
       iconBg: "bg-indigo-50",
       iconColor: "text-indigo-600",
     }));
@@ -86,7 +68,12 @@ export function mapProjectTasksToAttachments(tasks: ApiWorkspaceTask[]): Project
 }
 
 export function resolveProjectPhaseLabel(status: string) {
+  if (status === "completed") return "Completed";
   if (status === "on_track") return "Execution Phase";
   if (status === "delayed") return "Recovery Phase";
   return "Planning Phase";
+}
+
+export function areAllProjectTasksDone(completedTaskCount: number, taskCount: number) {
+  return taskCount > 0 && completedTaskCount === taskCount;
 }

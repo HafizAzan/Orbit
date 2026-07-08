@@ -36,6 +36,9 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     ME: "/organizations/me",
     ABOUT: "/organizations/me/about",
     MEMBERS: "/organizations/me/members",
+    TWO_FACTOR_STATUS: "/organizations/me/2fa/status",
+    TWO_FACTOR_SETUP: "/organizations/me/2fa/setup",
+    TWO_FACTOR_CONFIRM: "/organizations/me/2fa/confirm",
   },
   ACTIVITY: {
     LIST: "/activity",

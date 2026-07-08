@@ -29,64 +29,61 @@ function App() {
       <AppProvider>
         <AppUiThemeProvider>
           <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <ChildRoute element={<RequirePlatformAdmin />}>
-              <ChildRoute element={<AdminLayout />}>
-                {ADMIN_ROUTES_LIST.map((route: AdminRoute) => (
-                  <ChildRoute key={route.path} path={route.path} element={<route.component />} />
-                ))}
+            <ScrollToTop />
+            <Routes>
+              <ChildRoute element={<RequirePlatformAdmin />}>
+                <ChildRoute element={<AdminLayout />}>
+                  {ADMIN_ROUTES_LIST.map((route: AdminRoute) => (
+                    <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                  ))}
+                </ChildRoute>
               </ChildRoute>
-            </ChildRoute>
 
-            <ChildRoute element={<RequireWorkspaceUser />}>
-              <ChildRoute element={<WorkspaceLayout />}>
-                <ChildRoute element={<RequireMemberRouteAccess />}>
-                  <ChildRoute element={<RequireWorkspaceRouteAccess />}>
-                    {WORKSPACE_ROUTES_LIST.map((route: WorkspaceRoute) => (
-                      <ChildRoute key={route.path} path={route.path} element={<route.component />} />
-                    ))}
-                    <ChildRoute
-                      path="/projects/:projectId/settings"
-                      element={<ProjectThemeLegacyRedirect />}
-                    />
-                    <ChildRoute path={WORKSPACE_NOT_FOUND_ROUTE.path} element={<WORKSPACE_NOT_FOUND_ROUTE.component />} />
+              <ChildRoute element={<RequireWorkspaceUser />}>
+                <ChildRoute element={<WorkspaceLayout />}>
+                  <ChildRoute element={<RequireMemberRouteAccess />}>
+                    <ChildRoute element={<RequireWorkspaceRouteAccess />}>
+                      {WORKSPACE_ROUTES_LIST.map((route: WorkspaceRoute) => (
+                        <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                      ))}
+                      <ChildRoute path="/projects/:projectId/settings" element={<ProjectThemeLegacyRedirect />} />
+                      <ChildRoute path={WORKSPACE_NOT_FOUND_ROUTE.path} element={<WORKSPACE_NOT_FOUND_ROUTE.component />} />
+                    </ChildRoute>
                   </ChildRoute>
                 </ChildRoute>
               </ChildRoute>
-            </ChildRoute>
 
-            {WORKSPACE_LEGACY_REDIRECTS.map((redirect) => (
-              <ChildRoute key={`legacy-app-${redirect.path}`} path={redirect.path} element={<Navigate to={redirect.to} replace />} />
-            ))}
-
-            <ChildRoute path="/app" element={<WorkspaceHomeRedirect />} />
-
-            <ChildRoute element={<RequireGuest />}>
-              <ChildRoute element={<AuthLayout />}>
-                {LIST.AUTH_ROUTES_LIST.map((route: Route) => (
-                  <ChildRoute key={route.path} path={route.path} element={<route.component />} />
-                ))}
-              </ChildRoute>
-            </ChildRoute>
-
-            <ChildRoute element={<RequireAuth />}>
-              {AUTH_PROTECTED_ROUTES_LIST.map((route: AuthProtectedRoute) => (
-                <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+              {WORKSPACE_LEGACY_REDIRECTS.map((redirect) => (
+                <ChildRoute key={`legacy-app-${redirect.path}`} path={redirect.path} element={<Navigate to={redirect.to} replace />} />
               ))}
-            </ChildRoute>
 
-            <ChildRoute element={<Layout />}>
-              <ChildRoute element={<RequirePlanSelectionRedirect />}>
-                {LIST.PUBLIC_ROUTES_LIST.map((route: Route) => (
+              <ChildRoute path="/app" element={<WorkspaceHomeRedirect />} />
+
+              <ChildRoute element={<RequireGuest />}>
+                <ChildRoute element={<AuthLayout />}>
+                  {LIST.AUTH_ROUTES_LIST.map((route: Route) => (
+                    <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                  ))}
+                </ChildRoute>
+              </ChildRoute>
+
+              <ChildRoute element={<RequireAuth />}>
+                {AUTH_PROTECTED_ROUTES_LIST.map((route: AuthProtectedRoute) => (
                   <ChildRoute key={route.path} path={route.path} element={<route.component />} />
                 ))}
               </ChildRoute>
-            </ChildRoute>
 
-            <ChildRoute path={APP_NOT_FOUND_ROUTE.path} element={<APP_NOT_FOUND_ROUTE.component />} />
-          </Routes>
-        </BrowserRouter>
+              <ChildRoute element={<Layout />}>
+                <ChildRoute element={<RequirePlanSelectionRedirect />}>
+                  {LIST.PUBLIC_ROUTES_LIST.map((route: Route) => (
+                    <ChildRoute key={route.path} path={route.path} element={<route.component />} />
+                  ))}
+                </ChildRoute>
+              </ChildRoute>
+
+              <ChildRoute path={APP_NOT_FOUND_ROUTE.path} element={<APP_NOT_FOUND_ROUTE.component />} />
+            </Routes>
+          </BrowserRouter>
         </AppUiThemeProvider>
       </AppProvider>
     </QueryClientProvider>
