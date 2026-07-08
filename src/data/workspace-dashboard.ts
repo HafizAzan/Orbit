@@ -13,6 +13,14 @@ export const DASHBOARD_PERIOD_FILTER_OPTIONS: { value: DashboardPeriodFilter; la
 
 export const DEFAULT_DASHBOARD_PERIOD_FILTER: DashboardPeriodFilter = "this_month";
 
+export const VELOCITY_CHART_SUBTITLES: Record<DashboardPeriodFilter, string> = {
+  today: "How many tasks were completed today",
+  this_week: "Tasks completed on each day of this week",
+  this_month: "Tasks completed on each day of this month",
+  last_6_months: "Tasks completed in each month",
+  this_year: "Tasks completed in each month this year",
+};
+
 export type WorkspaceMetric = {
   id: string;
   label: string;

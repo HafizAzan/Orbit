@@ -30,7 +30,7 @@ function WorkspaceDashboard() {
 
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div className="xl:col-span-2">
-              <TeamVelocityChart data={data.velocity} />
+              <TeamVelocityChart data={data.velocity} period={period} />
             </div>
             <TaskStatusChart data={data.taskStatus} />
           </div>
