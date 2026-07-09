@@ -24,7 +24,7 @@ function TwoFactorPage() {
       challengeToken={state.challengeToken}
       onBack={() => navigate(UN_AUTH_ROUTES.LOGIN, { replace: true })}
       onComplete={(session) => {
-        saveAuthSession(session.accessToken, session.user, state.remember === true);
+        saveAuthSession(session.accessToken, session.user, state.remember === true, session.refreshToken);
         app?.setUser(session.user);
         showApiSuccessToast(session.message);
         navigate(getPostAuthRedirectPath(session.user), { replace: true });

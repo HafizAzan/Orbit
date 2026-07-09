@@ -190,7 +190,13 @@ export type AuthTwoFactorChallengeResponse = {
 export type AuthSessionResponse = {
   message: string;
   accessToken: string;
+  refreshToken: string;
   user: AuthUser;
+};
+
+export type AuthRefreshResponse = {
+  accessToken: string;
+  refreshToken: string;
 };
 
 export type VerifyRegisterResponse = AuthSessionResponse | AuthTwoFactorChallengeResponse;

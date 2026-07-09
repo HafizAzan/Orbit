@@ -1,11 +1,19 @@
-import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
+import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
 import { ApiRequestError } from "../lib/api-error";
-import { getAccessToken } from "../lib/auth-session";
+import {
+  clearAuthSession,
+  getAccessToken,
+  getRefreshToken,
+  isRememberMeEnabled,
+  updateAuthTokens,
+} from "../lib/auth-session";
+import API_ROUTES from "../router/api-routes";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 export type ApiRequestOptions = AxiosRequestConfig & {
   requireAuth?: boolean;
+  _retry?: boolean;
 };
 
 const apiSauceInstance = axios.create({
@@ -45,6 +53,86 @@ apiSauceInstance.interceptors.request.use((config) => {
 
   return config;
 });
+
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    return null;
+  }
+
+  try {
+    const response = await axios.post(
+      `${BASE_URL}${API_ROUTES.AUTH.REFRESH}`,
+      { refreshToken },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      },
+    );
+
+    const data = response.data as {
+      accessToken?: string;
+      refreshToken?: string;
+      statusCode?: number;
+    };
+
+    if (!data?.accessToken || !data?.refreshToken || (data.statusCode && data.statusCode >= 400)) {
+      clearAuthSession();
+      return null;
+    }
+
+    updateAuthTokens(data.accessToken, data.refreshToken, isRememberMeEnabled());
+    return data.accessToken;
+  } catch {
+    clearAuthSession();
+    return null;
+  }
+}
+
+function queueTokenRefresh() {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+  }
+
+  return refreshPromise;
+}
+
+apiSauceInstance.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as (InternalAxiosRequestConfig & ApiRequestOptions) | undefined;
+    const status = error.response?.status;
+    const requestUrl = originalRequest?.url ?? "";
+
+    const isAuthRefreshRequest = requestUrl.includes(API_ROUTES.AUTH.REFRESH);
+    const isAuthLoginRequest = requestUrl.includes(API_ROUTES.AUTH.LOGIN);
+
+    if (
+      status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthRefreshRequest &&
+      !isAuthLoginRequest
+    ) {
+      originalRequest._retry = true;
+
+      const nextAccessToken = await queueTokenRefresh();
+      if (nextAccessToken) {
+        originalRequest.headers = originalRequest.headers ?? {};
+        originalRequest.headers.Authorization = `Bearer ${nextAccessToken}`;
+        return apiSauceInstance.request(originalRequest);
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 const ApiResponseHandler = (response: AxiosResponse) => response?.data ?? response;
 const ApiErrorHandler = (error: AxiosError) => error?.response?.data ?? error;

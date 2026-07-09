@@ -13,6 +13,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     EMAIL_REQUEST_RECIPIENTS: "/auth/me/email/request-recipients",
     EMAIL_REQUEST: "/auth/me/email/request",
     LOGIN: "/auth/login",
+    REFRESH: "/auth/refresh",
     LOGOUT: "/auth/logout",
     FORGOT_PASSWORD: "/auth/forgot-password",
     RESET_PASSWORD: "/auth/reset-password",

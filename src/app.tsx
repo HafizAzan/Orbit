@@ -1,27 +1,27 @@
-import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route as ChildRoute, Routes } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Route as ChildRoute, Navigate, Routes } from "react-router-dom";
 import ScrollToTop from "./component/common/scroll-to-top";
 import { queryClient } from "./config/query-client";
 import { AppProvider } from "./context/app-context";
 import { AppUiThemeProvider } from "./context/app-ui-theme-context";
-import AuthLayout from "./layout/auth-layout/layout";
 import AdminLayout from "./layout/admin-layout/layout";
-import WorkspaceLayout from "./layout/workspace-layout/layout";
+import AuthLayout from "./layout/auth-layout/layout";
 import Layout from "./layout/public-layout/layout";
+import WorkspaceLayout from "./layout/workspace-layout/layout";
 import { ADMIN_ROUTES_LIST, type AdminRoute } from "./router/admin-routes";
 import { AUTH_PROTECTED_ROUTES_LIST, type AuthProtectedRoute } from "./router/auth-routes";
 import RequireAuth from "./router/guards/require-auth";
+import RequireGuest from "./router/guards/require-guest";
+import RequireMemberRouteAccess from "./router/guards/require-member-route-access";
 import RequirePlanSelectionRedirect from "./router/guards/require-plan-selection-redirect";
 import RequirePlatformAdmin from "./router/guards/require-platform-admin";
-import RequireWorkspaceUser from "./router/guards/require-workspace-user";
-import RequireMemberRouteAccess from "./router/guards/require-member-route-access";
 import RequireWorkspaceRouteAccess from "./router/guards/require-workspace-route-access";
+import RequireWorkspaceUser from "./router/guards/require-workspace-user";
 import WorkspaceHomeRedirect from "./router/guards/workspace-home-redirect";
-import RequireGuest from "./router/guards/require-guest";
 import { APP_NOT_FOUND_ROUTE, LIST, type Route } from "./router/public-routes";
-import { WORKSPACE_LEGACY_REDIRECTS, WORKSPACE_NOT_FOUND_ROUTE, WORKSPACE_ROUTES_LIST, type WorkspaceRoute } from "./router/workspace-routes";
 import ProjectThemeLegacyRedirect from "./router/redirects/project-theme-legacy-redirect";
+import { WORKSPACE_LEGACY_REDIRECTS, WORKSPACE_NOT_FOUND_ROUTE, WORKSPACE_ROUTES_LIST, type WorkspaceRoute } from "./router/workspace-routes";
 
 function App() {
   return (

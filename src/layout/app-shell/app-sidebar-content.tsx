@@ -1,16 +1,16 @@
-import { LogoutOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import React, { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import Logo from "../../component/logo";
-import { ConfirmModal } from "../../component/ui/modal";
-import { useAppContext } from "../../context/app-context";
-import { useLogout } from "../../hooks/user-authentication";
-import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
-import { clearAuthSession } from "../../lib/auth-session";
-import { cn } from "../../lib/utils";
-import { Text } from "../../component/ui/typography";
-import { UN_AUTH_ROUTES } from "../../router/public-routes";
+import { LogoutOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import React, { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import Logo from '../../component/logo';
+import { ConfirmModal } from '../../component/ui/modal';
+import { Text } from '../../component/ui/typography';
+import { useAppContext } from '../../context/app-context';
+import { useLogout } from '../../hooks/user-authentication';
+import { showApiErrorToast, showApiSuccessToast } from '../../lib/api-error';
+import { clearAuthSession } from '../../lib/auth-session';
+import { cn } from '../../lib/utils';
+import { UN_AUTH_ROUTES } from '../../router/public-routes';
 
 export type AppNavItem = {
   key: string;
@@ -80,8 +80,10 @@ function AppSidebarContent({
         }}
         className={({ isActive }) =>
           cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-            isActive ? "bg-feature-sync text-primary" : "text-muted hover:bg-background hover:text-foreground",
+            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+            isActive
+              ? 'bg-feature-sync text-primary'
+              : 'text-muted hover:bg-background hover:text-foreground',
           )
         }
       >
@@ -92,18 +94,27 @@ function AppSidebarContent({
   };
 
   return (
-    <div className={cn("flex h-full flex-col px-4 py-6", className)}>
+    <div className={cn('flex h-full flex-col px-4 py-6', className)}>
       <div className="mb-8 px-2">
-        <Link to={homePath} onClick={handleNavClick} className="inline-flex transition-opacity duration-300 hover:opacity-90">
+        <Link
+          to={homePath}
+          onClick={handleNavClick}
+          className="inline-flex transition-opacity duration-300 hover:opacity-90"
+        >
           <Logo />
         </Link>
-        <Text as="p" className="mt-2 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase">{brandSubtitle}</Text>
+        <Text
+          as="p"
+          className="mt-2 text-[10px] font-semibold tracking-[0.2em] text-muted uppercase"
+        >
+          {brandSubtitle}
+        </Text>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">{navItems.map(renderNavLink)}</nav>
 
       {bottomNavItems.length > 0 ? (
-        <div className="mt-4 flex flex-col gap-1 border-t border-border pt-4">{bottomNavItems.map(renderNavLink)}</div>
+        <div className="mt-4 flex flex-col gap-1 pb-2">{bottomNavItems.map(renderNavLink)}</div>
       ) : null}
 
       <div className="mt-auto border-t border-border pt-4">

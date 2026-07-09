@@ -104,7 +104,7 @@ function AcceptInviteForm() {
         return;
       }
 
-      saveAuthSession(result.accessToken, result.user, false);
+      saveAuthSession(result.accessToken, result.user, false, result.refreshToken);
       app?.setUser(result.user);
       showApiSuccessToast(result.message);
       navigate(getPostAuthRedirectPath(result.user));

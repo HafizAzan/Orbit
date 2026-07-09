@@ -3,6 +3,7 @@ import { assertApiSuccess } from "../lib/api-error";
 import API_ROUTES from "../router/api-routes";
 import type {
   AuthUser,
+  AuthRefreshResponse,
   AuthSessionResponse,
   ForgotPasswordRequest,
   ForgotPasswordResponse,
@@ -65,6 +66,11 @@ const login = async (data: LoginRequest): Promise<LoginResponse> => {
     remember: data.remember === true,
   });
   return assertApiSuccess<LoginResponse>(response);
+};
+
+const refreshSession = async (refreshToken: string): Promise<AuthRefreshResponse> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.REFRESH, { refreshToken });
+  return assertApiSuccess<AuthRefreshResponse>(response);
 };
 
 const verifyTwoFactor = async (data: VerifyTwoFactorRequest): Promise<AuthSessionResponse> => {
@@ -239,6 +245,7 @@ export {
   getRegisterPending,
   login,
   logout,
+  refreshSession,
   resendRegisterOtp,
   resetPassword,
   sendRegisterOtp,

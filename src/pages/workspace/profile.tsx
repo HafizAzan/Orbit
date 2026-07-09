@@ -1,19 +1,18 @@
-import React, { useMemo } from "react";
-import ProfileEmailSecurityCard from "../../component/admin/profile/profile-email-security-card";
-import ProfileInfoForm from "../../component/admin/profile/profile-info-form";
-import ProfilePasswordForm from "../../component/admin/profile/profile-password-form";
-import ProfileSaveBar from "../../component/admin/profile/profile-save-bar";
-import ProfileSummaryCard from "../../component/admin/profile/profile-summary-card";
-import WorkspaceOrganizationCard from "../../component/workspace/profile/workspace-organization-card";
-import WorkspaceAboutOrganizationCard from "../../component/workspace/profile/workspace-about-organization-card";
-import WorkspaceProfileActivityLogsCard from "../../component/workspace/profile/workspace-profile-activity-logs-card";
-import WorkspaceProfileTabs from "../../component/workspace/profile/workspace-profile-tabs";
-import { getWorkspaceProfileDisplayName } from "../../data/workspace-profile";
-import useWorkspaceProfile from "../../hooks/use-workspace-profile";
-import useWorkspaceProfileTab from "../../hooks/use-workspace-profile-tab";
-import { canChangeOwnEmail, canRequestOwnEmailChange } from "../../lib/email-access";
-import { getWorkspaceRoleLabel } from "../../lib/workspace-routing";
-import { Paragraph, Text, Title } from "../../component/ui/typography";
+import React, { useMemo } from 'react';
+import ProfileEmailSecurityCard from '../../component/admin/profile/profile-email-security-card';
+import ProfileInfoForm from '../../component/admin/profile/profile-info-form';
+import ProfilePasswordForm from '../../component/admin/profile/profile-password-form';
+import ProfileSaveBar from '../../component/admin/profile/profile-save-bar';
+import ProfileSummaryCard from '../../component/admin/profile/profile-summary-card';
+import { Paragraph, Text, Title } from '../../component/ui/typography';
+import WorkspaceAboutOrganizationCard from '../../component/workspace/profile/workspace-about-organization-card';
+import WorkspaceOrganizationCard from '../../component/workspace/profile/workspace-organization-card';
+import WorkspaceProfileTabs from '../../component/workspace/profile/workspace-profile-tabs';
+import { getWorkspaceProfileDisplayName } from '../../data/workspace-profile';
+import useWorkspaceProfile from '../../hooks/use-workspace-profile';
+import useWorkspaceProfileTab from '../../hooks/use-workspace-profile-tab';
+import { canChangeOwnEmail, canRequestOwnEmailChange } from '../../lib/email-access';
+import { getWorkspaceRoleLabel } from '../../lib/workspace-routing';
 
 function WorkspaceProfile() {
   const {
@@ -50,7 +49,9 @@ function WorkspaceProfile() {
   return (
     <div className="mx-auto max-w-8xl">
       <div className="mb-6">
-        <Text as="p" size="xs" weight="medium" color="muted">Account · {profile.organizationName}</Text>
+        <Text as="p" size="xs" weight="medium" color="muted">
+          Account · {profile.organizationName}
+        </Text>
         <Title level={2} className="mt-1 text-2xl text-foreground lg:text-3xl">
           My Profile
         </Title>
@@ -61,7 +62,7 @@ function WorkspaceProfile() {
 
       <WorkspaceProfileTabs activeTab={activeTab} role={profile.role} onChange={setActiveTab} />
 
-      {activeTab === "personal" ? (
+      {activeTab === 'personal' ? (
         <div className="space-y-6">
           <ProfileSummaryCard
             profile={profile}
@@ -81,7 +82,7 @@ function WorkspaceProfile() {
         </div>
       ) : null}
 
-      {activeTab === "security" ? (
+      {activeTab === 'security' ? (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <ProfileEmailSecurityCard
             profile={profile}
@@ -103,13 +104,13 @@ function WorkspaceProfile() {
         </div>
       ) : null}
 
-      {activeTab === "organization" ? <WorkspaceOrganizationCard profile={profile} /> : null}
+      {activeTab === 'organization' ? <WorkspaceOrganizationCard profile={profile} /> : null}
 
-      {activeTab === "about-organization" ? <WorkspaceAboutOrganizationCard role={profile.role} /> : null}
+      {activeTab === 'about-organization' ? (
+        <WorkspaceAboutOrganizationCard role={profile.role} />
+      ) : null}
 
-      {activeTab === "activity-logs" ? <WorkspaceProfileActivityLogsCard /> : null}
-
-      {activeTab === "personal" ? (
+      {activeTab === 'personal' ? (
         <ProfileSaveBar
           changeCount={profileChangeCount}
           saving={savingProfile}

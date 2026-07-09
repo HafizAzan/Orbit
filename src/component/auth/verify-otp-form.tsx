@@ -105,7 +105,7 @@ function VerifyOtpForm() {
         return;
       }
 
-      saveAuthSession(result.accessToken, result.user);
+      saveAuthSession(result.accessToken, result.user, false, result.refreshToken);
       app?.setUser(result.user);
       showApiSuccessToast(result.message);
       navigate(getPostAuthRedirectPath(result.user));

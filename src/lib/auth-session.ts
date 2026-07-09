@@ -1,13 +1,20 @@
 import type { AuthUser } from "../types/auth.types";
-import { clearAccessToken, readAccessTokenFromCookie, setAccessToken } from "./cookies";
+import {
+  clearAccessToken,
+  clearRefreshToken,
+  readAccessTokenFromCookie,
+  readRefreshTokenFromCookie,
+  setAccessToken,
+  setRefreshToken,
+} from "./cookies";
 
 const USER_SESSION_KEY = "flow-sync:user";
 const SESSION_EXPIRES_KEY = "flow-sync:session_expires";
 const REMEMBER_ME_KEY = "flow-sync:remember_me";
 
 export const AUTH_SESSION_TTL_MS = {
-  remember: 15 * 24 * 60 * 60 * 1000,
-  session: 8 * 60 * 60 * 1000,
+  remember: 30 * 24 * 60 * 60 * 1000,
+  session: 30 * 60 * 1000,
 } as const;
 
 function saveSessionExpiry(expiresAt: number) {
@@ -66,14 +73,29 @@ export function clearStoredUser() {
   localStorage.removeItem(USER_SESSION_KEY);
 }
 
-export function saveAuthSession(accessToken: string, user: AuthUser, remember = false) {
+export function saveAuthSession(
+  accessToken: string,
+  user: AuthUser,
+  remember = false,
+  refreshToken?: string,
+) {
   setAccessToken(accessToken, remember);
+  if (refreshToken) {
+    setRefreshToken(refreshToken, remember);
+  }
   saveStoredUser(user, remember);
+  saveSessionExpiry(getSessionExpiresAt(remember));
+}
+
+export function updateAuthTokens(accessToken: string, refreshToken: string, remember = isRememberMeEnabled()) {
+  setAccessToken(accessToken, remember);
+  setRefreshToken(refreshToken, remember);
   saveSessionExpiry(getSessionExpiresAt(remember));
 }
 
 export function clearAuthSession() {
   clearAccessToken();
+  clearRefreshToken();
   clearStoredUser();
   localStorage.removeItem(SESSION_EXPIRES_KEY);
   localStorage.removeItem(REMEMBER_ME_KEY);
@@ -90,4 +112,13 @@ export function getAccessToken(): string | null {
   }
 
   return readAccessTokenFromCookie();
+}
+
+export function getRefreshToken(): string | null {
+  if (isAuthSessionExpired()) {
+    clearAuthSession();
+    return null;
+  }
+
+  return readRefreshTokenFromCookie();
 }

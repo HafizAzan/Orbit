@@ -23,8 +23,14 @@ function LoginForm() {
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(true);
 
-  const completeSession = (accessToken: string, user: Parameters<typeof saveAuthSession>[1], remember: boolean, message: string) => {
-    saveAuthSession(accessToken, user, remember);
+  const completeSession = (
+    accessToken: string,
+    refreshToken: string,
+    user: Parameters<typeof saveAuthSession>[1],
+    remember: boolean,
+    message: string,
+  ) => {
+    saveAuthSession(accessToken, user, remember, refreshToken);
     app?.setUser(user);
     showApiSuccessToast(message);
     navigate(getPostAuthRedirectPath(user));
@@ -51,7 +57,7 @@ function LoginForm() {
         return;
       }
 
-      completeSession(result.accessToken, result.user, remember, result.message);
+      completeSession(result.accessToken, result.refreshToken, result.user, remember, result.message);
     } catch (error) {
       if (error instanceof ApiRequestError && error.code === AUTH_ERROR_CODES.PENDING_EMAIL_VERIFICATION && error.email) {
         const normalizedEmail = error.email.trim().toLowerCase();
@@ -86,7 +92,7 @@ function LoginForm() {
         challengeToken={challengeToken}
         onBack={resetTwoFactorState}
         onComplete={(session) => {
-          completeSession(session.accessToken, session.user, rememberMe, session.message);
+          completeSession(session.accessToken, session.refreshToken, session.user, rememberMe, session.message);
         }}
       />
     );
