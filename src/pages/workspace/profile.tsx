@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import PageSeo from '../../component/seo/page-seo';
 import ProfileEmailSecurityCard from '../../component/admin/profile/profile-email-security-card';
 import ProfileInfoForm from '../../component/admin/profile/profile-info-form';
 import ProfilePasswordForm from '../../component/admin/profile/profile-password-form';
@@ -48,6 +49,7 @@ function WorkspaceProfile() {
 
   return (
     <div className="mx-auto max-w-8xl">
+      <PageSeo title="Profile" description="Manage your personal profile and account settings." noIndex />
       <div className="mb-6">
         <Text as="p" size="xs" weight="medium" color="muted">
           Account · {profile.organizationName}

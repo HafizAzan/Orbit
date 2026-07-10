@@ -1,5 +1,6 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import React, { useCallback, useMemo, useState } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import CalendarDayView from "../../component/workspace/calendar/calendar-day-view";
 import CalendarEventModal, {
   type CalendarEventFormValues,
@@ -204,6 +205,7 @@ function WorkspaceCalendar() {
       errorTitle="Unable to load calendar"
     >
       <div className="mx-auto max-w-8xl">
+        <PageSeo title="Calendar" description="View workspace events and deadlines on the calendar." noIndex />
         <CalendarPageHeader
           activeDate={activeDate}
           view={view}

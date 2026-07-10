@@ -15,6 +15,7 @@ export type UserRecord = {
   name: string;
   email: string;
   organization: string;
+  organizationId?: string | null;
   role: UserRole;
   lastActive: string;
   status: UserStatus;
@@ -68,116 +69,7 @@ export const USER_STATS: UserStat[] = [
 
 export const USERS_PAGE_SIZE = 25;
 
-export const USERS_DATA: UserRecord[] = [
-  {
-    id: "1",
-    name: "Sarah Jenkins",
-    email: "sarah.jenkins@acme.com",
-    organization: "Acme Corp",
-    role: "Admin",
-    lastActive: "2 hours ago",
-    status: "active",
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    email: "m.chen@stark.com",
-    organization: "Stark Industries",
-    role: "Manager",
-    lastActive: "Just now",
-    status: "active",
-  },
-  {
-    id: "3",
-    name: "Emily Davis",
-    email: "emily@umbrella.co",
-    organization: "Umbrella Co",
-    role: "Member",
-    lastActive: "5 hours ago",
-    status: "active",
-  },
-  {
-    id: "4",
-    name: "John Doe",
-    email: "john@acme.com",
-    organization: "Acme Corp",
-    role: "Member",
-    lastActive: "1 day ago",
-    status: "pending",
-  },
-  {
-    id: "5",
-    name: "Tony Stark",
-    email: "tony@stark.com",
-    organization: "Stark Industries",
-    role: "Admin",
-    lastActive: "3 hours ago",
-    status: "active",
-  },
-  {
-    id: "6",
-    name: "Bruce Wayne",
-    email: "bruce@wayne.com",
-    organization: "Wayne Enterprises",
-    role: "Admin",
-    lastActive: "Yesterday",
-    status: "active",
-  },
-  {
-    id: "7",
-    name: "Richard Hendricks",
-    email: "richard@piedpiper.com",
-    organization: "Pied Piper",
-    role: "Manager",
-    lastActive: "4 days ago",
-    status: "suspended",
-  },
-  {
-    id: "8",
-    name: "Gavin Belson",
-    email: "gavin@hooli.com",
-    organization: "Hooli",
-    role: "Admin",
-    lastActive: "6 hours ago",
-    status: "active",
-  },
-  {
-    id: "9",
-    name: "Norman Osborn",
-    email: "norman@oscorp.com",
-    organization: "Oscorp",
-    role: "Member",
-    lastActive: "2 weeks ago",
-    status: "suspended",
-  },
-  {
-    id: "10",
-    name: "Alex Rivera",
-    email: "alex.rivera@Orbit.io",
-    organization: "Orbit",
-    role: "Admin",
-    lastActive: "Just now",
-    status: "active",
-  },
-  {
-    id: "11",
-    name: "Lisa Park",
-    email: "lisa@globex.io",
-    organization: "Globex Inc",
-    role: "Manager",
-    lastActive: "30 minutes ago",
-    status: "active",
-  },
-  {
-    id: "12",
-    name: "James Wilson",
-    email: "james@initech.net",
-    organization: "Initech",
-    role: "Member",
-    lastActive: "3 days ago",
-    status: "pending",
-  },
-];
+export const USERS_DATA: UserRecord[] = [];
 
 export const USER_STATUS_FILTER_OPTIONS: { value: UserStatus; label: string }[] = [
   { value: "active", label: "Active" },
@@ -191,9 +83,7 @@ export const USER_ROLE_FILTER_OPTIONS: { value: UserRole; label: string }[] = [
   { value: "Member", label: "Member" },
 ];
 
-export const USER_ORGANIZATION_FILTER_OPTIONS = Array.from(new Set(USERS_DATA.map((user) => user.organization)))
-  .sort()
-  .map((name) => ({ value: name, label: name }));
+export const USER_ORGANIZATION_FILTER_OPTIONS: { value: string; label: string }[] = [];
 
 export const USER_STAT_ICONS: Record<UserStat["icon"], ComponentType<{ className?: string }>> = {
   total: TeamOutlined,

@@ -1,35 +1,75 @@
-import { DownloadOutlined, FlagOutlined } from "@ant-design/icons";
+import { FlagOutlined } from "@ant-design/icons";
 import { Badge, Button } from "antd";
 import React, { useMemo } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import { Link } from "react-router-dom";
 import ActivityStatCard from "../../component/admin/activity/activity-stat-card";
 import ActivityTable from "../../component/admin/activity/activity-table";
 import { Paragraph, Title } from "../../component/ui/typography";
-import { ACTIVITY_STATS } from "../../data/admin-activity";
 import { useAdminActivity } from "../../context/admin-activity-context";
+import { useAdminActivityStats } from "../../hooks/use-admin-activity";
 import { ADMIN_ROUTES } from "../../router/admin-routes";
+import type { ActivityStat } from "../../data/admin-activity";
 
 function AdminActivity() {
   const { flaggedCount } = useAdminActivity();
+  const { data: stats } = useAdminActivityStats();
 
-  const stats = useMemo(
-    () =>
-      ACTIVITY_STATS.map((stat) =>
-        stat.id === "critical"
-          ? {
-              ...stat,
-              value: String(flaggedCount),
-              meta: flaggedCount === 1 ? "Needs review" : flaggedCount > 0 ? "Needs review" : "All clear",
-              metaVariant: flaggedCount > 0 ? ("danger" as const) : ("muted" as const),
-              variant: flaggedCount > 0 ? ("danger" as const) : undefined,
-            }
-          : stat,
-      ),
-    [flaggedCount],
-  );
+  const activityStats: ActivityStat[] = useMemo(() => {
+    if (!stats) {
+      return [
+        {
+          id: "critical",
+          label: "Flagged",
+          value: String(flaggedCount),
+          meta: flaggedCount > 0 ? "Needs review" : "All clear",
+          metaVariant: flaggedCount > 0 ? "danger" : "muted",
+          icon: "critical",
+          variant: flaggedCount > 0 ? "danger" : undefined,
+        },
+      ];
+    }
+
+    return [
+      {
+        id: "total",
+        label: "Total Events",
+        value: String(stats.total.value),
+        meta: "All time",
+        metaVariant: "muted",
+        icon: "events",
+      },
+      {
+        id: "today",
+        label: "Today",
+        value: String(stats.today.value),
+        meta: `${stats.today.percentage}%`,
+        metaVariant: "primary",
+        icon: "users",
+      },
+      {
+        id: "resolved",
+        label: "Resolved",
+        value: String(stats.resolved.value),
+        meta: `${stats.resolved.percentage}%`,
+        metaVariant: "muted",
+        icon: "system",
+      },
+      {
+        id: "critical",
+        label: "Flagged",
+        value: String(stats.flagged.value),
+        meta: stats.flagged.value > 0 ? "Needs review" : "All clear",
+        metaVariant: stats.flagged.value > 0 ? "danger" : "muted",
+        icon: "critical",
+        variant: stats.flagged.value > 0 ? "danger" : undefined,
+      },
+    ];
+  }, [stats, flaggedCount]);
 
   return (
     <div className="mx-auto max-w-8xl">
+      <PageSeo title="Activity Log" description="Monitor all platform activity and events." noIndex />
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Title level={2} className="text-2xl text-foreground lg:text-3xl">
@@ -48,15 +88,11 @@ function AdminActivity() {
               </Button>
             </Badge>
           </Link>
-
-          <Button type="primary" icon={<DownloadOutlined />} size="large" className="font-semibold!">
-            Export Logs
-          </Button>
         </div>
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
+        {activityStats.map((stat) => (
           <ActivityStatCard key={stat.id} stat={stat} />
         ))}
       </div>

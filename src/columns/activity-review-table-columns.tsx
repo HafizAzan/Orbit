@@ -1,7 +1,6 @@
 import {
   CheckOutlined,
   CloseOutlined,
-  DeleteOutlined,
   EllipsisOutlined,
   EyeOutlined,
   FlagOutlined,
@@ -23,7 +22,6 @@ type ActivityReviewTableColumnOptions = {
   onView: (record: ActivityRecord) => void;
   onResolve: (record: ActivityRecord) => void;
   onUnflag: (record: ActivityRecord) => void;
-  onDelete: (record: ActivityRecord) => void;
 };
 
 function getReviewActionItems(_record: ActivityRecord): MenuProps["items"] {
@@ -31,8 +29,6 @@ function getReviewActionItems(_record: ActivityRecord): MenuProps["items"] {
     { key: "view", label: "View details", icon: <EyeOutlined /> },
     { key: "resolve", label: "Mark as resolved", icon: <CheckOutlined /> },
     { key: "unflag", label: "Remove flag", icon: <CloseOutlined /> },
-    { type: "divider" },
-    { key: "delete", label: "Remove log", icon: <DeleteOutlined />, danger: true },
   ];
 }
 
@@ -40,7 +36,6 @@ function createActivityReviewTableColumns({
   onView,
   onResolve,
   onUnflag,
-  onDelete,
 }: ActivityReviewTableColumnOptions): ColumnsType<ActivityRecord> {
   return [
     {
@@ -56,13 +51,17 @@ function createActivityReviewTableColumns({
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <Text as="p" weight="semibold">{record.title}</Text>
+                <Text as="p" weight="semibold">
+                  {record.title}
+                </Text>
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 uppercase">
                   <FlagOutlined className="text-[10px]" />
                   Flagged
                 </span>
               </div>
-              <Text as="p" size="sm" color="muted" className="mt-0.5 line-clamp-1">{record.description}</Text>
+              <Text as="p" size="sm" color="muted" className="mt-0.5 line-clamp-1">
+                {record.description}
+              </Text>
             </div>
           </div>
         );
@@ -73,7 +72,11 @@ function createActivityReviewTableColumns({
       dataIndex: "organization",
       key: "organization",
       responsive: ["lg"],
-      render: (organization: string) => <Text size="sm" weight="medium">{organization}</Text>,
+      render: (organization: string) => (
+        <Text size="sm" weight="medium">
+          {organization}
+        </Text>
+      ),
     },
     {
       title: "Reason",
@@ -84,7 +87,9 @@ function createActivityReviewTableColumns({
             {getActivityFlagReasonLabel(record.flagReason)}
           </span>
         ) : (
-          <Text size="sm" color="muted">—</Text>
+          <Text size="sm" color="muted">
+            —
+          </Text>
         ),
     },
     {
@@ -107,7 +112,11 @@ function createActivityReviewTableColumns({
       title: "Flagged",
       dataIndex: "flaggedAt",
       key: "flaggedAt",
-      render: (flaggedAt: string | undefined) => <Text size="sm" color="muted">{flaggedAt ?? "—"}</Text>,
+      render: (flaggedAt: string | undefined) => (
+        <Text size="sm" color="muted">
+          {flaggedAt ?? "—"}
+        </Text>
+      ),
     },
     {
       title: "Category",
@@ -136,7 +145,6 @@ function createActivityReviewTableColumns({
                 if (key === "view") onView(record);
                 if (key === "resolve") onResolve(record);
                 if (key === "unflag") onUnflag(record);
-                if (key === "delete") onDelete(record);
               },
             }}
             trigger={["click"]}

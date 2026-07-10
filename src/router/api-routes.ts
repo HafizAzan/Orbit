@@ -6,6 +6,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     REGISTER_VERIFY: "/auth/register/verify",
     ME: "/auth/me",
     PROFILE: "/auth/me/profile",
+    AVATAR: "/auth/me/avatar",
     PASSWORD: "/auth/me/password",
     UI_THEME: "/auth/me/ui-theme",
     EMAIL_INITIATE: "/auth/me/email/initiate",
@@ -32,6 +33,17 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     SUBSCRIPTIONS: "/admin/subscriptions",
     SUBSCRIPTION_STATS: "/admin/subscriptions/stats",
     SUBSCRIPTION_PLAN_DISTRIBUTION: "/admin/subscriptions/plan-distribution",
+    SUBSCRIPTION_REVENUE_SERIES: "/admin/subscriptions/revenue-series",
+    DASHBOARD_OVERVIEW: "/admin/dashboard/overview",
+    DASHBOARD_REVENUE_SERIES: "/admin/dashboard/revenue-series",
+    USERS: "/admin/users",
+    USER_STATS: "/admin/users/stats",
+    ACTIVITY: "/admin/activity",
+    ACTIVITY_STATS: "/admin/activity/stats",
+    SETTINGS: "/admin/settings",
+    SETTINGS_LOGO: "/admin/settings/branding/logo",
+    SETTINGS_FAVICON: "/admin/settings/branding/favicon",
+    API_KEYS: "/admin/api-keys",
   },
   ORGANIZATIONS: {
     ME: "/organizations/me",
@@ -79,6 +91,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     CATALOG: "/billing/catalog",
     SUBSCRIPTION: "/billing/subscription",
     USAGE: "/billing/usage",
+    AI_CREDIT_HISTORY: "/billing/ai-credits/history",
     CHECKOUT: "/billing/checkout",
     CHECKOUT_CONFIRM: "/billing/checkout/confirm",
     SELECT_PLAN: "/billing/select-plan",
@@ -87,6 +100,12 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     REFUND: "/billing/refund",
     INVOICES: "/billing/invoices",
     PORTAL: "/billing/portal",
+  },
+  HEALTH: {
+    ROOT: "/health",
+  },
+  LEADS: {
+    CREATE: "/leads",
   },
   AI: {
     WORK_BREAKDOWN_GENERATE: "/ai/work-breakdown/generate",
@@ -99,6 +118,9 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     MEMBERSHIP_IMPACT_GENERATE: "/ai/membership-impact/generate",
     CALENDAR_DRAFT_GENERATE: "/ai/calendar-draft/generate",
     ASK_WORKSPACE: "/ai/ask-workspace",
+    ASK_PLATFORM: "/ai/ask-platform",
+    ORG_HEALTH: "/ai/org-health",
+    DESCRIBE_PLATFORM_ACTIVITY: "/ai/describe-platform-activity",
   },
 };
 

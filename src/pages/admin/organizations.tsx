@@ -1,6 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React, { useCallback, useState } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import OrganizationCreateModal from "../../component/admin/organizations/organization-create-modal";
 import OrgStatCard from "../../component/admin/organizations/org-stat-card";
 import OrganizationsTable from "../../component/admin/organizations/organizations-table";
@@ -87,6 +88,7 @@ function AdminOrganizations() {
 
   return (
     <div className="mx-auto max-w-8xl">
+      <PageSeo title="Organizations" description="Manage enterprise accounts and organizations." noIndex />
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Title level={2} className="text-2xl text-foreground lg:text-3xl">

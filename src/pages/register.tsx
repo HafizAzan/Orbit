@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
+import PageSeo from "../component/seo/page-seo";
 import RegisterForm from "../component/auth/register-form";
 import RegisterPreview from "../component/auth/register-preview";
 import { UN_AUTH_ROUTES } from "../router/public-routes";
@@ -18,12 +19,15 @@ function Register() {
   }
 
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-      <div className="flex w-full min-w-0 bg-card lg:bg-background">
-        <RegisterForm />
+    <>
+      <PageSeo title="Create Account" description="Create your Orbit account and start managing projects with your team." noIndex />
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
+        <div className="flex w-full min-w-0 bg-card lg:bg-background">
+          <RegisterForm />
+        </div>
+        <RegisterPreview />
       </div>
-      <RegisterPreview />
-    </div>
+    </>
   );
 }
 

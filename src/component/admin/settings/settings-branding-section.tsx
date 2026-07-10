@@ -1,16 +1,18 @@
-import { UploadOutlined } from '@ant-design/icons';
-import { Button, ColorPicker, type ColorPickerProps } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, ColorPicker, Upload, type ColorPickerProps, type UploadProps } from "antd";
+import React, { useEffect, useState } from "react";
 import {
   BRAND_COLOR_PRESETS,
   BRANDING_HINTS,
   DEFAULT_PLATFORM_LOGO,
   type PlatformSettings,
-} from '../../../data/admin-settings';
-import { isSameHexColor, normalizeHexColor } from '../../../lib/helper';
-import { toast } from '../../../lib/toast';
-import SettingsField from './settings-field';
-import SettingsSection from './settings-section';
+} from "../../../data/admin-settings";
+import { uploadPlatformFavicon, uploadPlatformLogo } from "../../../api-services/admin-settings.service";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
+import { isSameHexColor, normalizeHexColor } from "../../../lib/helper";
+import { resolveTaskAttachmentUrl } from "../../../lib/task-attachments";
+import SettingsField from "./settings-field";
+import SettingsSection from "./settings-section";
 
 type SettingsBrandingSectionProps = {
   settings: PlatformSettings;
@@ -19,21 +21,59 @@ type SettingsBrandingSectionProps = {
 
 function SettingsBrandingSection({ settings, onChange }: SettingsBrandingSectionProps) {
   const [pickerColor, setPickerColor] = useState(settings.brandColor);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
 
   useEffect(() => {
     setPickerColor(settings.brandColor);
   }, [settings.brandColor]);
 
-  const handlePickerChange: NonNullable<ColorPickerProps['onChange']> = (color) => {
+  const handlePickerChange: NonNullable<ColorPickerProps["onChange"]> = (color) => {
     setPickerColor(normalizeHexColor(color.toHexString()));
   };
 
-  const handlePickerChangeComplete: NonNullable<ColorPickerProps['onChangeComplete']> = (color) => {
+  const handlePickerChangeComplete: NonNullable<ColorPickerProps["onChangeComplete"]> = (color) => {
     const normalized = normalizeHexColor(color.toHexString());
     setPickerColor(normalized);
 
     if (!isSameHexColor(normalized, settings.brandColor)) {
-      onChange('brandColor', normalized);
+      onChange("brandColor", normalized);
+    }
+  };
+
+  const logoSrc = settings.logoUrl
+    ? resolveTaskAttachmentUrl(settings.logoUrl)
+    : DEFAULT_PLATFORM_LOGO;
+
+  const handleLogoUpload: UploadProps["customRequest"] = async (options) => {
+    const file = options.file as File;
+    setUploadingLogo(true);
+    try {
+      const next = await uploadPlatformLogo(file);
+      onChange("logoUrl", next.logoUrl);
+      showApiSuccessToast("Logo updated.");
+      options.onSuccess?.(next);
+    } catch (error) {
+      showApiErrorToast(error);
+      options.onError?.(error as Error);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleFaviconUpload: UploadProps["customRequest"] = async (options) => {
+    const file = options.file as File;
+    setUploadingFavicon(true);
+    try {
+      const next = await uploadPlatformFavicon(file);
+      onChange("faviconUrl", next.faviconUrl);
+      showApiSuccessToast("Favicon updated.");
+      options.onSuccess?.(next);
+    } catch (error) {
+      showApiErrorToast(error);
+      options.onError?.(error as Error);
+    } finally {
+      setUploadingFavicon(false);
     }
   };
 
@@ -47,11 +87,13 @@ function SettingsBrandingSection({ settings, onChange }: SettingsBrandingSection
         <SettingsField label="Platform Logo" hint={BRANDING_HINTS.logo}>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-border bg-background">
-              <img src={DEFAULT_PLATFORM_LOGO} alt="" className="h-10 w-10 object-contain" />
+              <img src={logoSrc} alt="" className="h-10 w-10 object-contain" />
             </div>
-            <Button onClick={() => toast.info('Logo upload coming soon')} className="font-medium!">
-              Change
-            </Button>
+            <Upload accept="image/png,image/jpeg,image/webp,image/gif" showUploadList={false} customRequest={handleLogoUpload}>
+              <Button loading={uploadingLogo} className="font-medium!">
+                Change
+              </Button>
+            </Upload>
           </div>
         </SettingsField>
 
@@ -70,13 +112,24 @@ function SettingsBrandingSection({ settings, onChange }: SettingsBrandingSection
         </SettingsField>
 
         <SettingsField label="Favicon" hint={BRANDING_HINTS.favicon}>
-          <Button
-            icon={<UploadOutlined />}
-            onClick={() => toast.info('Favicon upload coming soon')}
-            className="ml-2 font-medium!"
-          >
-            Upload New
-          </Button>
+          <div className="flex flex-wrap items-center gap-4">
+            {settings.faviconUrl ? (
+              <img
+                src={resolveTaskAttachmentUrl(settings.faviconUrl)}
+                alt=""
+                className="h-8 w-8 rounded border border-border object-contain"
+              />
+            ) : null}
+            <Upload
+              accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon,.ico"
+              showUploadList={false}
+              customRequest={handleFaviconUpload}
+            >
+              <Button icon={<UploadOutlined />} loading={uploadingFavicon} className="font-medium!">
+                Upload New
+              </Button>
+            </Upload>
+          </div>
         </SettingsField>
       </div>
     </SettingsSection>

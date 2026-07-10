@@ -1,8 +1,10 @@
 import { CameraOutlined } from "@ant-design/icons";
-import { Avatar, Button, Input } from "antd";
-import React from "react";
+import { Avatar, Button, Input, Upload, type UploadProps } from "antd";
+import React, { useState } from "react";
+import { uploadAvatar } from "../../../api-services/auth.service";
 import { PLATFORM_ADMIN_ROLE_LABEL, type AdminProfile } from "../../../data/admin-profile";
-import { toast } from "../../../lib/toast";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
+import { resolveTaskAttachmentUrl } from "../../../lib/task-attachments";
 import { Label, Paragraph, Title } from "../../ui/typography";
 
 type ProfileInfoFormProfile = Pick<AdminProfile, "firstName" | "lastName" | "avatarUrl">;
@@ -14,6 +16,7 @@ type ProfileInfoFormProps = {
   organizationName?: string;
   title?: string;
   description?: string;
+  onAvatarUploaded?: (avatarUrl: string) => void;
 };
 
 function ProfileInfoForm({
@@ -23,21 +26,52 @@ function ProfileInfoForm({
   organizationName,
   title = "Personal Details",
   description = "Update how your name appears across the admin console.",
+  onAvatarUploaded,
 }: ProfileInfoFormProps) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleAvatarUpload: UploadProps["customRequest"] = async (options) => {
+    const file = options.file as File;
+    setUploading(true);
+    try {
+      const user = await uploadAvatar(file);
+      const nextUrl = user.avatarUrl
+        ? resolveTaskAttachmentUrl(user.avatarUrl)
+        : profile.avatarUrl;
+      onChange("avatarUrl", nextUrl);
+      onAvatarUploaded?.(nextUrl);
+      showApiSuccessToast("Profile photo updated.");
+      options.onSuccess?.(user);
+    } catch (error) {
+      showApiErrorToast(error);
+      options.onError?.(error as Error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <article className="flex h-full w-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="mb-6">
-        <Title level={4} color="default">{title}</Title>
-        <Paragraph size="sm" className="mt-1 mb-0!">{description}</Paragraph>
+        <Title level={4} color="default">
+          {title}
+        </Title>
+        <Paragraph size="sm" className="mt-1 mb-0!">
+          {description}
+        </Paragraph>
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-background p-4">
         <Avatar size={72} className="bg-primary/10! text-primary! font-semibold!" src={profile.avatarUrl} />
         <div>
-          <Button icon={<CameraOutlined />} onClick={() => toast.info("Avatar upload coming soon")} className="font-medium!">
-            Change Photo
-          </Button>
-          <Paragraph size="xs" className="mt-2 mb-0!">JPG, PNG or GIF. Max 2MB.</Paragraph>
+          <Upload accept="image/png,image/jpeg,image/gif,image/webp" showUploadList={false} customRequest={handleAvatarUpload}>
+            <Button icon={<CameraOutlined />} loading={uploading} className="font-medium!">
+              Change Photo
+            </Button>
+          </Upload>
+          <Paragraph size="xs" className="mt-2 mb-0!">
+            JPG, PNG, GIF or WEBP. Max 2MB.
+          </Paragraph>
         </div>
       </div>
 
@@ -66,7 +100,13 @@ function ProfileInfoForm({
 
         <div className="space-y-2 md:col-span-2">
           <Label>Role</Label>
-          <Input size="large" value={roleLabel} readOnly disabled className="rounded-xl! bg-background! [&_input]:text-muted!" />
+          <Input
+            size="large"
+            value={roleLabel}
+            readOnly
+            disabled
+            className="rounded-xl! bg-background! [&_input]:text-muted!"
+          />
         </div>
 
         {organizationName ? (

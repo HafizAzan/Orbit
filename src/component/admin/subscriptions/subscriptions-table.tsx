@@ -1,20 +1,16 @@
-import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownloadOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import { Badge, Button, Input } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createSubscriptionTableColumns from "../../../columns/subscription-table-columns";
 import {
-  SUBSCRIPTIONS_DATA,
-  SUBSCRIPTIONS_PAGE_SIZE,
   SUBSCRIPTION_TABS,
-  SUBSCRIPTION_TAB_SLUGS,
-  DEFAULT_SUBSCRIPTION_TAB,
   type SubscriptionRecord,
   type SubscriptionTabKey,
 } from "../../../data/admin-subscriptions";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
 import useSubscriptionFilters from "../../../hooks/use-subscription-filters";
-import useUrlTab from "../../../hooks/use-url-tab";
-import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
+import { exportRowsAsCsv } from "../../../lib/csv-export";
+import { matchesSearchQuery } from "../../../lib/helper";
 import {
   countActiveSubscriptionFilters,
   getSubscriptionFilterChips,
@@ -22,7 +18,6 @@ import {
 } from "../../../lib/subscription-filters";
 import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
-import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
 import { Text } from "../../ui/typography";
@@ -30,9 +25,11 @@ import SubscriptionFilterDrawer from "./subscription-filter-drawer";
 import SubscriptionViewModal from "./subscription-view-modal";
 
 type SubscriptionsTableProps = {
-  data?: SubscriptionRecord[];
+  data: SubscriptionRecord[];
+  activeTab: SubscriptionTabKey;
+  onTabChange: (tab: SubscriptionTabKey) => void;
   onEditBilling?: (record: SubscriptionRecord) => void;
-  serverPagination?: {
+  serverPagination: {
     page: number;
     pageSize: number;
     total: number;
@@ -41,21 +38,14 @@ type SubscriptionsTableProps = {
 };
 
 function SubscriptionsTable({
-  data = SUBSCRIPTIONS_DATA,
+  data,
+  activeTab,
+  onTabChange,
   onEditBilling,
   serverPagination,
 }: SubscriptionsTableProps) {
-  const [rows, setRows] = useState(data);
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useSubscriptionFilters();
-  const { activeTab, setActiveTab } = useUrlTab<SubscriptionTabKey>({
-    slugToKey: SUBSCRIPTION_TAB_SLUGS,
-    defaultKey: DEFAULT_SUBSCRIPTION_TAB,
-  });
-  const [page, setPage] = useState(1);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<SubscriptionRecord | null>(null);
   const [viewRecord, setViewRecord] = useState<SubscriptionRecord | null>(null);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
@@ -64,7 +54,6 @@ function SubscriptionsTable({
       createSubscriptionTableColumns({
         onView: setViewRecord,
         onEditBilling: (record) => onEditBilling?.(record),
-        onDelete: setPendingDelete,
       }),
     [onEditBilling],
   );
@@ -73,16 +62,10 @@ function SubscriptionsTable({
   const filterChips = getSubscriptionFilterChips(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
 
-  useEffect(() => {
-    setRows(data);
-  }, [data]);
-
-  const tabbedData = useMemo(() => rows.filter((row) => row.status === activeTab), [rows, activeTab]);
-
   const filteredData = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return tabbedData.filter((subscription) => {
+    return data.filter((subscription) => {
       if (!matchesSubscriptionFilters(subscription, filters)) return false;
       if (!query) return true;
 
@@ -92,63 +75,54 @@ function SubscriptionsTable({
         matchesSearchQuery(subscription.plan, query)
       );
     });
-  }, [tabbedData, search, filters]);
+  }, [data, search, filters]);
+
+  const handleExportCsv = useCallback(() => {
+    exportRowsAsCsv({
+      filename: `subscriptions-${new Date().toISOString().slice(0, 10)}.csv`,
+      headers: [
+        "Organization",
+        "Email",
+        "Plan",
+        "Billing cycle",
+        "Amount",
+        "Currency",
+        "Status",
+        "Renewal",
+        "Started",
+      ],
+      rows: filteredData.map((row) => [
+        row.organizationName,
+        row.contactEmail,
+        row.plan,
+        row.billingCycle,
+        row.amount,
+        row.currency,
+        row.status,
+        row.renewalDate,
+        row.startedAt,
+      ]),
+    });
+    toast.success(`Exported ${filteredData.length} subscriptions`);
+  }, [filteredData]);
 
   useEffect(() => {
-    setPage(1);
-    setSelectedRowKeys([]);
-  }, [activeTab, rows, search, filters]);
-
-  const paginatedData = useMemo(() => {
-    if (serverPagination) {
-      return filteredData;
-    }
-
-    return paginateItems(filteredData, page, SUBSCRIPTIONS_PAGE_SIZE);
-  }, [filteredData, page, serverPagination]);
-
-  const paginationPage = serverPagination?.page ?? page;
-  const paginationPageSize = serverPagination?.pageSize ?? SUBSCRIPTIONS_PAGE_SIZE;
-  const paginationTotal = serverPagination?.total ?? filteredData.length;
-  const handlePageChange = serverPagination?.onChange ?? setPage;
-
-  const selectedCount = selectedRowKeys.length;
-  const hasSelection = selectedCount > 0;
-
-  const handleBulkDeleteConfirm = () => {
-    setRows((current) => current.filter((row) => !selectedRowKeys.includes(row.id)));
-    toast.success(`${selectedCount} ${pluralize(selectedCount, "subscription")} removed successfully`);
-    setSelectedRowKeys([]);
-    setBulkDeleteOpen(false);
-  };
-
-  const handleSingleDeleteConfirm = useCallback(() => {
-    if (!pendingDelete) return;
-
-    setRows((current) => current.filter((row) => row.id !== pendingDelete.id));
-    setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
-    toast.success(`${pendingDelete.organizationName} subscription removed successfully`);
-    setPendingDelete(null);
-  }, [pendingDelete]);
-
-  const handleOpenFilters = () => {
-    setDraftFilters(filters);
-    setFilterDrawerOpen(true);
-  };
-
-  const handleApplyFilters = () => {
-    setFilters(draftFilters);
-    setFilterDrawerOpen(false);
-  };
+    serverPagination.onChange(1);
+    // Reset to first page when filters/search change; parent owns page state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+  }, [search, filters]);
 
   const resultsSummary = (
     <Text as="span" size="sm" color="muted">
       Displaying{" "}
       <Text as="span" weight="semibold">
-        {paginationTotal === 0 ? 0 : (paginationPage - 1) * paginationPageSize + 1}-
-        {Math.min(paginationPage * paginationPageSize, paginationTotal)}
+        {serverPagination.total === 0
+          ? 0
+          : (serverPagination.page - 1) * serverPagination.pageSize + 1}
+        -
+        {Math.min(serverPagination.page * serverPagination.pageSize, serverPagination.total)}
       </Text>{" "}
-      of <Text as="span" weight="semibold">{paginationTotal}</Text> results
+      of <Text as="span" weight="semibold">{serverPagination.total}</Text> results
     </Text>
   );
 
@@ -172,10 +146,12 @@ function SubscriptionsTable({
                   <button
                     key={tab.key}
                     type="button"
-                    onClick={() => setActiveTab(tab.key)}
+                    onClick={() => onTabChange(tab.key)}
                     className={cn(
                       "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                      activeTab === tab.key ? "bg-feature-sync text-primary" : "text-muted hover:bg-background hover:text-foreground",
+                      activeTab === tab.key
+                        ? "bg-feature-sync text-primary"
+                        : "text-muted hover:bg-background hover:text-foreground",
                     )}
                   >
                     {tab.label}
@@ -207,31 +183,32 @@ function SubscriptionsTable({
           </div>
 
           <Badge count={activeFilterCount} size="small" offset={[-4, 4]}>
-            <Button icon={<FilterOutlined />} onClick={handleOpenFilters} className="w-fit font-medium!">
+            <Button
+              icon={<FilterOutlined />}
+              onClick={() => {
+                setDraftFilters(filters);
+                setFilterDrawerOpen(true);
+              }}
+              className="w-fit font-medium!"
+            >
               Filter
             </Button>
           </Badge>
 
           <Button
-            danger
-            icon={<DeleteOutlined />}
-            disabled={!hasSelection}
-            onClick={() => setBulkDeleteOpen(true)}
-            className={cn("w-fit font-semibold!", filterChips.length > 0 && "self-start sm:self-center")}
+            icon={<DownloadOutlined />}
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="w-fit font-medium!"
           >
-            Bulk Delete{hasSelection ? ` (${selectedCount})` : ""}
+            Export CSV
           </Button>
         </div>
 
         <Table<SubscriptionRecord>
           rowKey="id"
           columns={columns}
-          dataSource={paginatedData}
-          rowSelection={{
-            type: "checkbox",
-            selectedRowKeys,
-            onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
-          }}
+          dataSource={filteredData}
           scroll={{ x: 900 }}
           pagination={false}
           wrapperClassName="border-0! rounded-none! shadow-none!"
@@ -243,13 +220,13 @@ function SubscriptionsTable({
           }
         />
 
-        {paginationTotal > 0 ? (
+        {serverPagination.total > 0 ? (
           <TablePaginationFooter
             summary={resultsSummary}
-            current={paginationPage}
-            pageSize={paginationPageSize}
-            total={paginationTotal}
-            onChange={handlePageChange}
+            current={serverPagination.page}
+            pageSize={serverPagination.pageSize}
+            total={serverPagination.total}
+            onChange={serverPagination.onChange}
           />
         ) : null}
       </div>
@@ -261,34 +238,11 @@ function SubscriptionsTable({
         draftFilters={draftFilters}
         onClose={() => setFilterDrawerOpen(false)}
         onDraftChange={setDraftFilters}
-        onApply={handleApplyFilters}
+        onApply={() => {
+          setFilters(draftFilters);
+          setFilterDrawerOpen(false);
+        }}
         onClear={clearFilters}
-      />
-
-      <ConfirmModal
-        open={bulkDeleteOpen}
-        onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={handleBulkDeleteConfirm}
-        title="Remove subscriptions"
-        description={`Are you sure you want to remove ${selectedCount} selected ${pluralize(selectedCount, "subscription")}? This action cannot be undone.`}
-        confirmText="Remove"
-        confirmDanger
-        icon={<DeleteOutlined />}
-      />
-
-      <ConfirmModal
-        open={pendingDelete !== null}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={handleSingleDeleteConfirm}
-        title="Remove subscription"
-        description={
-          pendingDelete
-            ? `Are you sure you want to remove the subscription for ${pendingDelete.organizationName}? This action cannot be undone.`
-            : undefined
-        }
-        confirmText="Remove"
-        confirmDanger
-        icon={<DeleteOutlined />}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import PageSeo from "../../component/seo/page-seo";
 import { getProjectBoardPath } from "../../data/workspace-project-detail";
 import ProjectTeamAvatars from "../../component/workspace/projects/project-team-avatars";
 import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-link";
@@ -29,6 +30,7 @@ function WorkspaceBoards() {
       errorTitle="Unable to load boards"
     >
       <div className="mx-auto max-w-8xl">
+        <PageSeo title="Boards" description="Manage project tasks on Kanban boards." noIndex />
         <div className="mb-6">
           <Title level={2} className="text-2xl text-foreground lg:text-3xl">
             Boards

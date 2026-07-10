@@ -13,7 +13,7 @@ import {
   type SubscriptionStatus,
 } from "../../../data/admin-subscriptions";
 import { useUpdateSubscriptionBilling } from "../../../hooks/use-admin-subscriptions";
-import { showApiErrorToast } from "../../../lib/api-error";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { formatCurrency, getInitial } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import Modal from "../../ui/modal";
@@ -98,6 +98,7 @@ function SubscriptionEditBillingModal({ open, record, onClose }: SubscriptionEdi
           status: values.status,
         },
       });
+      showApiSuccessToast("Billing updated successfully");
       onClose();
     } catch (error) {
       showApiErrorToast(error);

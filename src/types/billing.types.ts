@@ -64,14 +64,16 @@ export type PlanFeatureFlag =
   | "sso"
   | "custom_roles"
   | "dedicated_success"
-  | "custom_sla";
+  | "custom_sla"
+  | "ai_assistant";
 
 export type OrganizationUsageMetric = {
-  key: "staff_users" | "projects" | "boards";
+  key: "staff_users" | "projects" | "boards" | "ai_credits";
   label: string;
   used: number;
   limit: number | null;
   unlimited: boolean;
+  remaining?: number | null;
 };
 
 export type OrganizationUsageResponse = {
@@ -87,13 +89,29 @@ export type OrganizationUsageResponse = {
     max_staff_users: number | null;
     max_projects: number | null;
     max_boards: number | null;
+    max_ai_credits: number | null;
   };
   usage: {
     staffUsers: number;
     projects: number;
     boards: number;
+    aiCredits: number;
   };
   metrics: OrganizationUsageMetric[];
+};
+
+export type AiCreditHistoryItem = {
+  id: string;
+  feature: string;
+  credits: number;
+  periodKey: string;
+  userName: string;
+  userEmail: string | null;
+  createdAt: string;
+};
+
+export type AiCreditHistoryResponse = {
+  data: AiCreditHistoryItem[];
 };
 
 export type BillingInvoice = {

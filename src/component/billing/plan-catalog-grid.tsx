@@ -58,7 +58,11 @@ function PlanCatalogGrid({ mode, onContact, onRequireAuth }: PlanCatalogGridProp
 
   const handlePlanAction = async (priceId: string, ctaType: CatalogCtaType) => {
     if (ctaType === 'contact') {
-      onContact?.();
+      if (onContact) {
+        onContact();
+      } else {
+        navigate('/contact?subject=enterprise');
+      }
       return;
     }
 

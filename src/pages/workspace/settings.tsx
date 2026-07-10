@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import useWorkspaceSettings from "../../hooks/use-workspace-settings";
 import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { useUpdateWorkspaceOrganization, useWorkspaceOrganization } from "../../hooks/use-workspace-organization";
@@ -142,13 +143,16 @@ function WorkspaceSettingsContent() {
 
 function WorkspaceSettings() {
   return (
-    <WorkspaceRoleGate
-      permission="settings.view"
-      title="Settings access restricted"
-      description="Only workspace owners and admins can manage organization settings."
-    >
-      <WorkspaceSettingsContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Workspace Settings" description="Configure workspace preferences, members, and security." noIndex />
+      <WorkspaceRoleGate
+        permission="settings.view"
+        title="Settings access restricted"
+        description="Only workspace owners and admins can manage organization settings."
+      >
+        <WorkspaceSettingsContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

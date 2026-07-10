@@ -70,6 +70,7 @@ export const CONTACT_SUBJECT_OPTIONS = [
   { value: "sales", label: "Sales & Pricing" },
   { value: "partnership", label: "Partnership" },
   { value: "billing", label: "Billing" },
+  { value: "enterprise", label: "Enterprise" },
 ];
 
 export const CONTACT_FAQ_ITEMS: FaqItem[] = [

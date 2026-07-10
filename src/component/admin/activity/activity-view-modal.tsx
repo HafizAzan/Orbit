@@ -1,5 +1,6 @@
-import { FlagOutlined } from "@ant-design/icons";
-import React from "react";
+import { FlagOutlined, RobotOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import React, { useEffect, useState } from "react";
 import {
   ACTIVITY_CATEGORY_ICONS,
   ACTIVITY_CATEGORY_LABELS,
@@ -7,7 +8,9 @@ import {
   ACTIVITY_SEVERITY_STYLES,
   type ActivityRecord,
 } from "../../../data/admin-activity";
+import { useDescribePlatformActivity } from "../../../hooks/use-ai";
 import { getActivityFlagReasonLabel } from "../../../lib/activity-review";
+import { showApiErrorToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 import DetailModal from "../../ui/detail-modal";
 import RecordDetailField from "../shared/record-detail-field";
@@ -23,6 +26,23 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
   const severityStyle = record ? ACTIVITY_SEVERITY_STYLES[record.severity] : null;
   const isFlagged = record?.reviewStatus === "flagged";
   const isResolved = record?.reviewStatus === "resolved";
+  const { mutateAsync, data, isPending, reset } = useDescribePlatformActivity();
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+
+  useEffect(() => {
+    reset();
+    setLoadedFor(null);
+  }, [record?.id, reset]);
+
+  const handleExplain = async () => {
+    if (!record) return;
+    try {
+      await mutateAsync({ activityId: record.id });
+      setLoadedFor(record.id);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  };
 
   return (
     <DetailModal
@@ -36,7 +56,38 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
       {record && severityStyle ? (
         <>
           <div className="mb-5 rounded-2xl border border-border bg-background/60 p-4">
-            <Paragraph size="sm" className="mb-0! leading-relaxed">{record.description}</Paragraph>
+            <Paragraph size="sm" className="mb-0! leading-relaxed">
+              {record.description}
+            </Paragraph>
+          </div>
+
+          <div className="mb-5 rounded-2xl border border-border bg-card p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <Text weight="semibold">AI explanation</Text>
+              <Button size="small" icon={<RobotOutlined />} loading={isPending} onClick={() => void handleExplain()}>
+                Explain
+              </Button>
+            </div>
+            {data?.draft && loadedFor === record.id ? (
+              <div className="space-y-2">
+                <Text as="p" weight="semibold">
+                  {data.draft.headline}
+                </Text>
+                <Paragraph size="sm" className="mb-0!">
+                  {data.draft.explanation}
+                </Paragraph>
+                <Paragraph size="xs" className="mb-0! text-muted">
+                  {data.draft.impact}
+                </Paragraph>
+                <Paragraph size="xs" className="mb-0! text-primary">
+                  {data.draft.suggestedFollowUp}
+                </Paragraph>
+              </div>
+            ) : (
+              <Paragraph size="xs" className="mb-0! text-muted">
+                Generate a plain-language explanation for this platform event.
+              </Paragraph>
+            )}
           </div>
 
           {isFlagged || isResolved ? (
@@ -62,7 +113,9 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
               </div>
 
               {record.flagNote ? (
-                <Paragraph size="sm" className="mt-3 mb-0! leading-relaxed">{record.flagNote}</Paragraph>
+                <Paragraph size="sm" className="mt-3 mb-0! leading-relaxed">
+                  {record.flagNote}
+                </Paragraph>
               ) : null}
             </div>
           ) : null}
@@ -71,7 +124,12 @@ function ActivityViewModal({ record, onClose }: ActivityViewModalProps) {
             <RecordDetailField label="Actor" value={record.actor} />
             <RecordDetailField label="Time" value={record.timestamp} />
             <RecordDetailField label="Category">
-              <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold", ACTIVITY_CATEGORY_STYLES[record.category])}>
+              <span
+                className={cn(
+                  "inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+                  ACTIVITY_CATEGORY_STYLES[record.category],
+                )}
+              >
                 {ACTIVITY_CATEGORY_LABELS[record.category]}
               </span>
             </RecordDetailField>

@@ -1,7 +1,7 @@
-import { ACTIVITIES_DATA } from "../data/admin-activity";
-import { ORGANIZATIONS_DATA } from "../data/admin-organizations";
-import { SUBSCRIPTIONS_DATA } from "../data/admin-subscriptions";
-import { USERS_DATA } from "../data/admin-users";
+import type { ActivityRecord } from "../data/admin-activity";
+import type { OrganizationRecord } from "../data/admin-organizations";
+import type { SubscriptionRecord } from "../data/admin-subscriptions";
+import type { UserRecord } from "../data/admin-users";
 import { ADMIN_ROUTES } from "../router/admin-routes";
 import { matchesSearchQuery } from "./helper";
 
@@ -22,6 +22,13 @@ export type AdminGlobalSearchResult = {
   title: string;
   subtitle: string;
   route: string;
+};
+
+export type AdminGlobalSearchSources = {
+  organizations: OrganizationRecord[];
+  users: UserRecord[];
+  subscriptions: SubscriptionRecord[];
+  activities: ActivityRecord[];
 };
 
 const RESULTS_PER_CATEGORY = 4;
@@ -46,7 +53,10 @@ function pushResult(
   counts[result.category] += 1;
 }
 
-export function searchAdminGlobal(query: string): AdminGlobalSearchResult[] {
+export function searchAdminGlobal(
+  query: string,
+  sources: AdminGlobalSearchSources,
+): AdminGlobalSearchResult[] {
   const normalizedQuery = query.trim();
   if (normalizedQuery.length < MIN_QUERY_LENGTH) return [];
 
@@ -58,7 +68,7 @@ export function searchAdminGlobal(query: string): AdminGlobalSearchResult[] {
     activity: 0,
   };
 
-  for (const organization of ORGANIZATIONS_DATA) {
+  for (const organization of sources.organizations) {
     const matches =
       matchesSearchQuery(organization.name, normalizedQuery) ||
       matchesSearchQuery(organization.slug, normalizedQuery) ||
@@ -76,7 +86,7 @@ export function searchAdminGlobal(query: string): AdminGlobalSearchResult[] {
     });
   }
 
-  for (const user of USERS_DATA) {
+  for (const user of sources.users) {
     const matches =
       matchesSearchQuery(user.name, normalizedQuery) ||
       matchesSearchQuery(user.email, normalizedQuery) ||
@@ -93,7 +103,7 @@ export function searchAdminGlobal(query: string): AdminGlobalSearchResult[] {
     });
   }
 
-  for (const subscription of SUBSCRIPTIONS_DATA) {
+  for (const subscription of sources.subscriptions) {
     const matches =
       matchesSearchQuery(subscription.organizationName, normalizedQuery) ||
       matchesSearchQuery(subscription.contactEmail, normalizedQuery) ||
@@ -110,7 +120,7 @@ export function searchAdminGlobal(query: string): AdminGlobalSearchResult[] {
     });
   }
 
-  for (const activity of ACTIVITIES_DATA) {
+  for (const activity of sources.activities) {
     const matches =
       matchesSearchQuery(activity.title, normalizedQuery) ||
       matchesSearchQuery(activity.description, normalizedQuery) ||

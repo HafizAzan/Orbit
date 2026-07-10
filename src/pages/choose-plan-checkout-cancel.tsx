@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, Navigate } from "react-router-dom";
+import PageSeo from "../component/seo/page-seo";
 import { Paragraph, Title } from "../component/ui/typography";
 import { useAppContext } from "../context/app-context";
 import { PLAN_ROUTES } from "../lib/auth-routing";
@@ -13,22 +14,25 @@ function ChoosePlanCheckoutCancel() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-14">
-      <div className="max-w-md text-center">
-        <Title level={3} className="text-foreground">
-          Checkout cancelled
-        </Title>
-        <Paragraph className="mt-3 text-muted">
-          No charges were made. You can choose a plan again whenever you are ready.
-        </Paragraph>
-        <Link
-          to={PLAN_ROUTES.CHOOSE_PLAN}
-          className="mt-6 inline-flex rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white"
-        >
-          Back to plans
-        </Link>
+    <>
+      <PageSeo title="Checkout Cancelled" description="Your checkout was cancelled. No charges were made." noIndex />
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-14">
+        <div className="max-w-md text-center">
+          <Title level={3} className="text-foreground">
+            Checkout cancelled
+          </Title>
+          <Paragraph className="mt-3 text-muted">
+            No charges were made. You can choose a plan again whenever you are ready.
+          </Paragraph>
+          <Link
+            to={PLAN_ROUTES.CHOOSE_PLAN}
+            className="mt-6 inline-flex rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Back to plans
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

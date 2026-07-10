@@ -85,6 +85,20 @@ function WorkspaceInvoicesTable({
         },
       },
       {
+        title: "Refund window",
+        key: "refundWindow",
+        render: (_, record) =>
+          record.refundable && record.refundWindowEndsAt ? (
+            <Text as="span" size="sm" color="muted">
+              Until {formatDate(record.refundWindowEndsAt)}
+            </Text>
+          ) : (
+            <Text as="span" size="sm" color="muted">
+              —
+            </Text>
+          ),
+      },
+      {
         title: "",
         key: "actions",
         width: 180,

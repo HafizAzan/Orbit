@@ -1,40 +1,57 @@
-import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined, StopOutlined } from "@ant-design/icons";
 import { Badge, Button, Input } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createUserTableColumns from "../../../columns/user-table-columns";
-import { USERS_DATA, USERS_PAGE_SIZE, type UserRecord } from "../../../data/admin-users";
+import { USERS_PAGE_SIZE, type UserRecord } from "../../../data/admin-users";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
+import { useDeleteAdminUser, useUpdateAdminUserStatus } from "../../../hooks/use-admin-users";
 import useUserFilters from "../../../hooks/use-user-filters";
-import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
+import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
+import { matchesSearchQuery } from "../../../lib/helper";
 import { countActiveUserFilters, getUserFilterChips, matchesUserFilters } from "../../../lib/user-filters";
-import { toast } from "../../../lib/toast";
-import { cn } from "../../../lib/utils";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
 import { Text } from "../../ui/typography";
+import UserEditModal from "./user-edit-modal";
 import UserFilterDrawer from "./user-filter-drawer";
 import UserViewModal from "./user-view-modal";
 
 type UsersTableProps = {
   data?: UserRecord[];
+  total?: number;
+  page?: number;
+  onPageChange?: (page: number) => void;
+  serverPagination?: boolean;
 };
 
-function UsersTable({ data = USERS_DATA }: UsersTableProps) {
-  const [rows, setRows] = useState(data);
+function UsersTable({
+  data = [],
+  total = 0,
+  page: controlledPage,
+  onPageChange,
+  serverPagination = false,
+}: UsersTableProps) {
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useUserFilters();
-  const [page, setPage] = useState(1);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [localPage, setLocalPage] = useState(1);
+  const [pendingSuspend, setPendingSuspend] = useState<UserRecord | null>(null);
   const [pendingDelete, setPendingDelete] = useState<UserRecord | null>(null);
   const [viewRecord, setViewRecord] = useState<UserRecord | null>(null);
+  const [editRecord, setEditRecord] = useState<UserRecord | null>(null);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const { mutateAsync: updateStatus, isPending: suspendPending } = useUpdateAdminUserStatus();
+  const { mutateAsync: deleteUser, isPending: deletePending } = useDeleteAdminUser();
+
+  const page = controlledPage ?? localPage;
+  const setPage = onPageChange ?? setLocalPage;
 
   const columns = useMemo(
     () =>
       createUserTableColumns({
         onView: setViewRecord,
+        onEdit: setEditRecord,
+        onSuspend: setPendingSuspend,
         onDelete: setPendingDelete,
       }),
     [],
@@ -44,50 +61,56 @@ function UsersTable({ data = USERS_DATA }: UsersTableProps) {
   const filterChips = getUserFilterChips(filters);
   const hasQuery = Boolean(search.trim()) || activeFilterCount > 0;
 
-  useEffect(() => {
-    setRows(data);
-  }, [data]);
-
   const filteredData = useMemo(() => {
+    if (serverPagination) return data;
     const query = search.trim().toLowerCase();
-
-    return rows.filter((user) => {
+    return data.filter((user) => {
       if (!matchesUserFilters(user, filters)) return false;
       if (!query) return true;
-
       return (
         matchesSearchQuery(user.name, query) ||
         matchesSearchQuery(user.email, query) ||
         matchesSearchQuery(user.organization, query)
       );
     });
-  }, [rows, search, filters]);
+  }, [data, search, filters, serverPagination]);
 
   useEffect(() => {
-    setPage(1);
-    setSelectedRowKeys([]);
-  }, [search, filters, rows]);
+    if (!serverPagination) setPage(1);
+  }, [search, filters, serverPagination, setPage]);
 
-  const paginatedData = useMemo(() => paginateItems(filteredData, page, USERS_PAGE_SIZE), [filteredData, page]);
+  const displayTotal = serverPagination ? total : filteredData.length;
 
-  const selectedCount = selectedRowKeys.length;
-  const hasSelection = selectedCount > 0;
+  const handleSuspendConfirm = useCallback(async () => {
+    if (!pendingSuspend) return;
+    try {
+      await updateStatus({
+        id: pendingSuspend.id,
+        data: {
+          status: pendingSuspend.status === "suspended" ? "active" : "suspended",
+        },
+      });
+      showApiSuccessToast(
+        pendingSuspend.status === "suspended"
+          ? `${pendingSuspend.name} reactivated`
+          : `${pendingSuspend.name} suspended`,
+      );
+      setPendingSuspend(null);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  }, [pendingSuspend, updateStatus]);
 
-  const handleBulkDeleteConfirm = () => {
-    setRows((current) => current.filter((row) => !selectedRowKeys.includes(row.id)));
-    toast.success(`${selectedCount} ${pluralize(selectedCount, "user")} removed successfully`);
-    setSelectedRowKeys([]);
-    setBulkDeleteOpen(false);
-  };
-
-  const handleSingleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!pendingDelete) return;
-
-    setRows((current) => current.filter((row) => row.id !== pendingDelete.id));
-    setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
-    toast.success(`${pendingDelete.name} removed successfully`);
-    setPendingDelete(null);
-  }, [pendingDelete]);
+    try {
+      await deleteUser(pendingDelete.id);
+      showApiSuccessToast(`${pendingDelete.name} has been deleted.`);
+      setPendingDelete(null);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  }, [pendingDelete, deleteUser]);
 
   const handleOpenFilters = () => {
     setDraftFilters(filters);
@@ -103,14 +126,14 @@ function UsersTable({ data = USERS_DATA }: UsersTableProps) {
     <Text as="span" size="sm" color="muted">
       Showing{" "}
       <Text as="span" weight="semibold">
-        {filteredData.length === 0 ? 0 : (page - 1) * USERS_PAGE_SIZE + 1}
+        {displayTotal === 0 ? 0 : (page - 1) * USERS_PAGE_SIZE + 1}
       </Text>
       {" to "}
       <Text as="span" weight="semibold">
-        {Math.min(page * USERS_PAGE_SIZE, filteredData.length)}
+        {Math.min(page * USERS_PAGE_SIZE, displayTotal)}
       </Text>
       {" of "}
-      <Text as="span" weight="semibold">{filteredData.length}</Text> users
+      <Text as="span" weight="semibold">{displayTotal}</Text> users
     </Text>
   );
 
@@ -157,27 +180,12 @@ function UsersTable({ data = USERS_DATA }: UsersTableProps) {
               Filter
             </Button>
           </Badge>
-
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            disabled={!hasSelection}
-            onClick={() => setBulkDeleteOpen(true)}
-            className={cn("w-fit font-semibold!", filterChips.length > 0 && "self-start sm:self-center")}
-          >
-            Bulk Delete{hasSelection ? ` (${selectedCount})` : ""}
-          </Button>
         </div>
 
         <Table<UserRecord>
           rowKey="id"
           columns={columns}
-          dataSource={paginatedData}
-          rowSelection={{
-            type: "checkbox",
-            selectedRowKeys,
-            onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
-          }}
+          dataSource={filteredData}
           scroll={{ x: 960 }}
           pagination={false}
           wrapperClassName="border-0! rounded-none! shadow-none!"
@@ -185,22 +193,23 @@ function UsersTable({ data = USERS_DATA }: UsersTableProps) {
           emptyDescription={
             hasQuery
               ? "Try adjusting your search or filters to find the user you are looking for."
-              : "Invite admins or add users to get started."
+              : "Users will appear here once organizations invite members."
           }
         />
 
-        {filteredData.length > 0 ? (
+        {displayTotal > 0 ? (
           <TablePaginationFooter
             summary={resultsSummary}
             current={page}
             pageSize={USERS_PAGE_SIZE}
-            total={filteredData.length}
+            total={displayTotal}
             onChange={setPage}
           />
         ) : null}
       </div>
 
       <UserViewModal record={viewRecord} onClose={() => setViewRecord(null)} />
+      <UserEditModal record={editRecord} onClose={() => setEditRecord(null)} />
 
       <UserFilterDrawer
         open={filterDrawerOpen}
@@ -212,28 +221,36 @@ function UsersTable({ data = USERS_DATA }: UsersTableProps) {
       />
 
       <ConfirmModal
-        open={bulkDeleteOpen}
-        onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={handleBulkDeleteConfirm}
-        title="Remove users"
-        description={`Are you sure you want to remove ${selectedCount} selected ${pluralize(selectedCount, "user")}? This action cannot be undone.`}
-        confirmText="Remove"
-        confirmDanger
-        icon={<DeleteOutlined />}
+        open={pendingSuspend !== null}
+        onClose={() => setPendingSuspend(null)}
+        onConfirm={() => void handleSuspendConfirm()}
+        title={pendingSuspend?.status === "suspended" ? "Reactivate user" : "Suspend user"}
+        description={
+          pendingSuspend
+            ? pendingSuspend.status === "suspended"
+              ? `Reactivate ${pendingSuspend.name}?`
+              : `Suspend ${pendingSuspend.name}? They will lose access until reactivated.`
+            : undefined
+        }
+        confirmText={pendingSuspend?.status === "suspended" ? "Reactivate" : "Suspend"}
+        confirmDanger={pendingSuspend?.status !== "suspended"}
+        confirmLoading={suspendPending}
+        icon={<StopOutlined />}
       />
 
       <ConfirmModal
         open={pendingDelete !== null}
         onClose={() => setPendingDelete(null)}
-        onConfirm={handleSingleDeleteConfirm}
-        title="Remove user"
+        onConfirm={() => void handleDeleteConfirm()}
+        title="Delete user"
         description={
           pendingDelete
-            ? `Are you sure you want to remove ${pendingDelete.name}? This action cannot be undone.`
+            ? `Permanently delete ${pendingDelete.name}? This action cannot be undone and will remove all their data.`
             : undefined
         }
-        confirmText="Remove"
+        confirmText="Delete permanently"
         confirmDanger
+        confirmLoading={deletePending}
         icon={<DeleteOutlined />}
       />
     </>

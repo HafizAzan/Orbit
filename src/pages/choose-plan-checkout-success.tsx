@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import PageSeo from "../component/seo/page-seo";
 import { confirmCheckout } from "../api-services/billing.service";
 import { getMe } from "../api-services/auth.service";
 import { PricingCardsGridSkeleton } from "../component/skeletons";
@@ -67,6 +68,8 @@ function ChoosePlanCheckoutSuccess() {
   }
 
   return (
+    <>
+      <PageSeo title="Checkout Success" description="Your plan is being activated." noIndex />
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-14">
       <div className="max-w-md text-center">
         {errorMessage ? (
@@ -94,6 +97,7 @@ function ChoosePlanCheckoutSuccess() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

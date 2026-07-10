@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import PricingCard from "../../common/pricing-card";
 import PricingIntervalToggle from "../../billing/pricing-interval-toggle";
@@ -20,13 +21,13 @@ import {
   resolveCatalogSavingsHint,
   type PricingBillingInterval,
 } from "../../../lib/pricing-catalog";
-import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
 import type { CatalogCtaType, PlanCode } from "../../../types/billing.types";
 import SettingsSection from "../../admin/settings/settings-section";
 import { Paragraph } from "../../ui/typography";
 
 function WorkspaceBillingPlanCards() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const catalogQuery = useBillingCatalog();
   const { data: subscription } = useCurrentSubscription();
@@ -47,7 +48,7 @@ function WorkspaceBillingPlanCards() {
     if (plan.plan === currentPlan) return;
 
     if (plan.ctaType === "contact") {
-      toast.info("Our sales team will reach out shortly.");
+      navigate("/contact?subject=enterprise");
       return;
     }
 

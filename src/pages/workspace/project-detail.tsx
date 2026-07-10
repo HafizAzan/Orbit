@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import MemberProjectDetailHeader from "../../component/workspace/projects/member-project-detail-header";
 import ProjectActivityFeed from "../../component/workspace/projects/project-activity-feed";
 import ProjectAiHealthCard from "../../component/workspace/projects/project-ai-health-card";
@@ -135,6 +136,8 @@ function WorkspaceProjectDetail() {
   );
 
   return (
+    <>
+      <PageSeo title="Project Detail" description="View and manage project tasks, activity, and discussions." noIndex />
     <QueryPageGuard
       query={projectQuery}
       loading={<ProjectDetailSkeleton />}
@@ -212,6 +215,7 @@ function WorkspaceProjectDetail() {
         </div>
       )}
     </QueryPageGuard>
+    </>
   );
 }
 

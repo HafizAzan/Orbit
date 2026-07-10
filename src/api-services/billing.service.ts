@@ -13,6 +13,7 @@ import type {
   CreateCheckoutResponse,
   CurrentSubscriptionResponse,
   OrganizationUsageResponse,
+  AiCreditHistoryResponse,
   RefundPaymentRequest,
   RefundPaymentResponse,
 } from "../types/billing.types";
@@ -37,6 +38,14 @@ const getCurrentSubscription = async (): Promise<CurrentSubscriptionResponse> =>
 const getOrganizationUsage = async (): Promise<OrganizationUsageResponse> => {
   const response = await ApiService.get(API_ROUTES.BILLING.USAGE, AUTH_REQUEST);
   return assertApiSuccess<OrganizationUsageResponse>(response);
+};
+
+const listAiCreditHistory = async (limit = 20): Promise<AiCreditHistoryResponse> => {
+  const response = await ApiService.get(
+    `${API_ROUTES.BILLING.AI_CREDIT_HISTORY}?limit=${limit}`,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<AiCreditHistoryResponse>(response);
 };
 
 const createCheckout = async (data: CreateCheckoutRequest): Promise<CreateCheckoutResponse> => {
@@ -98,6 +107,7 @@ export {
   getCatalog,
   getCurrentSubscription,
   getOrganizationUsage,
+  listAiCreditHistory,
   listInvoices,
   refundPayment,
   selectPlan,

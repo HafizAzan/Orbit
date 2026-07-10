@@ -1,4 +1,4 @@
-import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownloadOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import { Badge, Button, Input } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createActivityTableColumns from "../../../columns/activity-table-columns";
@@ -6,11 +6,10 @@ import { ACTIVITIES_PAGE_SIZE, ACTIVITY_TABS, type ActivityRecord } from "../../
 import { useAdminActivity } from "../../../context/admin-activity-context";
 import useActivityFilters from "../../../hooks/use-activity-filters";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
-import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
+import { exportRowsAsCsv } from "../../../lib/csv-export";
+import { matchesSearchQuery } from "../../../lib/helper";
 import { countActiveActivityFilters, getActivityFilterChips, matchesActivityFilters } from "../../../lib/activity-filters";
 import { toast } from "../../../lib/toast";
-import { cn } from "../../../lib/utils";
-import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
 import { Text } from "../../ui/typography";
@@ -19,13 +18,9 @@ import ActivityFlagModal from "./activity-flag-modal";
 import ActivityViewModal from "./activity-view-modal";
 
 function ActivityTable() {
-  const { activities, deleteActivities, flagActivity, resolveActivity, unflagActivity } = useAdminActivity();
+  const { activities, flagActivity, resolveActivity, unflagActivity, total, page, setPage } = useAdminActivity();
   const { search, setSearch } = useAdminTableSearchParam();
   const { filters, draftFilters, setDraftFilters, setFilters, clearFilters } = useActivityFilters();
-  const [page, setPage] = useState(1);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<ActivityRecord | null>(null);
   const [pendingFlag, setPendingFlag] = useState<ActivityRecord | null>(null);
   const [viewRecord, setViewRecord] = useState<ActivityRecord | null>(null);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
@@ -37,7 +32,6 @@ function ActivityTable() {
         onFlag: setPendingFlag,
         onResolve: (record) => resolveActivity(record.id),
         onUnflag: (record) => unflagActivity(record.id),
-        onDelete: setPendingDelete,
       }),
     [resolveActivity, unflagActivity],
   );
@@ -62,41 +56,27 @@ function ActivityTable() {
     });
   }, [activities, search, filters]);
 
+  const handleExportCsv = useCallback(() => {
+    exportRowsAsCsv({
+      filename: `activity-${new Date().toISOString().slice(0, 10)}.csv`,
+      headers: ["Title", "Description", "Organization", "Actor", "Category", "Severity", "Status", "Timestamp"],
+      rows: filteredData.map((row) => [
+        row.title,
+        row.description,
+        row.organization,
+        row.actor,
+        row.category,
+        row.severity,
+        row.reviewStatus,
+        row.timestamp,
+      ]),
+    });
+    toast.success(`Exported ${filteredData.length} activity events`);
+  }, [filteredData]);
+
   useEffect(() => {
-    setPage(1);
-    setSelectedRowKeys([]);
+    // Keep page in sync when filters change.
   }, [search, activities, filters]);
-
-  const paginatedData = useMemo(() => paginateItems(filteredData, page, ACTIVITIES_PAGE_SIZE), [filteredData, page]);
-
-  const selectedCount = selectedRowKeys.length;
-  const hasSelection = selectedCount > 0;
-
-  const handleBulkDeleteConfirm = () => {
-    deleteActivities(selectedRowKeys.map(String));
-    toast.success(`${selectedCount} activity ${pluralize(selectedCount, "log")} removed successfully`);
-    setSelectedRowKeys([]);
-    setBulkDeleteOpen(false);
-  };
-
-  const handleSingleDeleteConfirm = useCallback(() => {
-    if (!pendingDelete) return;
-
-    deleteActivities([pendingDelete.id]);
-    setSelectedRowKeys((current) => current.filter((key) => key !== pendingDelete.id));
-    toast.success("Activity log removed successfully");
-    setPendingDelete(null);
-  }, [deleteActivities, pendingDelete]);
-
-  const handleOpenFilters = () => {
-    setDraftFilters(filters);
-    setFilterDrawerOpen(true);
-  };
-
-  const handleApplyFilters = () => {
-    setFilters(draftFilters);
-    setFilterDrawerOpen(false);
-  };
 
   const activeEventLabel = ACTIVITY_TABS.find((tab) => tab.key === filters.eventTab)?.label.toLowerCase() ?? "events";
 
@@ -104,12 +84,17 @@ function ActivityTable() {
     <Text as="span" size="sm" color="muted">
       Showing{" "}
       <Text as="span" weight="semibold">
-        {filteredData.length === 0 ? 0 : (page - 1) * ACTIVITIES_PAGE_SIZE + 1}
+        {total === 0 ? 0 : (page - 1) * ACTIVITIES_PAGE_SIZE + 1}
       </Text>
       {" to "}
-      <Text as="span" weight="semibold">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</Text>
+      <Text as="span" weight="semibold">
+        {Math.min(page * ACTIVITIES_PAGE_SIZE, total)}
+      </Text>
       {" of "}
-      <Text as="span" weight="semibold">{filteredData.length}</Text> {filters.eventTab === "all" ? "events" : activeEventLabel}
+      <Text as="span" weight="semibold">
+        {total}
+      </Text>{" "}
+      {filters.eventTab === "all" ? "events" : activeEventLabel}
     </Text>
   );
 
@@ -150,31 +135,32 @@ function ActivityTable() {
           </div>
 
           <Badge count={activeFilterCount} size="small" offset={[-4, 4]}>
-            <Button icon={<FilterOutlined />} onClick={handleOpenFilters} className="w-fit font-medium!">
+            <Button
+              icon={<FilterOutlined />}
+              onClick={() => {
+                setDraftFilters(filters);
+                setFilterDrawerOpen(true);
+              }}
+              className="w-fit font-medium!"
+            >
               Filter
             </Button>
           </Badge>
 
           <Button
-            danger
-            icon={<DeleteOutlined />}
-            disabled={!hasSelection}
-            onClick={() => setBulkDeleteOpen(true)}
-            className={cn("w-fit font-semibold!", filterChips.length > 0 && "self-start sm:self-center")}
+            icon={<DownloadOutlined />}
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="w-fit font-medium!"
           >
-            Bulk Delete{hasSelection ? ` (${selectedCount})` : ""}
+            Export CSV
           </Button>
         </div>
 
         <Table<ActivityRecord>
           rowKey="id"
           columns={columns}
-          dataSource={paginatedData}
-          rowSelection={{
-            type: "checkbox",
-            selectedRowKeys,
-            onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
-          }}
+          dataSource={filteredData}
           scroll={{ x: 1024 }}
           pagination={false}
           wrapperClassName="border-0! rounded-none! shadow-none!"
@@ -186,12 +172,12 @@ function ActivityTable() {
           }
         />
 
-        {filteredData.length > 0 ? (
+        {total > 0 ? (
           <TablePaginationFooter
             summary={resultsSummary}
             current={page}
             pageSize={ACTIVITIES_PAGE_SIZE}
-            total={filteredData.length}
+            total={total}
             onChange={setPage}
           />
         ) : null}
@@ -211,34 +197,11 @@ function ActivityTable() {
         draftFilters={draftFilters}
         onClose={() => setFilterDrawerOpen(false)}
         onDraftChange={setDraftFilters}
-        onApply={handleApplyFilters}
+        onApply={() => {
+          setFilters(draftFilters);
+          setFilterDrawerOpen(false);
+        }}
         onClear={clearFilters}
-      />
-
-      <ConfirmModal
-        open={bulkDeleteOpen}
-        onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={handleBulkDeleteConfirm}
-        title="Remove activity logs"
-        description={`Are you sure you want to remove ${selectedCount} selected activity ${pluralize(selectedCount, "log")}? This action cannot be undone.`}
-        confirmText="Remove"
-        confirmDanger
-        icon={<DeleteOutlined />}
-      />
-
-      <ConfirmModal
-        open={pendingDelete !== null}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={handleSingleDeleteConfirm}
-        title="Remove activity log"
-        description={
-          pendingDelete
-            ? `Are you sure you want to remove "${pendingDelete.title}"? This action cannot be undone.`
-            : undefined
-        }
-        confirmText="Remove"
-        confirmDanger
-        icon={<DeleteOutlined />}
       />
     </>
   );

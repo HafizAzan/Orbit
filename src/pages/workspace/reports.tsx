@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import ProjectAiHealthCard from "../../component/workspace/projects/project-ai-health-card";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
@@ -118,13 +119,16 @@ function ReportMetricCard({ label, value }: { label: string; value: string }) {
 
 function WorkspaceReports() {
   return (
-    <WorkspaceRoleGate
-      permission="reports.view"
-      title="Reports access restricted"
-      description="Reports are available to owners, admins, and managers."
-    >
-      <WorkspaceReportsContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Reports" description="Workspace performance reports and analytics." noIndex />
+      <WorkspaceRoleGate
+        permission="reports.view"
+        title="Reports access restricted"
+        description="Reports are available to owners, admins, and managers."
+      >
+        <WorkspaceReportsContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

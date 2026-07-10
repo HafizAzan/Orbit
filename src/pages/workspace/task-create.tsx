@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import TaskFormScreen from "../../component/workspace/tasks/task-form/task-form-screen";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import { DEFAULT_TASK_FORM_VALUES } from "../../data/workspace-task-form";
@@ -17,13 +18,16 @@ function WorkspaceTaskCreate() {
   );
 
   return (
-    <WorkspaceRoleGate
-      permission="task.create"
-      title="Task creation restricted"
-      description="You do not have permission to create tasks in this workspace."
-    >
-      <TaskFormScreen mode="create" initialValues={initialValues} />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Create Task" description="Create a new task in your workspace." noIndex />
+      <WorkspaceRoleGate
+        permission="task.create"
+        title="Task creation restricted"
+        description="You do not have permission to create tasks in this workspace."
+      >
+        <TaskFormScreen mode="create" initialValues={initialValues} />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

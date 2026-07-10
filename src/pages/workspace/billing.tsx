@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import WorkspaceBillingPlanCards from "../../component/workspace/billing/workspace-billing-plan-cards";
 import WorkspaceBillingSummaryCards from "../../component/workspace/billing/workspace-billing-summary-cards";
 import WorkspaceBillingActions from "../../component/workspace/billing/workspace-billing-actions";
@@ -135,13 +136,16 @@ function WorkspaceBillingContent() {
 
 function WorkspaceBilling() {
   return (
-    <WorkspaceRoleGate
-      permission="billing.view"
-      title="Billing access restricted"
-      description="Only workspace owners and admins can manage billing and subscriptions."
-    >
-      <WorkspaceBillingContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Billing & Subscription" description="Manage your workspace billing and subscription plan." noIndex />
+      <WorkspaceRoleGate
+        permission="billing.view"
+        title="Billing access restricted"
+        description="Only workspace owners and admins can manage billing and subscriptions."
+      >
+        <WorkspaceBillingContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

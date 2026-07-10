@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import PageSeo from '../../component/seo/page-seo';
 import QueryPageGuard from '../../component/common/query-page-guard';
 import { ProjectsPageSkeleton } from '../../component/skeletons';
 import TablePaginationFooter from '../../component/ui/table-pagination-footer';
@@ -179,6 +180,8 @@ function WorkspaceProjectsContent() {
   );
 
   return (
+    <>
+      <PageSeo title="Projects" description="Browse and manage all workspace projects." noIndex />
     <QueryPageGuard
       query={projectsQuery}
       loading={<ProjectsPageSkeleton />}
@@ -240,6 +243,7 @@ function WorkspaceProjectsContent() {
         ) : null}
       </div>
     </QueryPageGuard>
+    </>
   );
 }
 

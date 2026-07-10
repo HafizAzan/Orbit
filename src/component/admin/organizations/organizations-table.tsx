@@ -1,10 +1,11 @@
-import { CloseOutlined, DeleteOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
+import { CloseOutlined, DeleteOutlined, DownloadOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import { Badge, Button, Input } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createOrganizationTableColumns from "../../../columns/organization-table-columns";
 import { ORGANIZATIONS_PAGE_SIZE, type OrganizationRecord } from "../../../data/admin-organizations";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
 import useOrganizationFilters from "../../../hooks/use-organization-filters";
+import { exportRowsAsCsv } from "../../../lib/csv-export";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
 import { countActiveOrganizationFilters, getOrganizationFilterChips, matchesOrganizationFilters } from "../../../lib/organization-filters";
 import { toast } from "../../../lib/toast";
@@ -148,6 +149,25 @@ function OrganizationsTable({
     setFilterDrawerOpen(true);
   };
 
+  const handleExportCsv = useCallback(() => {
+    exportRowsAsCsv({
+      filename: `organizations-${new Date().toISOString().slice(0, 10)}.csv`,
+      headers: ["Name", "Slug", "Owner", "Email", "Plan", "Users", "Projects", "Status", "Created"],
+      rows: filteredData.map((org) => [
+        org.name,
+        org.slug,
+        org.ownerName,
+        org.ownerEmail,
+        org.plan.name ?? org.plan.code,
+        org.users,
+        org.projects,
+        org.status,
+        org.createdAt,
+      ]),
+    });
+    toast.success(`Exported ${filteredData.length} organizations`);
+  }, [filteredData]);
+
   const handleApplyFilters = () => {
     setFilters(draftFilters);
     setFilterDrawerOpen(false);
@@ -206,6 +226,15 @@ function OrganizationsTable({
               Filter
             </Button>
           </Badge>
+
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleExportCsv}
+            disabled={filteredData.length === 0}
+            className="w-fit font-medium!"
+          >
+            Export CSV
+          </Button>
 
           <Button
             danger

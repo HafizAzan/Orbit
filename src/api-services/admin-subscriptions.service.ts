@@ -5,6 +5,7 @@ import type { OrganizationPlan } from "../data/admin-organizations";
 import type {
   BillingCycle,
   SubscriptionRecord,
+  SubscriptionRevenuePoint,
   SubscriptionStatus,
 } from "../data/admin-subscriptions";
 import {
@@ -45,9 +46,10 @@ export type UpdateSubscriptionBillingRequest = {
 const AUTH_REQUEST = { requireAuth: true } as const;
 
 const listSubscriptionsPage = async (
-  params: PaginationParams = {},
+  params: PaginationParams & { status?: string } = {},
 ): Promise<PaginatedResponse<SubscriptionRecord>> => {
   const searchParams = buildPaginationSearchParams(params);
+  if (params.status) searchParams.set("status", params.status);
   const response = await ApiService.get(
     `${API_ROUTES.ADMIN.SUBSCRIPTIONS}?${searchParams.toString()}`,
     AUTH_REQUEST,
@@ -70,6 +72,11 @@ const getPlanDistribution = async (): Promise<PlanDistributionRecord[]> => {
   return assertApiSuccess<PlanDistributionRecord[]>(response);
 };
 
+const getSubscriptionRevenueSeries = async (): Promise<SubscriptionRevenuePoint[]> => {
+  const response = await ApiService.get(API_ROUTES.ADMIN.SUBSCRIPTION_REVENUE_SERIES, AUTH_REQUEST);
+  return assertApiSuccess<SubscriptionRevenuePoint[]>(response);
+};
+
 const updateSubscriptionBilling = async (
   id: string,
   data: UpdateSubscriptionBillingRequest,
@@ -84,6 +91,7 @@ const updateSubscriptionBilling = async (
 
 export {
   getPlanDistribution,
+  getSubscriptionRevenueSeries,
   getSubscriptionStats,
   listSubscriptions,
   listSubscriptionsPage,

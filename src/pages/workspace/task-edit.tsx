@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import TaskFormScreen from "../../component/workspace/tasks/task-form/task-form-screen";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
@@ -22,6 +23,8 @@ function WorkspaceTaskEdit() {
   }, [task]);
 
   return (
+    <>
+      <PageSeo title="Edit Task" description="Edit task details and settings." noIndex />
     <QueryPageGuard
       query={taskQuery}
       loading={<FormPageSkeleton />}
@@ -43,6 +46,7 @@ function WorkspaceTaskEdit() {
         </WorkspaceRoleGate>
       )}
     </QueryPageGuard>
+    </>
   );
 }
 

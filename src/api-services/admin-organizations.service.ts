@@ -37,6 +37,8 @@ export type CreateOrganizationRequest = {
 export type UpdateOrganizationRequest = {
   name?: string;
   slug?: string;
+  ownerName?: string;
+  ownerEmail?: string;
   status?: OrganizationStatus;
   billingEmail?: string;
   plan?: OrganizationPlan;

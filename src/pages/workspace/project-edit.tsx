@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import ProjectFormScreen from "../../component/workspace/projects/project-form/project-form-screen";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
@@ -30,6 +31,8 @@ function WorkspaceProjectEdit() {
     : false;
 
   return (
+    <>
+      <PageSeo title="Edit Project" description="Edit project details and settings." noIndex />
     <QueryPageGuard
       query={projectQuery}
       loading={<FormPageSkeleton />}
@@ -56,6 +59,7 @@ function WorkspaceProjectEdit() {
         </WorkspaceRoleGate>
       )}
     </QueryPageGuard>
+    </>
   );
 }
 

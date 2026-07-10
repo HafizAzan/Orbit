@@ -1,35 +1,17 @@
-import { DEFAULT_ADMIN_PROFILE, type AdminProfile } from "../data/admin-profile";
-import { delay, generateOtpCode, normalizeEmail } from "./helper";
-
-/** Mock credential for local development until API is wired. */
-const MOCK_CURRENT_PASSWORD = "Admin@123";
-const OTP_TTL_MS = 10 * 60 * 1000;
-const adminEmailOtpStore = new Map<string, { code: string; expiresAt: number }>();
-
-async function sendAdminEmailOtp(email: string) {
-  await delay(300);
-  adminEmailOtpStore.set(email, {
-    code: generateOtpCode(),
-    expiresAt: Date.now() + OTP_TTL_MS,
-  });
-}
-
-async function verifyAdminEmailOtp(email: string, otp: string) {
-  await delay(300);
-  const entry = adminEmailOtpStore.get(email);
-
-  if (!entry || entry.expiresAt < Date.now()) {
-    adminEmailOtpStore.delete(email);
-    return false;
-  }
-
-  const isValid = entry.code === otp.trim();
-  if (isValid) {
-    adminEmailOtpStore.delete(email);
-  }
-
-  return isValid;
-}
+import {
+  changePassword,
+  confirmEmailChange,
+  forgotPassword,
+  initiateEmailChange,
+  updateProfile,
+} from "../api-services/auth.service";
+import {
+  DEFAULT_ADMIN_PROFILE,
+  type AdminProfile,
+} from "../data/admin-profile";
+import { splitFullName } from "../data/workspace-profile";
+import { resolveTaskAttachmentUrl } from "./task-attachments";
+import type { AuthUser } from "../types/auth.types";
 
 export type ChangeAdminPasswordInput = {
   currentPassword: string;
@@ -46,57 +28,66 @@ export type CompleteEmailChangeInput = {
   otp: string;
 };
 
-export async function updateAdminProfile(profile: AdminProfile): Promise<AdminProfile> {
-  await delay(500);
-  return profile;
-}
+export type CompleteAdminEmailChangeResult = {
+  email: string;
+  user: AuthUser;
+};
 
-export async function changeAdminPassword(input: ChangeAdminPasswordInput): Promise<void> {
-  await delay(600);
+export function buildAdminProfileFromUser(user: AuthUser): AdminProfile {
+  const { firstName, lastName } = splitFullName(user.name);
 
-  if (input.currentPassword !== MOCK_CURRENT_PASSWORD) {
-    throw new Error("Current password is incorrect");
-  }
-
-  if (input.currentPassword === input.newPassword) {
-    throw new Error("New password must be different from your current password");
-  }
+  return {
+    id: user.id,
+    firstName,
+    lastName,
+    email: user.email,
+    avatarUrl: user.avatarUrl
+      ? resolveTaskAttachmentUrl(user.avatarUrl)
+      : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email)}`,
+    role: "platform_admin",
+    emailVerified: user.emailVerificationStatus === "verified",
+  };
 }
 
 export function getAdminDisplayName(profile: AdminProfile = DEFAULT_ADMIN_PROFILE) {
   return `${profile.firstName} ${profile.lastName}`.trim();
 }
 
-export async function initiateAdminEmailChange(input: InitiateEmailChangeInput, currentEmail: string) {
-  await delay(400);
-
-  if (input.currentPassword !== MOCK_CURRENT_PASSWORD) {
-    throw new Error("Current password is incorrect");
-  }
-
-  const normalizedNewEmail = normalizeEmail(input.newEmail);
-
-  if (normalizedNewEmail === normalizeEmail(currentEmail)) {
-    throw new Error("New email must be different from your current email");
-  }
-
-  await sendAdminEmailOtp(normalizedNewEmail);
+export async function updateAdminProfile(profile: AdminProfile): Promise<AdminProfile> {
+  const fullName = getAdminDisplayName(profile);
+  const user = await updateProfile({ fullName });
+  return buildAdminProfileFromUser(user);
 }
 
-export async function completeAdminEmailChange(input: CompleteEmailChangeInput) {
-  await delay(500);
+export async function changeAdminPassword(input: ChangeAdminPasswordInput): Promise<void> {
+  await changePassword({
+    currentPassword: input.currentPassword,
+    newPassword: input.newPassword,
+  });
+}
 
-  const normalizedNewEmail = normalizeEmail(input.newEmail);
-  const isValid = await verifyAdminEmailOtp(normalizedNewEmail, input.otp);
+export async function initiateAdminEmailChange(input: InitiateEmailChangeInput) {
+  await initiateEmailChange({
+    newEmail: input.newEmail,
+    currentPassword: input.currentPassword,
+  });
+}
 
-  if (!isValid) {
-    throw new Error("Invalid or expired OTP. Please try again.");
-  }
+export async function completeAdminEmailChange(
+  input: CompleteEmailChangeInput,
+): Promise<CompleteAdminEmailChangeResult> {
+  const result = await confirmEmailChange({
+    newEmail: input.newEmail,
+    otp: input.otp,
+  });
 
-  return normalizedNewEmail;
+  return {
+    email: result.email,
+    user: result.user,
+  };
 }
 
 export async function sendAdminPasswordResetLink(email: string) {
-  await delay(500);
-  return normalizeEmail(email);
+  const result = await forgotPassword({ email });
+  return result.email;
 }

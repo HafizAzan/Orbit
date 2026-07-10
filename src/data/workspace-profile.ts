@@ -1,4 +1,5 @@
 import type { AuthUser, RegisterAs } from '../types/auth.types';
+import { resolveTaskAttachmentUrl } from '../lib/task-attachments';
 
 export type WorkspaceProfile = {
   id: string;
@@ -76,7 +77,9 @@ export function buildWorkspaceProfileFromUser(user: AuthUser): WorkspaceProfile 
     firstName,
     lastName,
     email: user.email,
-    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email)}`,
+    avatarUrl: user.avatarUrl
+      ? resolveTaskAttachmentUrl(user.avatarUrl)
+      : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email)}`,
     role: user.role,
     emailVerified: user.emailVerificationStatus === 'verified',
     accountStatus: user.accountStatus,

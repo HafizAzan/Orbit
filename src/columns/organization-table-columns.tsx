@@ -40,7 +40,7 @@ function createOrganizationTableColumns({ onView, onEdit, onDelete }: Organizati
           </div>
           <div className="min-w-0">
             <Text as="p" weight="semibold" className="truncate">{record.name}</Text>
-            <Text as="p" size="xs" color="muted" className="truncate">{record.slug}.Orbit.io</Text>
+            <Text as="p" size="xs" color="muted" className="truncate">{record.slug}.orbit.io</Text>
           </div>
         </div>
       ),

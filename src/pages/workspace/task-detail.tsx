@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import MarkdownContent from "../../component/common/markdown-content";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import TaskAiTipCard from "../../component/workspace/tasks/task-ai-tip-card";
@@ -37,6 +38,7 @@ function WorkspaceTaskDetail() {
         />
       ) : (
         <div className="mx-auto max-w-8xl">
+          <PageSeo title="Task Detail" description="View and manage task details and status." noIndex />
           <TaskDetailHeader task={task} />
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">

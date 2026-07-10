@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import PageSeo from "../component/seo/page-seo";
 import HelpCta from "../component/help/help-cta";
 import HelpFaqSection from "../component/help/help-faq-section";
 import HelpGuidesSection from "../component/help/help-guides-section";
@@ -35,6 +36,11 @@ function Help() {
 
   return (
     <>
+      <PageSeo
+        title="Help Center"
+        description="Find answers, guides, and support resources for Orbit project management."
+        path="/help"
+      />
       <HelpHero search={search} onSearchChange={setSearch} />
       <HelpQuickLinks />
       <HelpTopics selectedTopicId={selectedTopicId} onSelectTopic={setSelectedTopicId} />

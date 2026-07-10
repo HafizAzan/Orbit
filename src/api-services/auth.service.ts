@@ -170,6 +170,16 @@ const updateProfile = async (data: { fullName: string }): Promise<AuthUser> => {
   return assertApiSuccess<AuthUser>(response);
 };
 
+const uploadAvatar = async (file: File): Promise<AuthUser> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await ApiService.post(API_ROUTES.AUTH.AVATAR, formData, {
+    requireAuth: true,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return assertApiSuccess<AuthUser>(response);
+};
+
 const changePassword = async (data: {
   currentPassword: string;
   newPassword: string;
@@ -260,5 +270,6 @@ export {
   disableTwoFactor,
   submitEmailChangeRequest,
   updateProfile,
+  uploadAvatar,
   updateUiTheme,
 };

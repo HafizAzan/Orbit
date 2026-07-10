@@ -1,4 +1,5 @@
 import React from "react";
+import PageSeo from "../../component/seo/page-seo";
 import ProfileInfoForm from "../../component/admin/profile/profile-info-form";
 import ProfilePasswordForm from "../../component/admin/profile/profile-password-form";
 import ProfileSaveBar from "../../component/admin/profile/profile-save-bar";
@@ -21,6 +22,7 @@ function AdminProfile() {
 
   return (
     <div className="mx-auto max-w-8xl">
+      <PageSeo title="Admin Profile" description="Manage your admin account profile and security settings." noIndex />
       <div className="mb-6">
         <Text as="p" size="xs" color="muted" weight="medium">Account · Platform Admin</Text>
         <Title level={2} className="mt-1 text-2xl text-foreground lg:text-3xl">

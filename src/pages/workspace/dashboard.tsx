@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import ActiveProjectsCard from "../../component/workspace/dashboard/active-projects-card";
 import CriticalDeadlinesCard from "../../component/workspace/dashboard/critical-deadlines-card";
 import GlobalActivityFeed from "../../component/workspace/dashboard/global-activity-feed";
@@ -54,13 +55,16 @@ function WorkspaceDashboardContent() {
 
 function WorkspaceDashboard() {
   return (
-    <WorkspaceRoleGate
-      permission="dashboard.view"
-      title="Dashboard access restricted"
-      description="Members use My Tasks for assigned work. Owners, admins, and managers can open the workspace dashboard."
-    >
-      <WorkspaceDashboardContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Dashboard" description="Workspace overview, metrics, and activity." noIndex />
+      <WorkspaceRoleGate
+        permission="dashboard.view"
+        title="Dashboard access restricted"
+        description="Members use My Tasks for assigned work. Owners, admins, and managers can open the workspace dashboard."
+      >
+        <WorkspaceDashboardContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

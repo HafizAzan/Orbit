@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import MyTasksAssignedSection from "../../component/workspace/my-tasks/my-tasks-assigned-section";
 import MyTasksCompletedSection from "../../component/workspace/my-tasks/my-tasks-completed-section";
 import MyTasksDueTodaySection from "../../component/workspace/my-tasks/my-tasks-due-today-section";
@@ -126,13 +127,16 @@ function WorkspaceMyTasksContent() {
 
 function WorkspaceMyTasks() {
   return (
-    <WorkspaceRoleGate
-      permission="my_tasks.view"
-      title="My Tasks access restricted"
-      description="This personal task view is available to workspace members."
-    >
-      <WorkspaceMyTasksContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="My Tasks" description="View and manage your personally assigned tasks." noIndex />
+      <WorkspaceRoleGate
+        permission="my_tasks.view"
+        title="My Tasks access restricted"
+        description="This personal task view is available to workspace members."
+      >
+        <WorkspaceMyTasksContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

@@ -1,8 +1,5 @@
 import React from "react";
 import {
-  MOST_ACTIVE_ORGS,
-  RECENT_SIGNUPS,
-  TOP_ORGS,
   type ActiveOrgItem,
   type RecentSignupItem,
   type TopOrgItem,
@@ -10,6 +7,7 @@ import {
 import { formatCurrency } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
 import { Paragraph, Text, Title } from "../../ui/typography";
+
 
 function TopOrgsList({ items }: { items: TopOrgItem[] }) {
   return (
@@ -89,12 +87,26 @@ function RecentSignupsList({ items }: { items: RecentSignupItem[] }) {
   );
 }
 
-function DashboardInsightsSection() {
+function DashboardInsightsSection({
+  topOrgs = [],
+  recentSignups = [],
+}: {
+  topOrgs?: TopOrgItem[];
+  recentSignups?: RecentSignupItem[];
+}) {
+  const activeFromSignups: ActiveOrgItem[] = recentSignups.slice(0, 4).map((item, index) => ({
+    id: item.id,
+    name: item.name,
+    sessions: Math.max(20, 100 - index * 15),
+    activity: Math.max(40, 90 - index * 12),
+    avatarSeed: item.name,
+  }));
+
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <TopOrgsList items={TOP_ORGS} />
-      <MostActiveList items={MOST_ACTIVE_ORGS} />
-      <RecentSignupsList items={RECENT_SIGNUPS} />
+      <TopOrgsList items={topOrgs} />
+      <MostActiveList items={activeFromSignups} />
+      <RecentSignupsList items={recentSignups} />
     </div>
   );
 }

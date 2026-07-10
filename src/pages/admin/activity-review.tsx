@@ -1,6 +1,7 @@
 import { AuditOutlined, FlagOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React from "react";
+import PageSeo from "../../component/seo/page-seo";
 import { Link } from "react-router-dom";
 import ActivityReviewTable from "../../component/admin/activity/activity-review-table";
 import { Paragraph, Text, Title } from "../../component/ui/typography";
@@ -12,6 +13,7 @@ function AdminActivityReview() {
 
   return (
     <div className="mx-auto max-w-8xl">
+      <PageSeo title="Activity Review" description="Review flagged platform activity and resolve issues." noIndex />
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Title level={2} className="text-2xl text-foreground lg:text-3xl">

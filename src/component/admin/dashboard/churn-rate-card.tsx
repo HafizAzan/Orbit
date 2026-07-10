@@ -1,12 +1,15 @@
 import React from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { CHURN_RATE } from "../../../data/admin-dashboard";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
-function ChurnRateCard() {
+function ChurnRateCard({
+  churn = { value: 0, label: "Healthy", helperText: "No churn data yet." },
+}: {
+  churn?: { value: number; label: string; helperText: string };
+}) {
   const data = [
-    { name: "churn", value: CHURN_RATE.value },
-    { name: "retained", value: 100 - CHURN_RATE.value },
+    { name: "churn", value: churn.value },
+    { name: "retained", value: Math.max(0, 100 - churn.value) },
   ];
 
   return (
@@ -34,23 +37,19 @@ function ChurnRateCard() {
             </ResponsiveContainer>
 
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <Text as="p" className="text-2xl font-bold">{CHURN_RATE.value}%</Text>
-              <Text as="p" size="xs" color="muted" weight="medium">{CHURN_RATE.label}</Text>
+              <Text as="p" className="text-2xl font-bold">{churn.value}%</Text>
+              <Text as="p" size="xs" color="muted" weight="medium">{churn.label}</Text>
             </div>
           </div>
         </div>
 
         <div className="min-w-0 flex-1 border-t border-border pt-5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
           <Title level={5} color="default">Churn Rate</Title>
-          <Paragraph size="sm" className="mt-2 mb-0! max-w-2xl leading-relaxed">{CHURN_RATE.helperText}</Paragraph>
+          <Paragraph size="sm" className="mt-2 mb-0! max-w-2xl leading-relaxed">{churn.helperText}</Paragraph>
           <div className="mt-4 flex flex-wrap gap-4">
             <div className="rounded-xl bg-indigo-50 px-4 py-3">
               <Text as="p" size="xs" color="muted" weight="medium">Retained</Text>
-              <Text as="p" className="mt-0.5 text-lg font-bold">{100 - CHURN_RATE.value}%</Text>
-            </div>
-            <div className="rounded-xl bg-emerald-50 px-4 py-3">
-              <Text as="p" size="xs" color="muted" weight="medium">vs last month</Text>
-              <Text as="p" className="mt-0.5 text-lg font-bold text-emerald-600">-0.3%</Text>
+              <Text as="p" className="mt-0.5 text-lg font-bold">{Math.max(0, 100 - churn.value)}%</Text>
             </div>
           </div>
         </div>

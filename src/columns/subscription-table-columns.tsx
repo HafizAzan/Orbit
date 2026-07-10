@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
+import { EditOutlined, EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PLAN_STYLES, SUBSCRIPTION_STATUS_STYLES, type SubscriptionRecord } from "../data/admin-subscriptions";
@@ -9,19 +9,19 @@ import { cn } from "../lib/utils";
 type SubscriptionTableColumnOptions = {
   onView: (record: SubscriptionRecord) => void;
   onEditBilling: (record: SubscriptionRecord) => void;
-  onDelete: (record: SubscriptionRecord) => void;
 };
 
 function getActionItems(_record: SubscriptionRecord): MenuProps["items"] {
   return [
     { key: "view", label: "View subscription", icon: <EyeOutlined /> },
     { key: "edit", label: "Edit billing", icon: <EditOutlined /> },
-    { type: "divider" },
-    { key: "delete", label: "Remove", icon: <DeleteOutlined />, danger: true },
   ];
 }
 
-function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: SubscriptionTableColumnOptions): ColumnsType<SubscriptionRecord> {
+function createSubscriptionTableColumns({
+  onView,
+  onEditBilling,
+}: SubscriptionTableColumnOptions): ColumnsType<SubscriptionRecord> {
   return [
     {
       title: "Organization",
@@ -32,8 +32,12 @@ function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: Sub
             {getInitial(record.organizationName)}
           </div>
           <div className="min-w-0">
-            <Text as="p" weight="semibold" className="truncate">{record.organizationName}</Text>
-            <Text as="p" size="xs" color="muted" className="truncate">{record.contactEmail}</Text>
+            <Text as="p" weight="semibold" className="truncate">
+              {record.organizationName}
+            </Text>
+            <Text as="p" size="xs" color="muted" className="truncate">
+              {record.contactEmail}
+            </Text>
           </div>
         </div>
       ),
@@ -44,7 +48,9 @@ function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: Sub
       key: "plan",
       responsive: ["md"],
       render: (plan: SubscriptionRecord["plan"]) => (
-        <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide", PLAN_STYLES[plan])}>{plan}</span>
+        <span className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-wide", PLAN_STYLES[plan])}>
+          {plan}
+        </span>
       ),
     },
     {
@@ -52,14 +58,22 @@ function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: Sub
       dataIndex: "billingCycle",
       key: "billingCycle",
       responsive: ["lg"],
-      render: (cycle: SubscriptionRecord["billingCycle"]) => <Text size="sm" weight="medium">{cycle}</Text>,
+      render: (cycle: SubscriptionRecord["billingCycle"]) => (
+        <Text size="sm" weight="medium">
+          {cycle}
+        </Text>
+      ),
     },
     {
       title: "Renewal Date",
       dataIndex: "renewalDate",
       key: "renewalDate",
       responsive: ["md"],
-      render: (date: string) => <Text size="sm" color="muted">{formatDate(date)}</Text>,
+      render: (date: string) => (
+        <Text size="sm" color="muted">
+          {formatDate(date)}
+        </Text>
+      ),
     },
     {
       title: "Amount",
@@ -93,7 +107,6 @@ function createSubscriptionTableColumns({ onView, onEditBilling, onDelete }: Sub
             onClick: ({ key }) => {
               if (key === "view") onView(record);
               if (key === "edit") onEditBilling(record);
-              if (key === "delete") onDelete(record);
             },
           }}
           trigger={["click"]}

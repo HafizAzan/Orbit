@@ -1,20 +1,24 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import { ACTIVITIES_DATA, type ActivityRecord } from "../data/admin-activity";
+import { ACTIVITIES_PAGE_SIZE, type ActivityRecord } from "../data/admin-activity";
 import {
-  countFlaggedActivities,
-  flagActivityRecord,
-  getFlaggedActivities,
-  resolveActivityRecord,
-  unflagActivityRecord,
-  type FlagActivityInput,
-} from "../lib/activity-review";
+  useAdminActivityList,
+  useAdminActivityStats,
+  useFlagAdminActivity,
+  useResolveAdminActivity,
+  useUnflagAdminActivity,
+} from "../hooks/use-admin-activity";
+import type { FlagActivityInput } from "../lib/activity-review";
+import { showApiErrorToast } from "../lib/api-error";
 import { toast } from "../lib/toast";
 
 type AdminActivityContextValue = {
   activities: ActivityRecord[];
   flaggedActivities: ActivityRecord[];
   flaggedCount: number;
-  deleteActivities: (ids: string[]) => void;
+  isLoading: boolean;
+  total: number;
+  page: number;
+  setPage: (page: number) => void;
   flagActivity: (id: string, input: FlagActivityInput) => void;
   resolveActivity: (id: string) => void;
   unflagActivity: (id: string) => void;
@@ -24,58 +28,78 @@ const AdminActivityContext = createContext<AdminActivityContextValue | undefined
 
 type AdminActivityProviderProps = {
   children: ReactNode;
-  initialActivities?: ActivityRecord[];
 };
 
-function AdminActivityProvider({ children, initialActivities = ACTIVITIES_DATA }: AdminActivityProviderProps) {
-  const [activities, setActivities] = useState<ActivityRecord[]>(initialActivities);
+function AdminActivityProvider({ children }: AdminActivityProviderProps) {
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useAdminActivityList({ page, limit: ACTIVITIES_PAGE_SIZE });
+  const { data: flaggedPage } = useAdminActivityList({ page: 1, limit: 50, flagged: true });
+  const { data: stats } = useAdminActivityStats();
+  const flagMutation = useFlagAdminActivity();
+  const resolveMutation = useResolveAdminActivity();
+  const unflagMutation = useUnflagAdminActivity();
 
-  const deleteActivities = useCallback((ids: string[]) => {
-    setActivities((current) => current.filter((activity) => !ids.includes(activity.id)));
-  }, []);
-
-  const updateActivity = useCallback((id: string, updater: (record: ActivityRecord) => ActivityRecord) => {
-    setActivities((current) => current.map((activity) => (activity.id === id ? updater(activity) : activity)));
-  }, []);
+  const activities = data?.data ?? [];
+  const flaggedActivities = flaggedPage?.data ?? [];
+  const flaggedCount = stats?.flagged.value ?? flaggedActivities.length;
 
   const flagActivity = useCallback(
     (id: string, input: FlagActivityInput) => {
-      updateActivity(id, (record) => flagActivityRecord(record, input));
-      toast.success("Event flagged for manual review");
+      void flagMutation
+        .mutateAsync({
+          id,
+          data: { reason: input.reason, note: input.note },
+        })
+        .then(() => toast.success("Event flagged for manual review"))
+        .catch(showApiErrorToast);
     },
-    [updateActivity],
+    [flagMutation],
   );
 
   const resolveActivity = useCallback(
     (id: string) => {
-      updateActivity(id, resolveActivityRecord);
-      toast.success("Review marked as resolved");
+      void resolveMutation
+        .mutateAsync(id)
+        .then(() => toast.success("Review marked as resolved"))
+        .catch(showApiErrorToast);
     },
-    [updateActivity],
+    [resolveMutation],
   );
 
   const unflagActivity = useCallback(
     (id: string) => {
-      updateActivity(id, unflagActivityRecord);
-      toast.info("Flag removed from event");
+      void unflagMutation
+        .mutateAsync(id)
+        .then(() => toast.info("Flag removed from event"))
+        .catch(showApiErrorToast);
     },
-    [updateActivity],
+    [unflagMutation],
   );
-
-  const flaggedActivities = useMemo(() => getFlaggedActivities(activities), [activities]);
-  const flaggedCount = useMemo(() => countFlaggedActivities(activities), [activities]);
 
   const value = useMemo(
     () => ({
       activities,
       flaggedActivities,
       flaggedCount,
-      deleteActivities,
+      isLoading,
+      total: data?.total ?? 0,
+      page,
+      setPage,
       flagActivity,
       resolveActivity,
       unflagActivity,
     }),
-    [activities, flaggedActivities, flaggedCount, deleteActivities, flagActivity, resolveActivity, unflagActivity],
+    [
+      activities,
+      flaggedActivities,
+      flaggedCount,
+      isLoading,
+      data?.total,
+      page,
+      flagActivity,
+      resolveActivity,
+      unflagActivity,
+    ],
   );
 
   return <AdminActivityContext.Provider value={value}>{children}</AdminActivityContext.Provider>;

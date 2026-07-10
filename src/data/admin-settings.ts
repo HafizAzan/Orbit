@@ -11,6 +11,8 @@ export type PlatformSettings = {
   defaultLanguage: string;
   timezone: string;
   brandColor: string;
+  logoUrl: string;
+  faviconUrl: string;
   smtpHost: string;
   smtpPort: string;
   smtpUsername: string;
@@ -77,6 +79,8 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   defaultLanguage: "en-US",
   timezone: "America/Los_Angeles",
   brandColor: "#4F46E5",
+  logoUrl: "",
+  faviconUrl: "",
   smtpHost: "smtp.sendgrid.net",
   smtpPort: "587",
   smtpUsername: "apikey",
@@ -95,10 +99,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   invoicePrefix: "OR-",
 };
 
-export const API_KEYS: ApiKeyRecord[] = [
-  { id: "1", label: "Production Analytics", keyHint: "pk_live_...4f2e", createdAt: "2 hours ago" },
-  { id: "2", label: "Staging Integration", keyHint: "sk_test_...8f0b", createdAt: "Oct 12, 2023" },
-];
+export const API_KEYS: ApiKeyRecord[] = [];
 
 export const LANGUAGE_OPTIONS: SelectOption[] = [
   { value: "en-US", label: "English (US)" },

@@ -1,4 +1,5 @@
 import React from "react";
+import PageSeo from "../component/seo/page-seo";
 import CtaSection from "../component/home/cta-section";
 import FaqSection from "../component/home/faq-section";
 import Feature from "../component/home/feature";
@@ -13,6 +14,11 @@ import TestimonialsSection from "../component/home/testimonials-section";
 function Home() {
   return (
     <>
+      <PageSeo
+        title="Orbit — Project management for modern teams"
+        description="Plan, track, and ship work faster with Orbit. Boards, tasks, timelines, and real-time collaboration for modern teams."
+        path="/"
+      />
       <Feature />
       <SocialProof />
       <FeaturesSection />

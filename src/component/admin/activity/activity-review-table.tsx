@@ -1,4 +1,4 @@
-import { CheckOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { CheckOutlined, SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import createActivityReviewTableColumns from "../../../columns/activity-review-table-columns";
@@ -6,7 +6,6 @@ import { ACTIVITIES_PAGE_SIZE, type ActivityRecord } from "../../../data/admin-a
 import { useAdminActivity } from "../../../context/admin-activity-context";
 import useAdminTableSearchParam from "../../../hooks/use-admin-table-search-param";
 import { matchesSearchQuery, paginateItems, pluralize } from "../../../lib/helper";
-import { toast } from "../../../lib/toast";
 import { ConfirmModal } from "../../ui/modal";
 import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
@@ -14,11 +13,10 @@ import { Text } from "../../ui/typography";
 import ActivityViewModal from "./activity-view-modal";
 
 function ActivityReviewTable() {
-  const { flaggedActivities, resolveActivity, unflagActivity, deleteActivities } = useAdminActivity();
+  const { flaggedActivities, resolveActivity, unflagActivity } = useAdminActivity();
   const { search, setSearch } = useAdminTableSearchParam();
   const [page, setPage] = useState(1);
   const [viewRecord, setViewRecord] = useState<ActivityRecord | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<ActivityRecord | null>(null);
   const [pendingResolve, setPendingResolve] = useState<ActivityRecord | null>(null);
 
   const columns = useMemo(
@@ -27,7 +25,6 @@ function ActivityReviewTable() {
         onView: setViewRecord,
         onResolve: setPendingResolve,
         onUnflag: (record) => unflagActivity(record.id),
-        onDelete: setPendingDelete,
       }),
     [unflagActivity],
   );
@@ -53,14 +50,6 @@ function ActivityReviewTable() {
 
   const paginatedData = useMemo(() => paginateItems(filteredData, page, ACTIVITIES_PAGE_SIZE), [filteredData, page]);
 
-  const handleDeleteConfirm = useCallback(() => {
-    if (!pendingDelete) return;
-
-    deleteActivities([pendingDelete.id]);
-    toast.success("Activity log removed successfully");
-    setPendingDelete(null);
-  }, [deleteActivities, pendingDelete]);
-
   const handleResolveConfirm = useCallback(() => {
     if (!pendingResolve) return;
 
@@ -75,10 +64,14 @@ function ActivityReviewTable() {
         {filteredData.length === 0 ? 0 : (page - 1) * ACTIVITIES_PAGE_SIZE + 1}
       </Text>
       {" to "}
-      <Text as="span" weight="semibold">{Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}</Text>
+      <Text as="span" weight="semibold">
+        {Math.min(page * ACTIVITIES_PAGE_SIZE, filteredData.length)}
+      </Text>
       {" of "}
-      <Text as="span" weight="semibold">{filteredData.length}</Text> flagged{" "}
-      {pluralize(filteredData.length, "event")}
+      <Text as="span" weight="semibold">
+        {filteredData.length}
+      </Text>{" "}
+      flagged {pluralize(filteredData.length, "event")}
     </Text>
   );
 
@@ -123,21 +116,6 @@ function ActivityReviewTable() {
       </div>
 
       <ActivityViewModal record={viewRecord} onClose={() => setViewRecord(null)} />
-
-      <ConfirmModal
-        open={pendingDelete !== null}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={handleDeleteConfirm}
-        title="Remove activity log"
-        description={
-          pendingDelete
-            ? `Are you sure you want to remove "${pendingDelete.title}"? This action cannot be undone.`
-            : undefined
-        }
-        confirmText="Remove"
-        confirmDanger
-        icon={<DeleteOutlined />}
-      />
 
       <ConfirmModal
         open={pendingResolve !== null}

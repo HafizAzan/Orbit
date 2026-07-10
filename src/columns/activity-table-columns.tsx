@@ -1,4 +1,4 @@
-import { CheckOutlined, CloseOutlined, DeleteOutlined, EllipsisOutlined, EyeOutlined, FlagOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, EllipsisOutlined, EyeOutlined, FlagOutlined } from "@ant-design/icons";
 import { Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
@@ -16,7 +16,6 @@ type ActivityTableColumnOptions = {
   onFlag: (record: ActivityRecord) => void;
   onResolve: (record: ActivityRecord) => void;
   onUnflag: (record: ActivityRecord) => void;
-  onDelete: (record: ActivityRecord) => void;
 };
 
 function getActionItems(record: ActivityRecord): MenuProps["items"] {
@@ -33,8 +32,6 @@ function getActionItems(record: ActivityRecord): MenuProps["items"] {
     );
   }
 
-  items.push({ type: "divider" }, { key: "delete", label: "Remove log", icon: <DeleteOutlined />, danger: true });
-
   return items;
 }
 
@@ -43,7 +40,6 @@ function createActivityTableColumns({
   onFlag,
   onResolve,
   onUnflag,
-  onDelete,
 }: ActivityTableColumnOptions): ColumnsType<ActivityRecord> {
   return [
     {
@@ -60,7 +56,9 @@ function createActivityTableColumns({
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <Text as="p" weight="semibold">{record.title}</Text>
+                <Text as="p" weight="semibold">
+                  {record.title}
+                </Text>
                 {isFlagged ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 uppercase">
                     <FlagOutlined className="text-[10px]" />
@@ -68,7 +66,9 @@ function createActivityTableColumns({
                   </span>
                 ) : null}
               </div>
-              <Text as="p" size="sm" color="muted" className="mt-0.5 line-clamp-1">{record.description}</Text>
+              <Text as="p" size="sm" color="muted" className="mt-0.5 line-clamp-1">
+                {record.description}
+              </Text>
             </div>
           </div>
         );
@@ -79,14 +79,22 @@ function createActivityTableColumns({
       dataIndex: "organization",
       key: "organization",
       responsive: ["lg"],
-      render: (organization: string) => <Text size="sm" weight="medium">{organization}</Text>,
+      render: (organization: string) => (
+        <Text size="sm" weight="medium">
+          {organization}
+        </Text>
+      ),
     },
     {
       title: "Actor",
       dataIndex: "actor",
       key: "actor",
       responsive: ["md"],
-      render: (actor: string) => <Text size="sm" color="muted">{actor}</Text>,
+      render: (actor: string) => (
+        <Text size="sm" color="muted">
+          {actor}
+        </Text>
+      ),
     },
     {
       title: "Category",
@@ -118,7 +126,11 @@ function createActivityTableColumns({
       title: "Time",
       dataIndex: "timestamp",
       key: "timestamp",
-      render: (timestamp: string) => <Text size="sm" color="muted">{timestamp}</Text>,
+      render: (timestamp: string) => (
+        <Text size="sm" color="muted">
+          {timestamp}
+        </Text>
+      ),
     },
     {
       title: "Actions",
@@ -133,7 +145,6 @@ function createActivityTableColumns({
               if (key === "flag") onFlag(record);
               if (key === "resolve") onResolve(record);
               if (key === "unflag") onUnflag(record);
-              if (key === "delete") onDelete(record);
             },
           }}
           trigger={["click"]}

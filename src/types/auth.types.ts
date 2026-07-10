@@ -179,6 +179,7 @@ export type AuthUser = {
   organizationAwaitingSubscription: boolean;
   uiTheme?: AppUiThemeId;
   twoFactorEnabled?: boolean;
+  avatarUrl?: string | null;
 };
 
 export type AuthTwoFactorChallengeResponse = {

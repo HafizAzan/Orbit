@@ -1,8 +1,7 @@
 import { CheckOutlined, FilterOutlined } from "@ant-design/icons";
-import { Button, Drawer } from "antd";
+import { Button, Drawer, Skeleton } from "antd";
 import React from "react";
 import {
-  USER_ORGANIZATION_FILTER_OPTIONS,
   USER_ROLE_FILTER_OPTIONS,
   USER_ROLE_STYLES,
   USER_STATUS_FILTER_OPTIONS,
@@ -10,6 +9,7 @@ import {
   type UserRole,
   type UserStatus,
 } from "../../../data/admin-users";
+import { useOrganizations } from "../../../hooks/use-admin-organizations";
 import { countActiveUserFilters, DEFAULT_USER_FILTERS, type UserFilters } from "../../../lib/user-filters";
 import { delay } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
@@ -27,6 +27,8 @@ type UserFilterDrawerProps = {
 
 function UserFilterDrawer({ open, draftFilters, onClose, onDraftChange, onApply, onClear }: UserFilterDrawerProps) {
   const activeCount = countActiveUserFilters(draftFilters);
+  const { data: orgsPage, isLoading: orgsLoading } = useOrganizations({ page: 1, limit: 100 });
+  const orgOptions = (orgsPage?.data ?? []).map((org) => ({ value: org.name, label: org.name }));
 
   const toggleStatus = (status: UserStatus) => {
     const statuses = draftFilters.statuses.includes(status)
@@ -152,26 +154,32 @@ function UserFilterDrawer({ open, draftFilters, onClose, onDraftChange, onApply,
         </FilterDrawerSection>
 
         <FilterDrawerSection title="Organization" description="Limit results to specific organizations.">
-          <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-            {USER_ORGANIZATION_FILTER_OPTIONS.map((option) => {
-              const isSelected = draftFilters.organizations.includes(option.value);
+          {orgsLoading ? (
+            <Skeleton active paragraph={{ rows: 3 }} />
+          ) : orgOptions.length === 0 ? (
+            <Paragraph size="sm" color="muted">No organizations found.</Paragraph>
+          ) : (
+            <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+              {orgOptions.map((option) => {
+                const isSelected = draftFilters.organizations.includes(option.value);
 
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => toggleOrganization(option.value)}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-all",
-                    isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25 hover:bg-background",
-                  )}
-                >
-                  <Text size="sm" weight="medium">{option.label}</Text>
-                  {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
-                </button>
-              );
-            })}
-          </div>
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => toggleOrganization(option.value)}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-all",
+                      isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25 hover:bg-background",
+                    )}
+                  >
+                    <Text size="sm" weight="medium">{option.label}</Text>
+                    {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </FilterDrawerSection>
       </div>
     </Drawer>

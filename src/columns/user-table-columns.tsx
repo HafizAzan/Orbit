@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined, StopOutlined } from "@ant-design/icons";
 import { Avatar, Button, Dropdown, type MenuProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { USER_ROLE_STYLES, USER_STATUS_STYLES, type UserRecord } from "../data/admin-users";
@@ -7,19 +7,27 @@ import { cn } from "../lib/utils";
 
 type UserTableColumnOptions = {
   onView: (record: UserRecord) => void;
+  onEdit: (record: UserRecord) => void;
+  onSuspend: (record: UserRecord) => void;
   onDelete: (record: UserRecord) => void;
 };
 
-function getActionItems(_record: UserRecord): MenuProps["items"] {
+function getActionItems(record: UserRecord): MenuProps["items"] {
   return [
     { key: "view", label: "View profile", icon: <EyeOutlined /> },
     { key: "edit", label: "Edit user", icon: <EditOutlined /> },
+    {
+      key: "suspend",
+      label: record.status === "suspended" ? "Reactivate user" : "Suspend user",
+      icon: <StopOutlined />,
+      danger: record.status !== "suspended",
+    },
     { type: "divider" },
-    { key: "delete", label: "Remove user", icon: <DeleteOutlined />, danger: true },
+    { key: "delete", label: "Delete user", icon: <DeleteOutlined />, danger: true },
   ];
 }
 
-function createUserTableColumns({ onView, onDelete }: UserTableColumnOptions): ColumnsType<UserRecord> {
+function createUserTableColumns({ onView, onEdit, onSuspend, onDelete }: UserTableColumnOptions): ColumnsType<UserRecord> {
   return [
     {
       title: "User",
@@ -89,6 +97,8 @@ function createUserTableColumns({ onView, onDelete }: UserTableColumnOptions): C
             items: getActionItems(record),
             onClick: ({ key }) => {
               if (key === "view") onView(record);
+              if (key === "edit") onEdit(record);
+              if (key === "suspend") onSuspend(record);
               if (key === "delete") onDelete(record);
             },
           }}

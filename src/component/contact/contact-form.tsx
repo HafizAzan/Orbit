@@ -1,8 +1,9 @@
 import { SendOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { CONTACT_SUBJECT_OPTIONS } from "../../data/contact";
-import { delay } from "../../lib/helper";
+import { createLead, type LeadSubject } from "../../api-services/leads.service";
 import { toast } from "../../lib/toast";
 import { Label, Paragraph, Title } from "../ui/typography";
 
@@ -10,19 +11,34 @@ type ContactFormValues = {
   fullName: string;
   email: string;
   companyName: string;
-  subject: string;
+  subject: LeadSubject;
   message: string;
 };
 
 function ContactForm() {
   const [form] = Form.useForm<ContactFormValues>();
   const [submitting, setSubmitting] = useState(false);
+  const [searchParams] = useSearchParams();
 
-  const handleFinish = async (_values: ContactFormValues) => {
+  useEffect(() => {
+    const subject = searchParams.get("subject") as LeadSubject | null;
+    if (subject && CONTACT_SUBJECT_OPTIONS.some((opt) => opt.value === subject)) {
+      form.setFieldValue("subject", subject);
+    }
+  }, [searchParams, form]);
+
+  const handleFinish = async (values: ContactFormValues) => {
     setSubmitting(true);
 
     try {
-      await delay(800);
+      await createLead({
+        fullName: values.fullName,
+        email: values.email,
+        companyName: values.companyName || undefined,
+        subject: values.subject,
+        message: values.message,
+        source: "contact-form",
+      });
       toast.success("Message sent successfully. We'll get back to you soon.");
       form.resetFields();
     } catch {

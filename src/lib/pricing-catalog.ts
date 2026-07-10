@@ -74,7 +74,7 @@ export function mapCatalogToPricingPlans(
   interval: PricingBillingInterval = "monthly",
 ): PricingPlanCard[] {
   return products
-    .map((product) => {
+    .map((product): PricingPlanCard | null => {
       const selectedPrice = resolveCatalogPrice(product, interval);
 
       if (!selectedPrice) {
@@ -98,7 +98,7 @@ export function mapCatalogToPricingPlans(
         badge: product.badge ?? undefined,
         billingCycle: selectedPrice.billingCycle,
         savingsLabel: yearlySavings ?? undefined,
-      } satisfies PricingPlanCard;
+      };
     })
     .filter((plan): plan is PricingPlanCard => plan != null);
 }

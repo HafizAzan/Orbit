@@ -1,4 +1,5 @@
 import React from "react";
+import PageSeo from "../component/seo/page-seo";
 import ContactFaqSection from "../component/contact/contact-faq-section";
 import ContactForm from "../component/contact/contact-form";
 import ContactHero from "../component/contact/contact-hero";
@@ -7,6 +8,11 @@ import ContactInfoCard from "../component/contact/contact-info-card";
 function Contact() {
   return (
     <>
+      <PageSeo
+        title="Contact Us"
+        description="Get in touch with the Orbit team. Reach out for support, sales, partnerships, or enterprise inquiries."
+        path="/contact"
+      />
       <ContactHero />
 
       <section className="bg-background px-4 pb-14 sm:px-6 lg:px-10">

@@ -1,10 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   applyWorkBreakdown,
+  askPlatform,
   askWorkspace,
   describeActivity,
+  describePlatformActivity,
   generateCalendarDraft,
   generateMembershipImpact,
+  generateOrgHealth,
   generateProjectDraft,
   generateProjectSummary,
   generateTaskDraft,
@@ -76,6 +79,24 @@ export function useGenerateCalendarDraft() {
 export function useAskWorkspace() {
   return useMutation({
     mutationFn: (data: AskWorkspaceRequest) => askWorkspace(data),
+  });
+}
+
+export function useAskPlatform() {
+  return useMutation({
+    mutationFn: (data: AskWorkspaceRequest) => askPlatform(data),
+  });
+}
+
+export function useGenerateOrgHealth() {
+  return useMutation({
+    mutationFn: (data: { organizationId: string; language?: string }) => generateOrgHealth(data),
+  });
+}
+
+export function useDescribePlatformActivity() {
+  return useMutation({
+    mutationFn: (data: DescribeActivityRequest) => describePlatformActivity(data),
   });
 }
 

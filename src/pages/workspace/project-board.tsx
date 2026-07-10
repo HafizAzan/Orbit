@@ -1,6 +1,7 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import React, { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import PageSeo from "../../component/seo/page-seo";
 import KanbanBoardHeader from "../../component/workspace/boards/kanban-board-header";
 import KanbanColumn from "../../component/workspace/boards/kanban-column";
 import QueryPageGuard from "../../component/common/query-page-guard";
@@ -66,6 +67,7 @@ function WorkspaceProjectBoard() {
         <WorkspaceNotFound title="Board not found" description="This board does not exist or you do not have access to it." />
       ) : (
         <div className="mx-auto max-w-8xl">
+          <PageSeo title="Project Board" description="Manage project tasks on the Kanban board." noIndex />
           <KanbanBoardHeader board={board} />
 
           <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">

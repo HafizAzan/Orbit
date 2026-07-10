@@ -1,6 +1,7 @@
 import { UserAddOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React, { useCallback, useMemo, useState } from "react";
+import PageSeo from "../../component/seo/page-seo";
 import InviteMemberModal from "../../component/workspace/teams/invite-member-modal";
 import TeamSummaryCards from "../../component/workspace/teams/team-summary-cards";
 import TeamsTable from "../../component/workspace/teams/teams-table";
@@ -100,13 +101,16 @@ function WorkspaceTeamsContent() {
 
 function WorkspaceTeams() {
   return (
-    <WorkspaceRoleGate
-      permission="team.view"
-      title="Team access restricted"
-      description="Members cannot access team management. Contact your workspace admin if you need access."
-    >
-      <WorkspaceTeamsContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Teams" description="Manage workspace team members and invitations." noIndex />
+      <WorkspaceRoleGate
+        permission="team.view"
+        title="Team access restricted"
+        description="Members cannot access team management. Contact your workspace admin if you need access."
+      >
+        <WorkspaceTeamsContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

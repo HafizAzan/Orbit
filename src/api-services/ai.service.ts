@@ -92,12 +92,51 @@ const askWorkspace = async (data: AskWorkspaceRequest): Promise<AiAskWorkspaceRe
   return assertApiSuccess<AiAskWorkspaceResponse>(response);
 };
 
+const askPlatform = async (data: AskWorkspaceRequest): Promise<AiAskWorkspaceResponse> => {
+  const response = await ApiService.post(API_ROUTES.AI.ASK_PLATFORM, data, AUTH_REQUEST);
+  return assertApiSuccess<AiAskWorkspaceResponse>(response);
+};
+
+const generateOrgHealth = async (data: {
+  organizationId: string;
+  language?: string;
+}): Promise<{
+  message: string;
+  draft: {
+    executiveSummary: string;
+    healthScore: number;
+    confidence: number;
+    riskLevel: string;
+    strengths: string[];
+    risks: string[];
+    recommendedNextActions: string[];
+    delayedItems: string[];
+  };
+}> => {
+  const response = await ApiService.post(API_ROUTES.AI.ORG_HEALTH, data, AUTH_REQUEST);
+  return assertApiSuccess(response);
+};
+
+const describePlatformActivity = async (
+  data: DescribeActivityRequest,
+): Promise<AiActivityDescribeResponse> => {
+  const response = await ApiService.post(
+    API_ROUTES.AI.DESCRIBE_PLATFORM_ACTIVITY,
+    data,
+    AUTH_REQUEST,
+  );
+  return assertApiSuccess<AiActivityDescribeResponse>(response);
+};
+
 export {
   applyWorkBreakdown,
+  askPlatform,
   askWorkspace,
   describeActivity,
+  describePlatformActivity,
   generateCalendarDraft,
   generateMembershipImpact,
+  generateOrgHealth,
   generateProjectDraft,
   generateProjectSummary,
   generateTaskDraft,

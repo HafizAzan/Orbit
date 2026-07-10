@@ -195,26 +195,11 @@ export const GROWTH_FORECAST = {
   helperText: "On track to hit goal by Q4.",
 };
 
-export const TOP_ORGS: TopOrgItem[] = [
-  { id: "1", name: "Acme Corp", plan: "Enterprise", revenue: 12400, initial: "AC", color: "bg-violet-100 text-violet-700" },
-  { id: "2", name: "Stark Industries", plan: "Enterprise", revenue: 9800, initial: "SI", color: "bg-sky-100 text-sky-700" },
-  { id: "3", name: "Global Corp", plan: "Pro Plus", revenue: 7200, initial: "GC", color: "bg-indigo-100 text-indigo-700" },
-  { id: "4", name: "Wayne Enterprises", plan: "Business", revenue: 5600, initial: "WE", color: "bg-emerald-100 text-emerald-700" },
-];
+export const TOP_ORGS: TopOrgItem[] = [];
 
-export const MOST_ACTIVE_ORGS: ActiveOrgItem[] = [
-  { id: "1", name: "Hooli", sessions: 842, activity: 92, avatarSeed: "Hooli" },
-  { id: "2", name: "Initech", sessions: 615, activity: 78, avatarSeed: "Initech" },
-  { id: "3", name: "Oscorp", sessions: 488, activity: 65, avatarSeed: "Oscorp" },
-  { id: "4", name: "Pied Piper", sessions: 352, activity: 54, avatarSeed: "PiedPiper" },
-];
+export const MOST_ACTIVE_ORGS: ActiveOrgItem[] = [];
 
-export const RECENT_SIGNUPS: RecentSignupItem[] = [
-  { id: "1", name: "Nova Labs", timeAgo: "Joined 2h ago", planBadge: "PRO", badgeClass: "border-sky-200 bg-sky-50 text-sky-700" },
-  { id: "2", name: "Beta Works", timeAgo: "Joined 5h ago", planBadge: "TRIAL", badgeClass: "border-slate-200 bg-slate-50 text-slate-600" },
-  { id: "3", name: "Vertex AI", timeAgo: "Joined 1d ago", planBadge: "ENT", badgeClass: "border-violet-200 bg-violet-50 text-violet-700" },
-  { id: "4", name: "Cloud Nine", timeAgo: "Joined 2d ago", planBadge: "PRO", badgeClass: "border-sky-200 bg-sky-50 text-sky-700" },
-];
+export const RECENT_SIGNUPS: RecentSignupItem[] = [];
 
 export const DASHBOARD_METRIC_ICONS: Record<
   DashboardMetric["icon"],

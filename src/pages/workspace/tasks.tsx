@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button } from "antd";
+import PageSeo from "../../component/seo/page-seo";
 import TasksTable from "../../component/workspace/tasks/tasks-table";
 import WorkspaceNavLink from "../../component/workspace/common/workspace-nav-link";
 import QueryPageGuard from "../../component/common/query-page-guard";
@@ -108,13 +109,16 @@ function WorkspaceTasksContent() {
 
 function WorkspaceTasks() {
   return (
-    <WorkspaceRoleGate
-      permission="tasks.view_all"
-      title="Team tasks access restricted"
-      description="Members use My Tasks for their personal workload. Contact your workspace admin if you need broader access."
-    >
-      <WorkspaceTasksContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Tasks" description="Browse and manage all workspace tasks." noIndex />
+      <WorkspaceRoleGate
+        permission="tasks.view_all"
+        title="Team tasks access restricted"
+        description="Members use My Tasks for their personal workload. Contact your workspace admin if you need broader access."
+      >
+        <WorkspaceTasksContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 

@@ -1,22 +1,21 @@
-import { BankOutlined, CheckOutlined, EditOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import { BankOutlined, EditOutlined, MailOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ORGANIZATION_PLAN_FILTER_OPTIONS,
-  ORGANIZATION_STATUS_FILTER_OPTIONS,
-  PLAN_STYLES,
-  STATUS_STYLES,
   type OrganizationPlan,
   type OrganizationRecord,
   type OrganizationStatus,
-} from "../../../data/admin-organizations";
-import { useCreateOrganization, useUpdateOrganization } from "../../../hooks/use-admin-organizations";
-import { showApiErrorToast } from "../../../lib/api-error";
-import { formatDate } from "../../../lib/helper";
-import { generateOrganizationSlug } from "../../../lib/organization";
-import { cn } from "../../../lib/utils";
-import Modal from "../../ui/modal";
-import { Label, Paragraph, Text, Title } from "../../ui/typography";
+} from '../../../data/admin-organizations';
+import {
+  useCreateOrganization,
+  useUpdateOrganization,
+} from '../../../hooks/use-admin-organizations';
+import { showApiErrorToast } from '../../../lib/api-error';
+import { formatDate } from '../../../lib/helper';
+import { generateOrganizationSlug } from '../../../lib/organization';
+import { cn } from '../../../lib/utils';
+import Modal from '../../ui/modal';
+import { Label, Paragraph, Text, Title } from '../../ui/typography';
 
 type OrganizationCreateModalProps = {
   open: boolean;
@@ -33,11 +32,11 @@ type OrganizationCreateFormValues = {
 };
 
 const DEFAULT_FORM_VALUES: OrganizationCreateFormValues = {
-  name: "",
-  ownerName: "",
-  ownerEmail: "",
-  plan: "FREE",
-  status: "trial",
+  name: '',
+  ownerName: '',
+  ownerEmail: '',
+  plan: 'FREE',
+  status: 'trial',
 };
 
 type FormSectionProps = {
@@ -69,12 +68,10 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
   const { mutateAsync: createOrganization } = useCreateOrganization();
   const { mutateAsync: updateOrganization } = useUpdateOrganization();
 
-  const organizationName = Form.useWatch("name", form) ?? "";
-  const selectedPlan = Form.useWatch("plan", form) ?? DEFAULT_FORM_VALUES.plan;
-  const selectedStatus = Form.useWatch("status", form) ?? DEFAULT_FORM_VALUES.status;
+  const organizationName = Form.useWatch('name', form) ?? '';
 
   const previewSlug = useMemo(() => {
-    if (!organizationName.trim()) return "your-workspace";
+    if (!organizationName.trim()) return 'your-workspace';
     return generateOrganizationSlug(organizationName);
   }, [organizationName]);
 
@@ -111,6 +108,8 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
           id: record.id,
           data: {
             name: values.name,
+            ownerName: values.ownerName,
+            ownerEmail: values.ownerEmail,
             status: values.status,
             plan: values.plan,
           },
@@ -142,9 +141,9 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
       maskClosable={!submitting}
       width={540}
       classNames={{
-        container: "rounded-2xl! overflow-hidden! p-0! shadow-xl!",
-        header: "hidden!",
-        body: "p-0!",
+        container: 'rounded-2xl! overflow-hidden! p-0! shadow-xl!',
+        header: 'hidden!',
+        body: 'p-2!',
       }}
     >
       <div className="border-b border-border bg-feature-sync/30 px-6 py-5">
@@ -154,12 +153,12 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
           </span>
           <div className="min-w-0">
             <Title level={4} className="mb-0! text-foreground">
-              {isEditMode ? "Edit organization" : "Create organization"}
+              {isEditMode ? 'Edit organization' : 'Create organization'}
             </Title>
             <Paragraph size="sm" className="mt-1 mb-0! text-muted">
               {isEditMode
-                ? "Update workspace details, owner information, or subscription settings."
-                : "Set up a new workspace and invite the owner to get started."}
+                ? 'Update workspace details, owner information, or subscription settings.'
+                : 'Set up a new workspace and invite the owner to get started.'}
             </Paragraph>
           </div>
         </div>
@@ -174,18 +173,34 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
         onFinish={handleFinish}
       >
         <FormSection title="Organization" description="Basic workspace details.">
-          <Form.Item name="name" label={<Label>Organization name</Label>} rules={[{ required: true, message: "Please enter the organization name" }]}>
-            <Input size="large" placeholder="Acme Corp" autoComplete="organization" className="rounded-xl! border-border! bg-card!" />
+          <Form.Item
+            name="name"
+            label={<Label>Organization name</Label>}
+            rules={[{ required: true, message: 'Please enter the organization name' }]}
+          >
+            <Input
+              size="large"
+              placeholder="Acme Corp"
+              autoComplete="organization"
+              className="rounded-xl! border-border! bg-card!"
+            />
           </Form.Item>
 
           <div>
             <Label className="mb-2 block">Workspace slug</Label>
             <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-3">
               <span className="min-w-0 flex-1 truncate font-mono text-sm">
-                <Text className={cn("font-mono font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>
-                  {organizationName.trim() ? previewSlug : "your-workspace"}
+                <Text
+                  className={cn(
+                    'font-mono font-semibold',
+                    organizationName.trim() ? 'text-primary' : 'text-muted',
+                  )}
+                >
+                  {organizationName.trim() ? previewSlug : 'your-workspace'}
                 </Text>
-                <Text className="font-mono" color="muted">.Orbit.io</Text>
+                <Text className="font-mono" color="muted">
+                  .orbit.io
+                </Text>
               </span>
               <span className="shrink-0 rounded-full bg-feature-sync px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
                 Auto
@@ -194,88 +209,42 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
           </div>
         </FormSection>
 
-        <FormSection title="Owner" description={isEditMode ? "The primary admin for this workspace." : "The primary admin who will receive the invite."}>
+        <FormSection
+          title="Owner"
+          description={
+            isEditMode
+              ? 'The primary admin for this workspace.'
+              : 'The primary admin who will receive the invite.'
+          }
+        >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Form.Item name="ownerName" label={<Label>Owner name</Label>} rules={[{ required: true, message: "Please enter the owner name" }]}>
-              <Input size="large" placeholder="John Doe" autoComplete="name" className="rounded-xl! border-border! bg-card!" disabled={isEditMode} />
+            <Form.Item
+              name="ownerName"
+              label={<Label>Owner name</Label>}
+              rules={[{ required: true, message: 'Please enter the owner name' }]}
+            >
+              <Input
+                size="large"
+                placeholder="John Doe"
+                autoComplete="name"
+                className="rounded-xl! border-border! bg-card!"
+              />
             </Form.Item>
 
             <Form.Item
               name="ownerEmail"
               label={<Label>Owner email</Label>}
               rules={[
-                { required: true, message: "Please enter the owner email" },
-                { type: "email", message: "Please enter a valid email" },
+                { required: true, message: 'Please enter the owner email' },
+                { type: 'email', message: 'Please enter a valid email' },
               ]}
-              extra={isEditMode ? <Text size="xs" color="muted">Owner email cannot be changed from the admin console.</Text> : undefined}
             >
               <Input
                 size="large"
                 placeholder="owner@company.com"
                 autoComplete="email"
                 className="rounded-xl! border-border! bg-card!"
-                disabled={isEditMode}
               />
-            </Form.Item>
-          </div>
-        </FormSection>
-
-        <FormSection title="Subscription" description="Choose the plan and account status.">
-          <div>
-            <Label className="mb-2 block">Plan</Label>
-            <Form.Item name="plan" rules={[{ required: true, message: "Please select a plan" }]}>
-              <div className="grid grid-cols-2 gap-2">
-                {ORGANIZATION_PLAN_FILTER_OPTIONS.map((option) => {
-                  const isSelected = selectedPlan === option.value;
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => form.setFieldValue("plan", option.value)}
-                      className={cn(
-                        "flex flex-col items-start gap-2 rounded-xl border px-3.5 py-3 text-left transition-all",
-                        isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25",
-                      )}
-                    >
-                      <span
-                        className={cn("inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide", PLAN_STYLES[option.value])}
-                      >
-                        {option.value}
-                      </span>
-                      <Text size="sm" weight="medium">{option.label}</Text>
-                    </button>
-                  );
-                })}
-              </div>
-            </Form.Item>
-          </div>
-
-          <div>
-            <Label className="mb-2 block">Status</Label>
-            <Form.Item name="status" rules={[{ required: true, message: "Please select a status" }]}>
-              <div className="space-y-2">
-                {ORGANIZATION_STATUS_FILTER_OPTIONS.map((option) => {
-                  const isSelected = selectedStatus === option.value;
-                  const statusStyle = STATUS_STYLES[option.value];
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => form.setFieldValue("status", option.value)}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-all",
-                        isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-card hover:border-primary/25",
-                      )}
-                    >
-                      <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", statusStyle.dot)} />
-                      <Text size="sm" weight="medium">{statusStyle.label}</Text>
-                      {isSelected ? <CheckOutlined className="ml-auto text-sm text-primary" /> : null}
-                    </button>
-                  );
-                })}
-              </div>
             </Form.Item>
           </div>
         </FormSection>
@@ -303,7 +272,12 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
       </Form>
 
       <div className="flex flex-col-reverse gap-2 border-t border-border bg-background/60 px-6 py-4 sm:flex-row sm:justify-end">
-        <Button size="large" onClick={onClose} disabled={submitting} className="h-11! rounded-xl! font-medium! sm:min-w-30">
+        <Button
+          size="large"
+          onClick={onClose}
+          disabled={submitting}
+          className="h-11! rounded-xl! font-medium! sm:min-w-30"
+        >
           Cancel
         </Button>
         <Button
@@ -314,7 +288,7 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
           onClick={() => form.submit()}
           className="h-11! rounded-xl! font-semibold! sm:min-w-40"
         >
-          {isEditMode ? "Save changes" : "Create organization"}
+          {isEditMode ? 'Save changes' : 'Create organization'}
         </Button>
       </div>
     </Modal>

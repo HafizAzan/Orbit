@@ -7,6 +7,7 @@ import {
   getCatalog,
   getCurrentSubscription,
   getOrganizationUsage,
+  listAiCreditHistory,
   listInvoices,
   refundPayment,
   selectPlan,
@@ -57,6 +58,17 @@ export function useOrganizationUsage() {
   return useQuery({
     queryKey: ["billing-usage"],
     queryFn: getOrganizationUsage,
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+  });
+}
+
+export function useAiCreditHistory(limit = 20) {
+  const { isAuthenticated } = useBillingAccess();
+
+  return useQuery({
+    queryKey: ["billing-ai-credit-history", limit],
+    queryFn: () => listAiCreditHistory(limit),
     enabled: isAuthenticated,
     staleTime: 30_000,
   });

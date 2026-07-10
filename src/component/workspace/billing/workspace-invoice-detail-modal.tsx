@@ -56,6 +56,16 @@ function WorkspaceInvoiceDetailModal({
             </RecordDetailField>
             <RecordDetailField label="Invoice date" value={formatDate(detail.createdAt)} />
             <RecordDetailField
+              label="Refundable until"
+              value={
+                detail.refundable && detail.refundWindowEndsAt
+                  ? formatDate(detail.refundWindowEndsAt)
+                  : detail.refundable
+                    ? "Within refund window"
+                    : "Not refundable"
+              }
+            />
+            <RecordDetailField
               label="Billing period"
               value={
                 detail.periodStart && detail.periodEnd

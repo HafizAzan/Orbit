@@ -1,15 +1,20 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import { DEFAULT_ADMIN_PROFILE, type AdminProfile } from "../data/admin-profile";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { type AdminProfile } from "../data/admin-profile";
 import {
+  buildAdminProfileFromUser,
   changeAdminPassword,
   completeAdminEmailChange,
+  getAdminDisplayName,
   initiateAdminEmailChange,
   sendAdminPasswordResetLink,
   updateAdminProfile,
   type ChangeAdminPasswordInput,
 } from "../lib/admin-profile";
+import { getApiErrorMessage } from "../lib/api-error";
 import { countObjectChanges } from "../lib/helper";
 import { toast } from "../lib/toast";
+import type { AuthUser } from "../types/auth.types";
+import { useAppContext } from "./app-context";
 
 type AdminProfileContextValue = {
   profile: AdminProfile;
@@ -29,18 +34,51 @@ type AdminProfileContextValue = {
 
 const AdminProfileContext = createContext<AdminProfileContextValue | undefined>(undefined);
 
+function emptyAdminProfile(): AdminProfile {
+  return {
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    avatarUrl: "",
+    role: "platform_admin",
+    emailVerified: false,
+  };
+}
+
+function syncUserFromProfile(user: AuthUser, profile: AdminProfile): AuthUser {
+  return {
+    ...user,
+    name: getAdminDisplayName(profile),
+    email: profile.email,
+    emailVerificationStatus: profile.emailVerified ? "verified" : "pending",
+  };
+}
+
 type AdminProfileProviderProps = {
   children: ReactNode;
-  initialProfile?: AdminProfile;
 };
 
-function AdminProfileProvider({ children, initialProfile = DEFAULT_ADMIN_PROFILE }: AdminProfileProviderProps) {
-  const [savedProfile, setSavedProfile] = useState<AdminProfile>(initialProfile);
-  const [profile, setProfile] = useState<AdminProfile>(initialProfile);
+function AdminProfileProvider({ children }: AdminProfileProviderProps) {
+  const app = useAppContext();
+  const user = app?.user ?? null;
+
+  const [savedProfile, setSavedProfile] = useState<AdminProfile>(() =>
+    user ? buildAdminProfileFromUser(user) : emptyAdminProfile(),
+  );
+  const [profile, setProfile] = useState<AdminProfile>(savedProfile);
   const [savingProfile, setSavingProfile] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [changingEmail, setChangingEmail] = useState(false);
   const [resettingPassword, setResettingPassword] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const nextProfile = buildAdminProfileFromUser(user);
+    setSavedProfile(nextProfile);
+    setProfile(nextProfile);
+  }, [user]);
 
   const profileChangeCount = useMemo(() => countObjectChanges(profile, savedProfile), [profile, savedProfile]);
 
@@ -63,13 +101,18 @@ function AdminProfileProvider({ children, initialProfile = DEFAULT_ADMIN_PROFILE
       const updated = await updateAdminProfile(profile);
       setProfile(updated);
       setSavedProfile(updated);
+
+      if (user && app?.setUser) {
+        app.setUser(syncUserFromProfile(user, updated));
+      }
+
       toast.success("Profile updated successfully");
-    } catch {
-      toast.error("Failed to update profile. Please try again.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) ?? "Failed to update profile. Please try again.");
     } finally {
       setSavingProfile(false);
     }
-  }, [profile]);
+  }, [app, profile, user]);
 
   const handleChangePassword = useCallback(async (input: ChangeAdminPasswordInput) => {
     setChangingPassword(true);
@@ -79,47 +122,53 @@ function AdminProfileProvider({ children, initialProfile = DEFAULT_ADMIN_PROFILE
       toast.success("Password updated successfully");
       return true;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update password");
+      toast.error(getApiErrorMessage(error) ?? "Failed to update password");
       return false;
     } finally {
       setChangingPassword(false);
     }
   }, []);
 
-  const handleInitiateEmailChange = useCallback(
-    async (newEmail: string, currentPassword: string) => {
-      setChangingEmail(true);
-
-      try {
-        await initiateAdminEmailChange({ newEmail, currentPassword }, profile.email);
-        toast.success("OTP sent to your new email address");
-        return true;
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to start email change");
-        return false;
-      } finally {
-        setChangingEmail(false);
-      }
-    },
-    [profile.email],
-  );
-
-  const handleCompleteEmailChange = useCallback(async (newEmail: string, otp: string) => {
+  const handleInitiateEmailChange = useCallback(async (newEmail: string, currentPassword: string) => {
     setChangingEmail(true);
 
     try {
-      const updatedEmail = await completeAdminEmailChange({ newEmail, otp });
-      setProfile((current) => ({ ...current, email: updatedEmail, emailVerified: true }));
-      setSavedProfile((current) => ({ ...current, email: updatedEmail, emailVerified: true }));
-      toast.success("Email address updated successfully");
+      await initiateAdminEmailChange({ newEmail, currentPassword });
+      toast.success("OTP sent to your new email address");
       return true;
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to verify email change");
+      toast.error(getApiErrorMessage(error) ?? "Failed to start email change");
       return false;
     } finally {
       setChangingEmail(false);
     }
   }, []);
+
+  const handleCompleteEmailChange = useCallback(
+    async (newEmail: string, otp: string) => {
+      setChangingEmail(true);
+
+      try {
+        const result = await completeAdminEmailChange({ newEmail, otp });
+        const nextProfile = buildAdminProfileFromUser(result.user);
+        setProfile(nextProfile);
+        setSavedProfile(nextProfile);
+
+        if (app?.setUser) {
+          app.setUser(result.user);
+        }
+
+        toast.success("Email address updated successfully");
+        return true;
+      } catch (error) {
+        toast.error(getApiErrorMessage(error) ?? "Failed to verify email change");
+        return false;
+      } finally {
+        setChangingEmail(false);
+      }
+    },
+    [app],
+  );
 
   const handleSendPasswordResetLink = useCallback(async () => {
     setResettingPassword(true);
@@ -128,8 +177,8 @@ function AdminProfileProvider({ children, initialProfile = DEFAULT_ADMIN_PROFILE
       await sendAdminPasswordResetLink(profile.email);
       toast.success(`Password reset link sent to ${profile.email}`);
       return true;
-    } catch {
-      toast.error("Failed to send reset link. Please try again.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error) ?? "Failed to send reset link. Please try again.");
       return false;
     } finally {
       setResettingPassword(false);

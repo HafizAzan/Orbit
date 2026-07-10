@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ClockCircleOutlined, LogoutOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Navigate } from "react-router-dom";
+import PageSeo from "../component/seo/page-seo";
 import { getMe } from "../api-services/auth.service";
 import { PageHeaderSkeleton } from "../component/skeletons";
 import { Paragraph, Title } from "../component/ui/typography";
@@ -89,6 +90,8 @@ function WorkspaceSubscriptionPending() {
   const organizationName = app.user.organization?.name ?? "your organization";
 
   return (
+    <>
+      <PageSeo title="Subscription Pending" description="Your workspace subscription is being activated." noIndex />
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-14">
       <div className="max-w-lg text-center">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
@@ -141,6 +144,7 @@ function WorkspaceSubscriptionPending() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

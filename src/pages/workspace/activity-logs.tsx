@@ -1,4 +1,5 @@
 import React from "react";
+import PageSeo from "../../component/seo/page-seo";
 import { Paragraph, Title } from "../../component/ui/typography";
 import QueryPageGuard from "../../component/common/query-page-guard";
 import WorkspaceActivityLogsSection from "../../component/workspace/activity/workspace-activity-logs-section";
@@ -35,13 +36,16 @@ function WorkspaceActivityLogsContent() {
 
 function WorkspaceActivityLogsPage() {
   return (
-    <WorkspaceRoleGate
-      permission="activity.view"
-      title="Activity logs access restricted"
-      description="Activity logs are available to owners, admins, and managers."
-    >
-      <WorkspaceActivityLogsContent />
-    </WorkspaceRoleGate>
+    <>
+      <PageSeo title="Activity Logs" description="Workspace audit trail and activity history." noIndex />
+      <WorkspaceRoleGate
+        permission="activity.view"
+        title="Activity logs access restricted"
+        description="Activity logs are available to owners, admins, and managers."
+      >
+        <WorkspaceActivityLogsContent />
+      </WorkspaceRoleGate>
+    </>
   );
 }
 
