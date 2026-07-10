@@ -180,6 +180,10 @@ export type AuthUser = {
   uiTheme?: AppUiThemeId;
   twoFactorEnabled?: boolean;
   avatarUrl?: string | null;
+  authProvider?: AuthProvider;
+  githubConnected?: boolean;
+  googleConnected?: boolean;
+  githubLogin?: string | null;
 };
 
 export type AuthTwoFactorChallengeResponse = {

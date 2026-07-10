@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import PageSeo from '../../component/seo/page-seo';
+import ProfileConnectedAccountsCard from '../../component/admin/profile/profile-connected-accounts-card';
 import ProfileEmailSecurityCard from '../../component/admin/profile/profile-email-security-card';
 import ProfileInfoForm from '../../component/admin/profile/profile-info-form';
 import ProfilePasswordForm from '../../component/admin/profile/profile-password-form';
@@ -9,6 +10,7 @@ import { Paragraph, Text, Title } from '../../component/ui/typography';
 import WorkspaceAboutOrganizationCard from '../../component/workspace/profile/workspace-about-organization-card';
 import WorkspaceOrganizationCard from '../../component/workspace/profile/workspace-organization-card';
 import WorkspaceProfileTabs from '../../component/workspace/profile/workspace-profile-tabs';
+import { useAppContext } from '../../context/app-context';
 import { getWorkspaceProfileDisplayName } from '../../data/workspace-profile';
 import useWorkspaceProfile from '../../hooks/use-workspace-profile';
 import useWorkspaceProfileTab from '../../hooks/use-workspace-profile-tab';
@@ -16,6 +18,7 @@ import { canChangeOwnEmail, canRequestOwnEmailChange } from '../../lib/email-acc
 import { getWorkspaceRoleLabel } from '../../lib/workspace-routing';
 
 function WorkspaceProfile() {
+  const app = useAppContext();
   const {
     profile,
     profileChangeCount,
@@ -103,6 +106,12 @@ function WorkspaceProfile() {
             onSubmit={handleChangePassword}
             onSendResetLink={async () => handleSendPasswordResetLink()}
           />
+
+          {app?.user ? (
+            <div className="xl:col-span-2">
+              <ProfileConnectedAccountsCard user={app.user} />
+            </div>
+          ) : null}
         </div>
       ) : null}
 

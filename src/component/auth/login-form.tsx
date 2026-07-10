@@ -1,7 +1,7 @@
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Divider, Form, Input } from "antd";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAppContext } from "../../context/app-context";
 import { useLogin } from "../../hooks/user-authentication";
 import { AUTH_ERROR_CODES, ApiRequestError, showApiErrorToast, showApiInfoToast, showApiSuccessToast } from "../../lib/api-error";
@@ -18,10 +18,20 @@ import { Label, Paragraph, Text, Title } from "../ui/typography";
 function LoginForm() {
   const [form] = Form.useForm<LoginFormValues>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const app = useAppContext();
   const { mutateAsync: login, isPending: loggingIn } = useLogin();
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(true);
+
+  useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (!oauthError) return;
+    showApiErrorToast(decodeURIComponent(oauthError));
+    const next = new URLSearchParams(searchParams);
+    next.delete("error");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const completeSession = (
     accessToken: string,
@@ -162,10 +172,24 @@ function LoginForm() {
         </Divider>
 
         <div className="grid grid-cols-2 gap-3">
-          <Button size="large" icon={<GoogleOutlined />} className="h-11! font-medium!">
+          <Button
+            size="large"
+            icon={<GoogleOutlined />}
+            className="h-11! font-medium!"
+            onClick={() => {
+              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/google`);
+            }}
+          >
             Google
           </Button>
-          <Button size="large" icon={<GithubOutlined />} className="h-11! font-medium!">
+          <Button
+            size="large"
+            icon={<GithubOutlined />}
+            className="h-11! font-medium!"
+            onClick={() => {
+              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/github`);
+            }}
+          >
             GitHub
           </Button>
         </div>

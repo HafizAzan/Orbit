@@ -23,6 +23,7 @@ const MODULE_LABELS: Record<ActivityEvent["module"], string> = {
   organization: "Organization",
   security: "Security",
   billing: "Billing",
+  github: "GitHub",
 };
 
 type WorkspaceActivityLogsSectionProps = {

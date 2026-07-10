@@ -7,6 +7,7 @@ import ProjectAiHealthCard from "../../component/workspace/projects/project-ai-h
 import ProjectAttachmentsCard from "../../component/workspace/projects/project-attachments-card";
 import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
 import ProjectDiscussionCard from "../../component/workspace/projects/project-discussion-card";
+import ProjectGithubCard from "../../component/workspace/projects/project-github-card";
 import ProjectNetworkPulseCard from "../../component/workspace/projects/project-network-pulse-card";
 import ProjectPhaseProgressCard from "../../component/workspace/projects/project-phase-progress-card";
 import ProjectTasksCard from "../../component/workspace/projects/project-tasks-card";
@@ -210,6 +211,7 @@ function WorkspaceProjectDetail() {
             <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
               <ProjectNetworkPulseCard members={project.teamMembers} tasks={projectTasks} />
               <ProjectTeamCard members={project.teamMembers} />
+              <ProjectGithubCard projectId={projectId} viewerRole={apiProject!.viewerRole} />
             </div>
           </div>
         </div>

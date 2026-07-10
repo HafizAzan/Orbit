@@ -7,7 +7,8 @@ export type ActivityModule =
   | "members"
   | "organization"
   | "security"
-  | "billing";
+  | "billing"
+  | "github";
 
 export type ActivityAction =
   | "created"

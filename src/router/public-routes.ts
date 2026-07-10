@@ -16,6 +16,8 @@ const UN_AUTH_ROUTES: Record<string, string> = {
   VERIFY_EMAIL: "/verify-email",
   VERIFY_OTP: "/verify-otp",
   TWO_FACTOR: "/two-factor",
+  GITHUB_CALLBACK: "/auth/github/callback",
+  GOOGLE_CALLBACK: "/auth/google/callback",
   ABOUT: "/about",
   CONTACT: "/contact",
   HELP: "/help",
@@ -23,11 +25,14 @@ const UN_AUTH_ROUTES: Record<string, string> = {
   PRIVACY: "/privacy-policy",
 };
 
-const AUTH_ROUTE_KEYS = ["LOGIN", "REGISTER", "ACCEPT_INVITE", "FORGOT_PASSWORD", "VERIFY_EMAIL", "VERIFY_OTP", "TWO_FACTOR", "RESET_PASSWORD"] as const;
+const AUTH_ROUTE_KEYS = ["LOGIN", "REGISTER", "ACCEPT_INVITE", "FORGOT_PASSWORD", "VERIFY_EMAIL", "VERIFY_OTP", "TWO_FACTOR", "RESET_PASSWORD", "GITHUB_CALLBACK", "GOOGLE_CALLBACK"] as const;
 
 function resolvePageImport(key: string) {
   const routePath = UN_AUTH_ROUTES[key];
-  const fileName = routePath === "/" ? "home" : routePath.replace(/^\//, "");
+  // Vite dynamic imports only allow one path segment; nested routes map to flat files
+  // e.g. /auth/github/callback → pages/auth-github-callback.tsx
+  const fileName =
+    routePath === "/" ? "home" : routePath.replace(/^\//, "").replace(/\//g, "-");
 
   return import(`../pages/${fileName}.tsx`);
 }

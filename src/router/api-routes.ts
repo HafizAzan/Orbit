@@ -1,5 +1,7 @@
 const API_ROUTES: Record<string, Record<string, string>> = {
   AUTH: {
+    GITHUB: "/auth/github",
+    GOOGLE: "/auth/google",
     REGISTER_SEND_OTP: "/auth/register/send-otp",
     REGISTER_PENDING: "/auth/register/pending",
     REGISTER_RESEND_OTP: "/auth/register/resend-otp",
@@ -9,6 +11,8 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     AVATAR: "/auth/me/avatar",
     PASSWORD: "/auth/me/password",
     UI_THEME: "/auth/me/ui-theme",
+    OAUTH_GITHUB_UNLINK: "/auth/me/oauth/github/unlink",
+    OAUTH_GOOGLE_UNLINK: "/auth/me/oauth/google/unlink",
     EMAIL_INITIATE: "/auth/me/email/initiate",
     EMAIL_CONFIRM: "/auth/me/email/confirm",
     EMAIL_REQUEST_RECIPIENTS: "/auth/me/email/request-recipients",

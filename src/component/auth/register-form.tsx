@@ -213,10 +213,24 @@ function RegisterForm() {
         </Divider>
 
         <div className="grid grid-cols-2 gap-3">
-          <Button size="large" icon={<GoogleOutlined />} className="h-11! font-medium!">
+          <Button
+            size="large"
+            icon={<GoogleOutlined />}
+            className="h-11! font-medium!"
+            onClick={() => {
+              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/google`);
+            }}
+          >
             Google
           </Button>
-          <Button size="large" icon={<GithubOutlined />} className="h-11! font-medium!">
+          <Button
+            size="large"
+            icon={<GithubOutlined />}
+            className="h-11! font-medium!"
+            onClick={() => {
+              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/github`);
+            }}
+          >
             GitHub
           </Button>
         </div>

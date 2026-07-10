@@ -195,6 +195,16 @@ const changePassword = async (data: {
   return assertApiSuccess<{ message: string }>(response);
 };
 
+const unlinkGitHub = async (): Promise<AuthUser> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.OAUTH_GITHUB_UNLINK, {}, AUTH_REQUEST);
+  return assertApiSuccess<AuthUser>(response);
+};
+
+const unlinkGoogle = async (): Promise<AuthUser> => {
+  const response = await ApiService.post(API_ROUTES.AUTH.OAUTH_GOOGLE_UNLINK, {}, AUTH_REQUEST);
+  return assertApiSuccess<AuthUser>(response);
+};
+
 const initiateEmailChange = async (
   data: InitiateEmailChangeRequest,
 ): Promise<InitiateEmailChangeResponse> => {
@@ -272,4 +282,6 @@ export {
   updateProfile,
   uploadAvatar,
   updateUiTheme,
+  unlinkGitHub,
+  unlinkGoogle,
 };

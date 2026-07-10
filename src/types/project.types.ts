@@ -47,6 +47,7 @@ export type ApiWorkspaceProject = {
     }
   >;
   viewerRole: "admin" | "member" | "viewer" | "org_admin" | null;
+  githubRepoFullName: string | null;
 };
 
 export type AssignableProjectMember = {
