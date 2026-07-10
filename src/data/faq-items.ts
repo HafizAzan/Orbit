@@ -13,9 +13,9 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     id: "security",
-    question: "Is my data secure with FlowSync?",
+    question: "Is my data secure with Orbit?",
     answer:
-      "Yes. FlowSync uses enterprise-grade encryption in transit and at rest, role-based access controls, and regular third-party security audits to keep your workspace data protected.",
+      "Yes. Orbit uses enterprise-grade encryption in transit and at rest, role-based access controls, and regular third-party security audits to keep your workspace data protected.",
   },
   {
     id: "import",

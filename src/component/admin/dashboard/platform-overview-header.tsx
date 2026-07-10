@@ -31,7 +31,7 @@ function PlatformOverviewHeader({ activeTab, onTabChange }: PlatformOverviewHead
           Platform Overview
         </Title>
         <Paragraph size="sm" className="mt-1 text-muted">
-          Real-time health and performance metrics for FlowSync.
+          Real-time health and performance metrics for Orbit.
         </Paragraph>
       </div>
 

@@ -13,7 +13,7 @@ import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
 import { Label, Paragraph, Text, Title } from "../ui/typography";
 
-const WORKSPACE_DOMAIN = "flowsync.io";
+const WORKSPACE_DOMAIN = "Orbit.io";
 
 function RegisterForm() {
   const [form] = Form.useForm<RegisterFormValues>();

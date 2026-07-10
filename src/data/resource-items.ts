@@ -20,7 +20,7 @@ const RESOURCE_ITEMS: ResourceItem[] = [
   {
     id: "getting-started",
     category: "Guide",
-    title: "Getting started with FlowSync",
+    title: "Getting started with Orbit",
     description: "Set up your workspace, invite your team, and ship your first project in under 15 minutes.",
     meta: "8 min read",
     href: UN_AUTH_ROUTES.REGISTER,
@@ -43,7 +43,7 @@ const RESOURCE_ITEMS: ResourceItem[] = [
     id: "enterprise-webinar",
     category: "Webinar",
     title: "Scaling teams without the chaos",
-    description: "Learn how enterprise leaders unify delivery, reporting, and cross-team visibility with FlowSync.",
+    description: "Learn how enterprise leaders unify delivery, reporting, and cross-team visibility with Orbit.",
     meta: "45 min session",
     href: UN_AUTH_ROUTES.CONTACT,
     ctaLabel: "Watch replay",

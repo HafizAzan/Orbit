@@ -285,7 +285,7 @@ const RAW_ACTIVITIES_DATA = [
     id: "17",
     title: "Database maintenance completed",
     description: "Scheduled index optimization finished across US East cluster",
-    organization: "FlowSync",
+    organization: "Orbit",
     actor: "DevOps",
     category: "system",
     severity: "success",

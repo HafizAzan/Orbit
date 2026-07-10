@@ -13,10 +13,10 @@ function HelpGuidesSection() {
             Popular guides
           </Text>
           <Title level={2} className="mt-3 text-foreground">
-            Learn FlowSync step by step
+            Learn Orbit step by step
           </Title>
           <Paragraph className="mt-4 text-hero-text">
-            In-depth guides and sessions to help your team adopt FlowSync with confidence.
+            In-depth guides and sessions to help your team adopt Orbit with confidence.
           </Paragraph>
         </AnimateOnScroll>
 

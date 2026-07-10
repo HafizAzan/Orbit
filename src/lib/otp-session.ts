@@ -1,6 +1,6 @@
 import type { AuthFlow } from "../types/auth.types";
 
-const OTP_SESSION_PREFIX = "flow-sync:otp-session";
+const OTP_SESSION_PREFIX = "orbit:otp-session";
 
 export type OtpSession = {
   email: string;

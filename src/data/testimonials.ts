@@ -11,7 +11,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "sarah-jenkins",
     quote:
-      "FlowSync has completely transformed how our product team operates. We've seen a 30% reduction in meeting times since switching.",
+      "Orbit has completely transformed how our product team operates. We've seen a 30% reduction in meeting times since switching.",
     name: "Sarah Jenkins",
     role: "CTO, CloudScale",
     avatarUrl: "https://i.pravatar.cc/150?img=5",
@@ -29,7 +29,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "elena-rodriguez",
     quote:
-      "Scalability was our biggest concern, but FlowSync handles our 200+ person department without breaking a sweat. It's truly enterprise-grade.",
+      "Scalability was our biggest concern, but Orbit handles our 200+ person department without breaking a sweat. It's truly enterprise-grade.",
     name: "Elena Rodriguez",
     role: "VP Engineering, NexusCorp",
     avatarUrl: "https://i.pravatar.cc/150?img=9",
@@ -38,7 +38,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "david-okonkwo",
     quote:
-      "Onboarding new hires used to take weeks. With FlowSync's templates and boards, our teams are productive from day one.",
+      "Onboarding new hires used to take weeks. With Orbit's templates and boards, our teams are productive from day one.",
     name: "David Okonkwo",
     role: "Operations Lead, Vertex Labs",
     avatarUrl: "https://i.pravatar.cc/150?img=15",
@@ -56,7 +56,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "james-wilson",
     quote:
-      "We evaluated several tools, but FlowSync's analytics gave us visibility we never had before. Delivery predictability improved immediately.",
+      "We evaluated several tools, but Orbit's analytics gave us visibility we never had before. Delivery predictability improved immediately.",
     name: "James Wilson",
     role: "Director of Engineering, StackForge",
     avatarUrl: "https://i.pravatar.cc/150?img=11",
@@ -65,7 +65,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "ana-martinez",
     quote:
-      "Security and compliance were non-negotiable for us. FlowSync checked every box while still being intuitive for the whole org.",
+      "Security and compliance were non-negotiable for us. Orbit checked every box while still being intuitive for the whole org.",
     name: "Ana Martinez",
     role: "CISO, FinEdge",
     avatarUrl: "https://i.pravatar.cc/150?img=23",
@@ -92,7 +92,7 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "marcus-thompson",
     quote:
-      "FlowSync scaled with us from 20 to 150 people without a painful migration. Support has been responsive every step of the way.",
+      "Orbit scaled with us from 20 to 150 people without a painful migration. Support has been responsive every step of the way.",
     name: "Marcus Thompson",
     role: "CEO, LaunchPad Studio",
     avatarUrl: "https://i.pravatar.cc/150?img=14",

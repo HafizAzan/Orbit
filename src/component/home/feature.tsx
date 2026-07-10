@@ -51,7 +51,7 @@ function Feature() {
         </AnimateOnScroll>
 
         <AnimateOnScroll immediate variant="fade-right" delay={120} className="mx-auto w-[80%] overflow-hidden">
-          <img src={RESOURCES.IMAGES.LAPTOP} alt="FlowSync dashboard preview" className="h-auto w-full object-contain" />
+          <img src={RESOURCES.IMAGES.LAPTOP} alt="Orbit dashboard preview" className="h-auto w-full object-contain" />
         </AnimateOnScroll>
       </div>
     </section>

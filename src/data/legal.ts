@@ -40,7 +40,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
   hero: {
     title: "Terms of Service",
     description:
-      "Please read these terms carefully before using FlowSync. By accessing or using our platform, you agree to be bound by these terms.",
+      "Please read these terms carefully before using Orbit. By accessing or using our platform, you agree to be bound by these terms.",
   },
   sidebar: {
     title: "Document overview",
@@ -50,7 +50,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
   },
   content: {
     title: "Terms of Service",
-    description: "The following terms govern your access to and use of the FlowSync platform and related services.",
+    description: "The following terms govern your access to and use of the Orbit platform and related services.",
   },
   sections: [
     {
@@ -58,8 +58,8 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Agreement to Terms",
       icon: FileProtectOutlined,
       paragraphs: [
-        "These Terms of Service constitute a legally binding agreement between you and FlowSync Inc. regarding your use of our website, applications, and services.",
-        "If you do not agree to these terms, you may not access or use FlowSync. If you are using FlowSync on behalf of an organization, you represent that you have authority to bind that organization.",
+        "These Terms of Service constitute a legally binding agreement between you and Orbit Inc. regarding your use of our website, applications, and services.",
+        "If you do not agree to these terms, you may not access or use Orbit. If you are using Orbit on behalf of an organization, you represent that you have authority to bind that organization.",
       ],
     },
     {
@@ -67,7 +67,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Use of Service",
       icon: CloudOutlined,
       paragraphs: [
-        "FlowSync provides workflow automation and team collaboration tools. You may use the service only for lawful business purposes and in accordance with these terms.",
+        "Orbit provides workflow automation and team collaboration tools. You may use the service only for lawful business purposes and in accordance with these terms.",
         "We reserve the right to modify, suspend, or discontinue any part of the service at any time. We will make reasonable efforts to notify you of material changes.",
       ],
     },
@@ -77,7 +77,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       icon: UserOutlined,
       paragraphs: [
         "You must provide accurate and complete information when creating an account. You are responsible for maintaining the confidentiality of your credentials and for all activity under your account.",
-        "You must notify us immediately of any unauthorized use of your account. FlowSync is not liable for losses arising from unauthorized access where you failed to safeguard your credentials.",
+        "You must notify us immediately of any unauthorized use of your account. Orbit is not liable for losses arising from unauthorized access where you failed to safeguard your credentials.",
       ],
     },
     {
@@ -94,7 +94,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Acceptable Use",
       icon: SafetyCertificateOutlined,
       paragraphs: [
-        "You agree not to misuse FlowSync, including by attempting to gain unauthorized access, interfering with service operation, uploading malicious code, or violating applicable laws.",
+        "You agree not to misuse Orbit, including by attempting to gain unauthorized access, interfering with service operation, uploading malicious code, or violating applicable laws.",
         "We may investigate and take appropriate action against violations, including suspension or termination of your account without prior notice in serious cases.",
       ],
     },
@@ -103,8 +103,8 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Intellectual Property",
       icon: LockOutlined,
       paragraphs: [
-        "FlowSync and its licensors retain all rights to the platform, branding, and underlying technology. These terms do not grant you any ownership rights in our intellectual property.",
-        "You retain ownership of content you submit to FlowSync. You grant us a limited license to host, process, and display your content solely to provide the service.",
+        "Orbit and its licensors retain all rights to the platform, branding, and underlying technology. These terms do not grant you any ownership rights in our intellectual property.",
+        "You retain ownership of content you submit to Orbit. You grant us a limited license to host, process, and display your content solely to provide the service.",
       ],
     },
     {
@@ -112,7 +112,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Termination",
       icon: TeamOutlined,
       paragraphs: [
-        "You may stop using FlowSync at any time by closing your account. We may suspend or terminate access if you breach these terms or if required for legal or security reasons.",
+        "You may stop using Orbit at any time by closing your account. We may suspend or terminate access if you breach these terms or if required for legal or security reasons.",
         "Upon termination, your right to use the service ceases. Provisions that by nature should survive termination will remain in effect.",
       ],
     },
@@ -121,8 +121,8 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Limitation of Liability",
       icon: GlobalOutlined,
       paragraphs: [
-        "To the maximum extent permitted by law, FlowSync shall not be liable for indirect, incidental, special, consequential, or punitive damages arising from your use of the service.",
-        "Our total liability for any claim related to the service is limited to the amount you paid to FlowSync in the twelve months preceding the event giving rise to the claim.",
+        "To the maximum extent permitted by law, Orbit shall not be liable for indirect, incidental, special, consequential, or punitive damages arising from your use of the service.",
+        "Our total liability for any claim related to the service is limited to the amount you paid to Orbit in the twelve months preceding the event giving rise to the claim.",
       ],
     },
     {
@@ -130,7 +130,7 @@ export const TERMS_OF_SERVICE: LegalDocument = {
       title: "Contact",
       icon: MailOutlined,
       paragraphs: [
-        "Questions about these Terms of Service may be directed to legal@flowsync.io or via our contact page. We aim to respond to legal inquiries within five business days.",
+        "Questions about these Terms of Service may be directed to legal@Orbit.io or via our contact page. We aim to respond to legal inquiries within five business days.",
       ],
     },
   ],
@@ -140,7 +140,7 @@ export const PRIVACY_POLICY: LegalDocument = {
   hero: {
     title: "Privacy Policy",
     description:
-      "This policy explains how FlowSync collects, uses, and protects your personal information when you use our platform and services.",
+      "This policy explains how Orbit collects, uses, and protects your personal information when you use our platform and services.",
   },
   sidebar: {
     title: "Document overview",
@@ -158,7 +158,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       title: "Information We Collect",
       icon: UserOutlined,
       paragraphs: [
-        "We collect information you provide directly, such as your name, email address, company name, billing details, and content you upload to FlowSync.",
+        "We collect information you provide directly, such as your name, email address, company name, billing details, and content you upload to Orbit.",
         "We also collect usage data automatically, including device information, log data, IP address, browser type, and interactions with our platform to improve performance and security.",
       ],
     },
@@ -167,7 +167,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       title: "How We Use Information",
       icon: CloudOutlined,
       paragraphs: [
-        "We use your information to provide, maintain, and improve FlowSync, process transactions, send service-related communications, and respond to support requests.",
+        "We use your information to provide, maintain, and improve Orbit, process transactions, send service-related communications, and respond to support requests.",
         "We may use aggregated or de-identified data for analytics, product development, and understanding how our services are used.",
       ],
     },
@@ -204,7 +204,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       icon: SafetyCertificateOutlined,
       paragraphs: [
         "Depending on your location, you may have rights to access, correct, delete, or export your personal data, and to object to or restrict certain processing activities.",
-        "To exercise these rights, contact privacy@flowsync.io. We will verify your request and respond within the timeframe required by applicable law.",
+        "To exercise these rights, contact privacy@Orbit.io. We will verify your request and respond within the timeframe required by applicable law.",
       ],
     },
     {
@@ -213,7 +213,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       icon: FileProtectOutlined,
       paragraphs: [
         "We use cookies and similar technologies to remember preferences, authenticate sessions, and analyze site traffic. You can manage cookie preferences through your browser settings.",
-        "Disabling certain cookies may affect the functionality of some FlowSync features.",
+        "Disabling certain cookies may affect the functionality of some Orbit features.",
       ],
     },
     {
@@ -229,7 +229,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       title: "Contact Us",
       icon: MailOutlined,
       paragraphs: [
-        "For privacy-related questions or requests, email privacy@flowsync.io or visit our contact page. Our Data Protection team will assist you promptly.",
+        "For privacy-related questions or requests, email privacy@Orbit.io or visit our contact page. Our Data Protection team will assist you promptly.",
       ],
     },
   ],

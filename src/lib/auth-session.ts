@@ -8,9 +8,9 @@ import {
   setRefreshToken,
 } from "./cookies";
 
-const USER_SESSION_KEY = "flow-sync:user";
-const SESSION_EXPIRES_KEY = "flow-sync:session_expires";
-const REMEMBER_ME_KEY = "flow-sync:remember_me";
+const USER_SESSION_KEY = "orbit:user";
+const SESSION_EXPIRES_KEY = "orbit:session_expires";
+const REMEMBER_ME_KEY = "orbit:remember_me";
 
 export const AUTH_SESSION_TTL_MS = {
   remember: 30 * 24 * 60 * 60 * 1000,

@@ -153,8 +153,8 @@ export const USERS_DATA: UserRecord[] = [
   {
     id: "10",
     name: "Alex Rivera",
-    email: "alex.rivera@flowsync.io",
-    organization: "FlowSync",
+    email: "alex.rivera@Orbit.io",
+    organization: "Orbit",
     role: "Admin",
     lastActive: "Just now",
     status: "active",

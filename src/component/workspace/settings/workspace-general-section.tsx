@@ -48,7 +48,7 @@ function WorkspaceGeneralSection({
         <SettingsField label="Workspace URL">
           <div className="rounded-xl border border-border bg-background px-4 py-3">
             <Paragraph size="sm">
-              flowsync.io/workspace/
+              Orbit.io/workspace/
               <Text
                 as="span"
                 weight="semibold"

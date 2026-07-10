@@ -29,7 +29,7 @@ export const PROJECT_THEMES: ProjectThemeDefinition[] = [
   {
     id: "classic",
     label: "Classic",
-    description: "Clean indigo accents — the default FlowSync look.",
+    description: "Clean indigo accents — the default Orbit look.",
     accent: "#6366f1",
     accentSoft: "bg-indigo-50",
     accentText: "text-indigo-600",

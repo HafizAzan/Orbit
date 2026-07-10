@@ -16,7 +16,7 @@ export const DEFAULT_ADMIN_PROFILE: AdminProfile = {
   id: "platform-admin-1",
   firstName: "Admin",
   lastName: "User",
-  email: "admin@flowsync.io",
+  email: "admin@Orbit.io",
   avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
   role: "platform_admin",
   emailVerified: true,

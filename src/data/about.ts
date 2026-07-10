@@ -24,7 +24,7 @@ export const ABOUT_HERO = {
   badge: "About Us",
   title: "Building the future of synchronized teamwork",
   description:
-    "FlowSync helps enterprise teams move faster together — unifying workflows, communication, and delivery in one seamless platform built for scale.",
+    "Orbit helps enterprise teams move faster together — unifying workflows, communication, and delivery in one seamless platform built for scale.",
 };
 
 export const ABOUT_STATS: AboutStat[] = [
@@ -36,8 +36,8 @@ export const ABOUT_STATS: AboutStat[] = [
 export const ABOUT_STORY = {
   title: "How it all started",
   paragraphs: [
-    "FlowSync began when our founders noticed a painful gap: teams were drowning in disconnected tools, endless status meetings, and manual handoffs that slowed every project down.",
-    "We set out to build a platform where planning, execution, and collaboration live in one flow — so teams can focus on outcomes, not overhead. Today, FlowSync powers organizations across the globe.",
+    "Orbit began when our founders noticed a painful gap: teams were drowning in disconnected tools, endless status meetings, and manual handoffs that slowed every project down.",
+    "We set out to build a platform where planning, execution, and collaboration live in one flow — so teams can focus on outcomes, not overhead. Today, Orbit powers organizations across the globe.",
   ],
   milestones: [
     { id: "founded", year: "2018", label: "Founded" },
@@ -70,10 +70,10 @@ export const ABOUT_VALUES: AboutValue[] = [
 export const ABOUT_QUOTE = {
   text: "Our vision is to empower every enterprise team to move at the speed of thought, where execution is as seamless as a heartbeat.",
   author: "Sarah Chen",
-  role: "Founder & CEO, FlowSync",
+  role: "Founder & CEO, Orbit",
 };
 
 export const ABOUT_CTA = {
   title: "Ready to sync your workflow?",
-  description: "Join thousands of teams already building with FlowSync. Start free or talk to our sales team.",
+  description: "Join thousands of teams already building with Orbit. Start free or talk to our sales team.",
 };

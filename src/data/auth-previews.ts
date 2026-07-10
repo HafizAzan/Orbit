@@ -63,7 +63,7 @@ export const LOGIN_PREVIEW_DATA: LoginPreviewData = {
   ],
   testimonial: {
     quote:
-      "FlowSync has completely transformed how our engineering and design teams collaborate on complex projects.",
+      "Orbit has completely transformed how our engineering and design teams collaborate on complex projects.",
     author: "Alex Rivera, Head of Product at TechFlow",
   },
   velocityLabel: "Velocity",

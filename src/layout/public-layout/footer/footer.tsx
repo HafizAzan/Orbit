@@ -13,7 +13,7 @@ function Footer() {
           <Link to={UN_AUTH_ROUTES.HOME} className="inline-flex w-fit transition-opacity duration-300 hover:opacity-90">
             <Logo />
           </Link>
-          <Paragraph size="sm" font="roboto">© {new Date().getFullYear()} FlowSync Inc. All rights reserved.</Paragraph>
+          <Paragraph size="sm" font="roboto">© {new Date().getFullYear()} Orbit Inc. All rights reserved.</Paragraph>
         </div>
 
         <nav className="nav:justify-self-center">

@@ -1,7 +1,3 @@
-/**
- * Wrap React Query pages: skeleton on first load (`isPending`), `QueryErrorState` on failure.
- * Pass static skeletons only — do not add custom loading state for API data; use the query object.
- */
 import type { UseQueryResult } from "@tanstack/react-query";
 import React from "react";
 import QueryErrorState from "./query-error-state";

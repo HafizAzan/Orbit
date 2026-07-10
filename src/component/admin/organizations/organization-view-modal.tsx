@@ -18,7 +18,7 @@ function OrganizationViewModal({ record, onClose }: OrganizationViewModalProps) 
       open={record !== null}
       onClose={onClose}
       title={record?.name ?? "Organization details"}
-      subtitle={record ? `${record.slug}.flowsync.io` : undefined}
+      subtitle={record ? `${record.slug}.Orbit.io` : undefined}
       icon={record ? <span className="text-sm font-bold text-primary">{getInitial(record.name)}</span> : undefined}
     >
       {record && statusStyle ? (

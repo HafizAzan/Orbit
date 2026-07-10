@@ -3,7 +3,9 @@ import { Button, Popover } from "antd";
 import React from "react";
 import { useAppUiTheme } from "../../context/app-ui-theme-context";
 import { APP_UI_THEMES, isDarkAppUiTheme, type AppUiThemeId } from "../../data/app-ui-themes";
+import { getOrbitLogoPalette } from "../../data/orbit-logo-themes";
 import { cn } from "../../lib/utils";
+import OrbitMark from "../orbit-mark";
 import { Paragraph, Text, Title } from "../ui/typography";
 
 function AppUiThemeDropdown() {
@@ -18,16 +20,17 @@ function AppUiThemeDropdown() {
   const content = (
     <div className="w-[min(100vw-2rem,24rem)] p-1">
       <Title level={5} className="px-2 pt-1">
-        FlowSync appearance
+        Orbit appearance
       </Title>
       <Paragraph size="sm" color="muted" className="px-2 pb-3">
-        Three light themes and three dark themes. Light options only change accents.
+        Three light themes and three dark themes. Logo and accents update with each theme.
       </Paragraph>
 
       <div className="grid grid-cols-2 gap-2">
         {APP_UI_THEMES.map((theme) => {
           const isSelected = theme.id === themeId;
           const isDark = isDarkAppUiTheme(theme.id);
+          const logoPalette = getOrbitLogoPalette(theme.id);
 
           return (
             <button
@@ -42,7 +45,8 @@ function AppUiThemeDropdown() {
             >
               <div className={cn("mb-2 overflow-hidden rounded-lg border border-border", isDark ? "bg-[#0b1120]" : "bg-background")}>
                 <div className="h-1.5" style={{ background: theme.previewGradient }} />
-                <div className="flex gap-1 p-1.5">
+                <div className="flex items-center gap-1.5 p-1.5">
+                  <OrbitMark palette={logoPalette} className="h-5 w-5 shrink-0" title="" />
                   <div className={cn("h-3 flex-1 rounded", isDark ? "bg-[#151c2f]" : "bg-white")} />
                   <div className="h-3 w-3 rounded-full" style={{ backgroundColor: theme.antdPrimary }} />
                 </div>
@@ -65,7 +69,7 @@ function AppUiThemeDropdown() {
     <Popover open={open} onOpenChange={setOpen} trigger="click" placement="bottomRight" content={content}>
       <Button
         type="text"
-        aria-label="Change FlowSync theme"
+        aria-label="Change Orbit theme"
         icon={<BgColorsOutlined className="text-lg!" />}
         className="flex! h-10! w-10! items-center! justify-center!"
       />

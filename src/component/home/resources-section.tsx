@@ -18,7 +18,7 @@ function ResourcesSection() {
           </Title>
 
           <Paragraph className="mt-4 text-hero-text">
-            Guides, templates, and sessions built by practitioners — so you can adopt FlowSync with confidence.
+            Guides, templates, and sessions built by practitioners — so you can adopt Orbit with confidence.
           </Paragraph>
         </AnimateOnScroll>
 

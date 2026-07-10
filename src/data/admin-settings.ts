@@ -73,7 +73,7 @@ export type SettingsToggleItem<K extends keyof PlatformSettings = keyof Platform
 };
 
 export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
-  platformName: "FlowSync",
+  platformName: "Orbit",
   defaultLanguage: "en-US",
   timezone: "America/Los_Angeles",
   brandColor: "#4F46E5",
@@ -89,10 +89,10 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   slackWebhook: "",
   stripeEnabled: true,
   sendgridEnabled: true,
-  webhookUrl: "https://api.flowsync.io/webhooks/platform",
+  webhookUrl: "https://api.Orbit.io/webhooks/platform",
   defaultCurrency: "USD",
   taxId: "US-84-3928102",
-  invoicePrefix: "FS-",
+  invoicePrefix: "OR-",
 };
 
 export const API_KEYS: ApiKeyRecord[] = [
@@ -136,7 +136,7 @@ export const BRANDING_HINTS = {
   favicon: "Upload a square image to appear in browser tabs.",
 } as const;
 
-export const DEFAULT_PLATFORM_LOGO = "/flow-sync.svg";
+export const DEFAULT_PLATFORM_LOGO = "/orbit.svg";
 
 export const NOTIFICATION_TOGGLES: SettingsToggleItem<"emailNotifications" | "weeklyDigest">[] = [
   {

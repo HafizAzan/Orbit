@@ -12,7 +12,7 @@ function InsightsSection() {
         <AnimateOnScroll variant="fade-left" className="order-2 nav:order-1">
           <img
             src={RESOURCES.IMAGES.DASHBOARD}
-            alt="FlowSync analytics dashboard"
+            alt="Orbit analytics dashboard"
             className="block max-w-none rounded-2xl object-cover object-left"
           />
         </AnimateOnScroll>
@@ -28,7 +28,7 @@ function InsightsSection() {
             </Title>
 
             <Paragraph size="base" color="muted" className="max-w-xl text-hero-text">
-              Go beyond simple task management. FlowSync&apos;s dashboard provides deep analytical insights into team velocity, resource allocation,
+              Go beyond simple task management. Orbit&apos;s dashboard provides deep analytical insights into team velocity, resource allocation,
               and project health, helping you make informed decisions faster.
             </Paragraph>
           </div>

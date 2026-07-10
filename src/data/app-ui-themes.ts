@@ -23,7 +23,7 @@ export const APP_UI_THEMES: AppUiThemeDefinition[] = [
   {
     id: "classic",
     label: "Classic",
-    description: "FlowSync default — indigo on clean slate.",
+    description: "Orbit default — indigo on clean slate.",
     previewGradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
     antdPrimary: "#4f46e5",
     mode: "light",

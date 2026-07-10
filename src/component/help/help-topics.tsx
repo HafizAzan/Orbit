@@ -21,7 +21,7 @@ function HelpTopics({ selectedTopicId, onSelectTopic }: HelpTopicsProps) {
             Find help by category
           </Title>
           <Paragraph className="mt-4 text-hero-text">
-            Select a topic to filter FAQs below, or browse all articles to explore everything FlowSync offers.
+            Select a topic to filter FAQs below, or browse all articles to explore everything Orbit offers.
           </Paragraph>
         </AnimateOnScroll>
 

@@ -10,7 +10,7 @@ function CtaSection() {
         <AnimateOnScroll variant="scale-in">
           <CtaBanner
             title="Ready to synchronize your team?"
-            description="Join 10,000+ companies already building the future with FlowSync."
+            description="Join 10,000+ companies already building the future with Orbit."
             primaryAction={{
               label: "Start for free",
               href: UN_AUTH_ROUTES.REGISTER,

@@ -9,9 +9,9 @@ import {
 } from "../api-services/notification.service";
 import { getSocket } from "../config/socket";
 import {
-  playFlowSyncNotificationSound,
-  unlockFlowSyncNotificationSound,
-} from "../lib/flow-sync-notification-sound";
+  playOrbitNotificationSound,
+  unlockOrbitNotificationSound,
+} from "../lib/orbit-notification-sound";
 
 export const notificationsQueryKey = ["workspace-notifications"] as const;
 export const notificationsUnreadQueryKey = ["workspace-notifications-unread"] as const;
@@ -62,7 +62,7 @@ export function useNotificationSocketListener(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
-    const unlock = () => unlockFlowSyncNotificationSound();
+    const unlock = () => unlockOrbitNotificationSound();
     window.addEventListener("pointerdown", unlock, { once: true });
     window.addEventListener("keydown", unlock, { once: true });
 
@@ -84,7 +84,7 @@ export function useNotificationSocketListener(enabled: boolean) {
       });
 
       queryClient.setQueryData<number>(notificationsUnreadQueryKey, (current = 0) => current + 1);
-      playFlowSyncNotificationSound();
+      playOrbitNotificationSound();
     };
 
     socket.on("notification:created", handleCreated);

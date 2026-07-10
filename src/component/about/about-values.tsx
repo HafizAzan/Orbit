@@ -12,7 +12,7 @@ function AboutValues() {
             Our Core Values
           </Title>
           <Paragraph size="base" className="mt-3 text-muted">
-            The principles that guide how we build, ship, and support FlowSync every day.
+            The principles that guide how we build, ship, and support Orbit every day.
           </Paragraph>
         </AnimateOnScroll>
 

@@ -51,7 +51,7 @@ export const HELP_HERO = {
   badge: "Help Center",
   title: "How can we help you?",
   description:
-    "Find answers, browse guides, and get support for FlowSync — whether you are setting up your first workspace or managing an enterprise rollout.",
+    "Find answers, browse guides, and get support for Orbit — whether you are setting up your first workspace or managing an enterprise rollout.",
   searchPlaceholder: "Search help articles and FAQs...",
 };
 
@@ -66,8 +66,8 @@ export const HELP_QUICK_LINKS: HelpQuickLink[] = [
   {
     id: "email",
     title: "Email us",
-    description: "support@flowsync.io — we reply within 24 hours.",
-    href: "mailto:support@flowsync.io",
+    description: "support@Orbit.io — we reply within 24 hours.",
+    href: "mailto:support@Orbit.io",
     icon: MailOutlined,
   },
   {
@@ -167,7 +167,7 @@ export const HELP_GUIDES: HelpGuide[] = [
     id: "onboarding-webinar",
     category: "Webinar",
     title: "Admin onboarding walkthrough",
-    description: "Watch how platform admins manage organizations, users, and subscriptions from the FlowSync console.",
+    description: "Watch how platform admins manage organizations, users, and subscriptions from the Orbit console.",
     meta: "35 min session",
     href: UN_AUTH_ROUTES.CONTACT,
     ctaLabel: "Watch replay",
@@ -182,7 +182,7 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     topicId: "getting-started",
     question: "How do I create my first workspace?",
     answer:
-      "Sign up for FlowSync, choose your organization name, and follow the onboarding wizard. Organization owners and admins can invite teammates from the Teams page (/teams). Managers and members cannot send org invites — ask your admin if you need someone added.",
+      "Sign up for Orbit, choose your organization name, and follow the onboarding wizard. Organization owners and admins can invite teammates from the Teams page (/teams). Managers and members cannot send org invites — ask your admin if you need someone added.",
   },
   {
     id: "invite-team",
@@ -196,7 +196,7 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     topicId: "getting-started",
     question: "Can I import boards from Jira or Trello?",
     answer:
-      "Yes. Use Settings → Import to connect Jira or Trello and map fields to FlowSync boards. Most teams complete a basic migration in under an hour.",
+      "Yes. Use Settings → Import to connect Jira or Trello and map fields to Orbit boards. Most teams complete a basic migration in under an hour.",
   },
   {
     id: "automations",
@@ -224,7 +224,7 @@ export const HELP_FAQ_ITEMS: HelpFaqItem[] = [
     topicId: "security",
     question: "How is my data backed up?",
     answer:
-      "FlowSync performs continuous replication with daily snapshots retained for 30 days on all paid plans. Enterprise customers can request extended retention and export schedules.",
+      "Orbit performs continuous replication with daily snapshots retained for 30 days on all paid plans. Enterprise customers can request extended retention and export schedules.",
   },
   {
     id: "upgrade-plan",

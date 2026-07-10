@@ -1,4 +1,4 @@
-const SOUND_PREF_KEY = "flow-sync.notification-sound";
+const SOUND_PREF_KEY = "orbit.notification-sound";
 const SOUND_VOLUME = 0.22;
 
 let audioContext: AudioContext | null = null;
@@ -22,7 +22,7 @@ function getAudioContext(): AudioContext | null {
 }
 
 /** Call once after a user gesture so browsers allow later notification audio. */
-export function unlockFlowSyncNotificationSound() {
+export function unlockOrbitNotificationSound() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -31,14 +31,14 @@ export function unlockFlowSyncNotificationSound() {
   });
 }
 
-export function isFlowSyncNotificationSoundEnabled() {
+export function isOrbitNotificationSoundEnabled() {
   if (typeof window === "undefined") return true;
   const stored = window.localStorage.getItem(SOUND_PREF_KEY);
   if (stored === "off") return false;
   return true;
 }
 
-export function setFlowSyncNotificationSoundEnabled(enabled: boolean) {
+export function setOrbitNotificationSoundEnabled(enabled: boolean) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(SOUND_PREF_KEY, enabled ? "on" : "off");
 }
@@ -65,12 +65,12 @@ function tone(
 }
 
 /**
- * Short branded motif for Flow Sync:
+ * Short branded motif for Orbit:
  * F4 → A4 → C5 (flow) + soft high sparkle (sync).
  * Distinct from generic WhatsApp / Slack / OS pings.
  */
-export function playFlowSyncNotificationSound(options?: { force?: boolean }) {
-  if (!options?.force && !isFlowSyncNotificationSoundEnabled()) return;
+export function playOrbitNotificationSound(options?: { force?: boolean }) {
+  if (!options?.force && !isOrbitNotificationSoundEnabled()) return;
   if (typeof document !== "undefined" && document.visibilityState === "hidden") {
     // Still play when tab is backgrounded if browser allows — skip only if muted preference.
   }
@@ -84,7 +84,7 @@ export function playFlowSyncNotificationSound(options?: { force?: boolean }) {
 
   const run = () => {
     const t0 = ctx.currentTime + 0.01;
-    // Flow Sync signature: F – A – C rising, then bright sync tip.
+    // Orbit signature: F – A – C rising, then bright sync tip.
     tone(ctx, 349.23, t0, 0.14, SOUND_VOLUME * 0.85, "triangle"); // F4
     tone(ctx, 440.0, t0 + 0.11, 0.14, SOUND_VOLUME * 0.9, "triangle"); // A4
     tone(ctx, 523.25, t0 + 0.22, 0.18, SOUND_VOLUME, "sine"); // C5
@@ -103,6 +103,6 @@ export function playFlowSyncNotificationSound(options?: { force?: boolean }) {
   run();
 }
 
-export function getFlowSyncNotificationSoundUnlocked() {
+export function getOrbitNotificationSoundUnlocked() {
   return unlocked;
 }

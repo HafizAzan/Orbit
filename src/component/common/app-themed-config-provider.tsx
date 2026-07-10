@@ -1,7 +1,7 @@
-import { ConfigProvider, theme as antdTheme } from "antd";
-import React, { type ReactNode } from "react";
-import { useAppUiTheme } from "../../context/app-ui-theme-context";
-import { isDarkAppUiTheme } from "../../data/app-ui-themes";
+import { ConfigProvider, theme as antdTheme } from 'antd';
+import React, { type ReactNode } from 'react';
+import { useAppUiTheme } from '../../context/app-ui-theme-context';
+import { isDarkAppUiTheme } from '../../data/app-ui-themes';
 
 type AppThemedConfigProviderProps = {
   children: ReactNode;
@@ -19,46 +19,46 @@ function AppThemedConfigProvider({ children }: AppThemedConfigProviderProps) {
           colorPrimary: antdPrimary,
           borderRadius: 10,
           controlHeight: 40,
-          fontFamily: '"Roboto", ui-sans-serif, system-ui, sans-serif',
+          fontFamily: '"Manrope", ui-sans-serif, system-ui, sans-serif',
           ...(isDark
             ? {
-                colorBgContainer: "#151c2f",
-                colorBgElevated: "#1a2332",
-                colorBorder: "#243044",
-                colorText: "#e2e8f0",
-                colorTextSecondary: "#94a3b8",
-                colorLink: "#818cf8",
-                colorLinkHover: "#a5b4fc",
-                colorLinkActive: "#c7d2fe",
+                colorBgContainer: '#151c2f',
+                colorBgElevated: '#1a2332',
+                colorBorder: '#243044',
+                colorText: '#e2e8f0',
+                colorTextSecondary: '#94a3b8',
+                colorLink: '#818cf8',
+                colorLinkHover: '#a5b4fc',
+                colorLinkActive: '#c7d2fe',
               }
             : {}),
         },
         components: isDark
           ? {
               Input: {
-                colorBgContainer: "#151c2f",
-                colorBorder: "#243044",
+                colorBgContainer: '#151c2f',
+                colorBorder: '#243044',
                 activeBorderColor: antdPrimary,
-                hoverBorderColor: "#334155",
+                hoverBorderColor: '#334155',
               },
               Select: {
-                colorBgContainer: "#151c2f",
-                colorBorder: "#243044",
-                optionSelectedBg: "rgba(99, 102, 241, 0.2)",
+                colorBgContainer: '#151c2f',
+                colorBorder: '#243044',
+                optionSelectedBg: 'rgba(99, 102, 241, 0.2)',
               },
               Button: {
-                defaultBg: "#151c2f",
-                defaultBorderColor: "#243044",
-                defaultColor: "#e2e8f0",
+                defaultBg: '#151c2f',
+                defaultBorderColor: '#243044',
+                defaultColor: '#e2e8f0',
               },
               Drawer: {
-                colorBgElevated: "#151c2f",
+                colorBgElevated: '#151c2f',
               },
               Popover: {
-                colorBgElevated: "#151c2f",
+                colorBgElevated: '#151c2f',
               },
               Dropdown: {
-                colorBgElevated: "#151c2f",
+                colorBgElevated: '#151c2f',
               },
             }
           : undefined,

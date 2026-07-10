@@ -27,7 +27,7 @@ export type ContactInfoGroup = {
 export const CONTACT_HERO = {
   title: "Contact Us",
   description:
-    "Have a question about FlowSync? Our team is here to help you streamline your workflow and scale your operations.",
+    "Have a question about Orbit? Our team is here to help you streamline your workflow and scale your operations.",
 };
 
 export const CONTACT_INFO_GROUPS: ContactInfoGroup[] = [
@@ -36,7 +36,7 @@ export const CONTACT_INFO_GROUPS: ContactInfoGroup[] = [
     title: "Support",
     icon: CustomerServiceOutlined,
     items: [
-      { id: "support-email", label: "Email", value: "support@flowsync.io", href: "mailto:support@flowsync.io", icon: MailOutlined },
+      { id: "support-email", label: "Email", value: "support@Orbit.io", href: "mailto:support@Orbit.io", icon: MailOutlined },
       { id: "support-phone", label: "Phone", value: "+1 (555) 123-4567", href: "tel:+15551234567", icon: PhoneOutlined },
       { id: "support-chat", label: "Live Chat", value: "Available 24/7", icon: CustomerServiceOutlined },
     ],
@@ -46,7 +46,7 @@ export const CONTACT_INFO_GROUPS: ContactInfoGroup[] = [
     title: "Sales",
     icon: ShopOutlined,
     items: [
-      { id: "sales-email", label: "Email", value: "sales@flowsync.io", href: "mailto:sales@flowsync.io", icon: MailOutlined },
+      { id: "sales-email", label: "Email", value: "sales@Orbit.io", href: "mailto:sales@Orbit.io", icon: MailOutlined },
       { id: "sales-phone", label: "Phone", value: "+1 (555) 987-6543", href: "tel:+15559876543", icon: PhoneOutlined },
     ],
   },
@@ -89,12 +89,12 @@ export const CONTACT_FAQ_ITEMS: FaqItem[] = [
     id: "enterprise",
     question: "Do you offer enterprise support?",
     answer:
-      "FlowSync Enterprise includes dedicated account management, SLA-backed support, and custom onboarding. Contact sales for details.",
+      "Orbit Enterprise includes dedicated account management, SLA-backed support, and custom onboarding. Contact sales for details.",
   },
   {
     id: "security-contact",
     question: "How do I report a security issue?",
     answer:
-      "Please email security@flowsync.io with details of the vulnerability. We take responsible disclosure seriously and respond promptly.",
+      "Please email security@Orbit.io with details of the vulnerability. We take responsible disclosure seriously and respond promptly.",
   },
 ];

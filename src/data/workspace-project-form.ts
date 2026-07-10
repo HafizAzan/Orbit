@@ -55,7 +55,7 @@ export const PROJECT_VISIBILITY_OPTIONS: {
   {
     value: "public",
     label: "Public",
-    description: "Everyone in FlowSync can browse and join this project.",
+    description: "Everyone in Orbit can browse and join this project.",
   },
 ];
 

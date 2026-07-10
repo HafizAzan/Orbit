@@ -14,7 +14,7 @@ function SettingsGeneralSection({ settings, onChange }: SettingsGeneralSectionPr
     <SettingsSection
       id="general"
       title="General Settings"
-      description="Core identification and localization for your FlowSync instance."
+      description="Core identification and localization for your Orbit instance."
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <SettingsField label="Platform Name">

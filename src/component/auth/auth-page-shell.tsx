@@ -22,7 +22,7 @@ function AuthPageShell({ children }: AuthPageShellProps) {
 
       <AnimateOnScroll immediate variant="fade-in" delay={200}>
         <Text as="p" size="sm" color="muted" className="relative z-10 mt-10 text-center">
-          © {new Date().getFullYear()} FlowSync Technologies Inc. All rights reserved.
+          © {new Date().getFullYear()} Orbit Technologies Inc. All rights reserved.
         </Text>
       </AnimateOnScroll>
     </div>

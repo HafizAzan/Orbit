@@ -44,7 +44,7 @@ function KanbanSection() {
         <AnimateOnScroll variant="fade-right" delay={120} className="overflow-hidden rounded-[28px] border-4 border-white/90 bg-white p-2 nav:rounded-[32px] nav:border-8 nav:p-3">
           <img
             src={RESOURCES.IMAGES.KANBAN_LAPTOP}
-            alt="FlowSync Kanban board on laptop"
+            alt="Orbit Kanban board on laptop"
             className="h-auto w-full rounded-2xl object-cover nav:rounded-3xl"
           />
         </AnimateOnScroll>

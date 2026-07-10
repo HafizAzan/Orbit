@@ -185,7 +185,7 @@ function OrganizationCreateModal({ open, record = null, onClose }: OrganizationC
                 <Text className={cn("font-mono font-semibold", organizationName.trim() ? "text-primary" : "text-muted")}>
                   {organizationName.trim() ? previewSlug : "your-workspace"}
                 </Text>
-                <Text className="font-mono" color="muted">.flowsync.io</Text>
+                <Text className="font-mono" color="muted">.Orbit.io</Text>
               </span>
               <span className="shrink-0 rounded-full bg-feature-sync px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary uppercase">
                 Auto

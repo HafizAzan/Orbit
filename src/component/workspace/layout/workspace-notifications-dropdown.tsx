@@ -5,11 +5,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../context/app-context";
 import type { ApiNotification } from "../../../api-services/notification.service";
 import {
-  isFlowSyncNotificationSoundEnabled,
-  playFlowSyncNotificationSound,
-  setFlowSyncNotificationSoundEnabled,
-  unlockFlowSyncNotificationSound,
-} from "../../../lib/flow-sync-notification-sound";
+  isOrbitNotificationSoundEnabled,
+  playOrbitNotificationSound,
+  setOrbitNotificationSoundEnabled,
+  unlockOrbitNotificationSound,
+} from "../../../lib/orbit-notification-sound";
 import { cn } from "../../../lib/utils";
 import { resolveWorkspaceNotificationHref } from "../../../lib/workspace-notification-routing";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
@@ -33,7 +33,7 @@ function WorkspaceNotificationsDropdown() {
   const role = app?.user?.role;
   const isMember = role === "member";
   const [open, setOpen] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(() => isFlowSyncNotificationSoundEnabled());
+  const [soundEnabled, setSoundEnabled] = useState(() => isOrbitNotificationSoundEnabled());
   const notificationsQuery = useNotifications();
   const unreadQuery = useUnreadNotificationCount();
   const { mutate: markAsRead } = useMarkNotificationAsRead();
@@ -43,12 +43,12 @@ function WorkspaceNotificationsDropdown() {
   const unreadCount = unreadQuery.data ?? notifications.filter((notification) => !notification.read).length;
 
   const handleToggleSound = useCallback(() => {
-    unlockFlowSyncNotificationSound();
+    unlockOrbitNotificationSound();
     const next = !soundEnabled;
-    setFlowSyncNotificationSoundEnabled(next);
+    setOrbitNotificationSoundEnabled(next);
     setSoundEnabled(next);
     if (next) {
-      playFlowSyncNotificationSound({ force: true });
+      playOrbitNotificationSound({ force: true });
     }
   }, [soundEnabled]);
 
@@ -86,7 +86,7 @@ function WorkspaceNotificationsDropdown() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
-          <Tooltip title={soundEnabled ? "Mute Flow Sync sound" : "Enable Flow Sync sound"}>
+          <Tooltip title={soundEnabled ? "Mute Orbit sound" : "Enable Orbit sound"}>
             <Button
               type="text"
               size="small"

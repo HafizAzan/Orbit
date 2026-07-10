@@ -1,24 +1,27 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import ProjectCard from "../../component/workspace/projects/project-card";
-import ProjectTemplateCard from "../../component/workspace/projects/project-template-card";
-import ProjectsPageHeader from "../../component/workspace/projects/projects-page-header";
-import ProjectsToolbar from "../../component/workspace/projects/projects-toolbar";
-import QueryPageGuard from "../../component/common/query-page-guard";
-import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
-import TablePaginationFooter from "../../component/ui/table-pagination-footer";
-import { ProjectsPageSkeleton } from "../../component/skeletons";
-import { useAppContext } from "../../context/app-context";
-import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
-import { useDeleteProject, useProjects } from "../../hooks/use-workspace-projects";
-import type { ProjectsViewMode } from "../../data/workspace-projects";
-import { buildProjectTeamFilterOptions } from "../../data/workspace-projects";
-import { DEFAULT_PROJECTS_LIST_PARAMS, DEFAULT_PROJECTS_PAGE_SIZE } from "../../types/project.types";
-import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
-import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
-import { getDeletableProjectIds } from "../../lib/project-access";
-import { pluralize } from "../../lib/helper";
-import { cn } from "../../lib/utils";
-import { Text } from "../../component/ui/typography";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import QueryPageGuard from '../../component/common/query-page-guard';
+import { ProjectsPageSkeleton } from '../../component/skeletons';
+import TablePaginationFooter from '../../component/ui/table-pagination-footer';
+import { Text } from '../../component/ui/typography';
+import ProjectCard from '../../component/workspace/projects/project-card';
+import ProjectTemplateCard from '../../component/workspace/projects/project-template-card';
+import ProjectsPageHeader from '../../component/workspace/projects/projects-page-header';
+import ProjectsToolbar from '../../component/workspace/projects/projects-toolbar';
+import WorkspaceRoleGate from '../../component/workspace/workspace-role-gate';
+import { useAppContext } from '../../context/app-context';
+import type { ProjectsViewMode } from '../../data/workspace-projects';
+import { buildProjectTeamFilterOptions } from '../../data/workspace-projects';
+import useWorkspacePermissions from '../../hooks/use-workspace-permissions';
+import { useDeleteProject, useProjects } from '../../hooks/use-workspace-projects';
+import { showApiErrorToast, showApiSuccessToast } from '../../lib/api-error';
+import { pluralize } from '../../lib/helper';
+import { getDeletableProjectIds } from '../../lib/project-access';
+import { cn } from '../../lib/utils';
+import {
+  DEFAULT_PROJECTS_LIST_PARAMS,
+  DEFAULT_PROJECTS_PAGE_SIZE,
+  mapApiProjectToWorkspaceProject,
+} from '../../types/project.types';
 
 function WorkspaceProjects() {
   return (
@@ -48,16 +51,16 @@ function WorkspaceProjectsContent() {
   const projects = projectsPage?.data ?? [];
   const totalProjects = projectsPage?.total ?? 0;
   const { mutateAsync: deleteProject } = useDeleteProject();
-  const canBulkDeleteProjects = can("project.delete");
+  const canBulkDeleteProjects = can('project.delete');
   const deletableProjectIds = useMemo(
     () => getDeletableProjectIds(deleteActor, projects),
     [deleteActor, projects],
   );
-  const canCreateProject = can("project.create");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [priorityFilter, setPriorityFilter] = useState("all");
-  const [teamFilter, setTeamFilter] = useState("all");
-  const [viewMode, setViewMode] = useState<ProjectsViewMode>("grid");
+  const canCreateProject = can('project.create');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [teamFilter, setTeamFilter] = useState('all');
+  const [viewMode, setViewMode] = useState<ProjectsViewMode>('grid');
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
 
   const workspaceProjects = useMemo(
@@ -72,15 +75,15 @@ function WorkspaceProjectsContent() {
 
   const filteredProjects = useMemo(() => {
     return workspaceProjects.filter((project) => {
-      if (statusFilter !== "all" && project.status !== statusFilter) {
+      if (statusFilter !== 'all' && project.status !== statusFilter) {
         return false;
       }
 
-      if (priorityFilter !== "all" && project.priority !== priorityFilter) {
+      if (priorityFilter !== 'all' && project.priority !== priorityFilter) {
         return false;
       }
 
-      if (teamFilter !== "all" && project.teamId !== teamFilter) {
+      if (teamFilter !== 'all' && project.teamId !== teamFilter) {
         return false;
       }
 
@@ -119,7 +122,7 @@ function WorkspaceProjectsContent() {
 
   const handlePageChange = useCallback((nextPage: number) => {
     setPage(nextPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const selectedCount = selectedProjectIds.length;
@@ -152,7 +155,7 @@ function WorkspaceProjectsContent() {
       }
 
       showApiSuccessToast(
-        `${selectedCount} ${pluralize(selectedCount, "project")} deleted successfully`,
+        `${selectedCount} ${pluralize(selectedCount, 'project')} deleted successfully`,
       );
       setSelectedProjectIds([]);
     } catch (error) {
@@ -162,12 +165,16 @@ function WorkspaceProjectsContent() {
 
   const resultsSummary = (
     <Text as="span" size="sm" color="muted">
-      Showing{" "}
+      Showing{' '}
       <Text as="span" weight="semibold">
         {totalProjects === 0 ? 0 : (currentPage - 1) * pageSize + 1}-
         {Math.min(currentPage * pageSize, totalProjects)}
-      </Text>{" "}
-      of <Text as="span" weight="semibold">{totalProjects}</Text> projects
+      </Text>{' '}
+      of{' '}
+      <Text as="span" weight="semibold">
+        {totalProjects}
+      </Text>{' '}
+      projects
     </Text>
   );
 
@@ -202,9 +209,9 @@ function WorkspaceProjectsContent() {
 
         <div
           className={cn(
-            viewMode === "grid"
-              ? "grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
-              : "flex flex-col gap-4",
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'
+              : 'flex flex-col gap-4',
           )}
         >
           {filteredProjects.map((project) => (
@@ -217,7 +224,7 @@ function WorkspaceProjectsContent() {
               onSelectedChange={(selected) => handleProjectSelectedChange(project.id, selected)}
             />
           ))}
-          {viewMode === "grid" && canCreateProject ? <ProjectTemplateCard /> : null}
+          {viewMode === 'grid' && canCreateProject ? <ProjectTemplateCard /> : null}
         </div>
 
         {totalProjects > 0 ? (

@@ -6,7 +6,7 @@ export type TrustedBrand = {
 const TRUSTED_BRANDS: TrustedBrand[] = [
   { name: "NovaTech", logo: "/svg/brands/brand-1.svg" },
   { name: "Waveform", logo: "/svg/brands/brand-2.svg" },
-  { name: "Orbit", logo: "/svg/brands/brand-3.svg" },
+  { name: "Helix", logo: "/svg/brands/brand-3.svg" },
   { name: "Pulse", logo: "/svg/brands/brand-4.svg" },
   { name: "Apex", logo: "/svg/brands/brand-5.svg" },
 ];

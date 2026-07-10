@@ -58,7 +58,7 @@ function AcceptInvitePreview({ invite }: AcceptInvitePreviewProps) {
                   {invite.organizationName}
                 </Title>
                 <Text as="p" size="sm" color="muted" className="mt-1 truncate">
-                  flowsync.io/workspace/{invite.organizationSlug}
+                  Orbit.io/workspace/{invite.organizationSlug}
                 </Text>
               </div>
             </div>

@@ -1,5 +1,5 @@
-const ACCESS_TOKEN_COOKIE = "flow-sync.access_token";
-const REFRESH_TOKEN_COOKIE = "flow-sync.refresh_token";
+const ACCESS_TOKEN_COOKIE = "orbit.access_token";
+const REFRESH_TOKEN_COOKIE = "orbit.refresh_token";
 
 const REMEMBER_ME_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 const SESSION_MAX_AGE_SECONDS = 30 * 60;
