@@ -1,6 +1,9 @@
 import type { BillingInvoice } from "../types/billing.types";
 import type { BillingCatalogProduct, PlanCode, PricingPlanCard } from "../types/billing.types";
-import { mapCatalogToPricingPlans } from "../lib/pricing-catalog";
+import {
+  mapCatalogToPricingPlans,
+  type PricingBillingInterval,
+} from "../lib/pricing-catalog";
 
 export type WorkspaceBillingPlan = PricingPlanCard & {
   plan: PlanCode;
@@ -81,12 +84,17 @@ export function resolveWorkspaceInvoices(apiInvoices: BillingInvoice[] | undefin
 
 export const WORKSPACE_PLAN_ORDER: PlanCode[] = ["FREE", "PRO", "BUSINESS", "ENTERPRISE"];
 
-export function resolveWorkspaceBillingPlans(products: BillingCatalogProduct[] | undefined): WorkspaceBillingPlan[] {
+export function resolveWorkspaceBillingPlans(
+  products: BillingCatalogProduct[] | undefined,
+  interval: PricingBillingInterval = "monthly",
+): WorkspaceBillingPlan[] {
   if (!products?.length) return [];
 
-  return mapCatalogToPricingPlans(products).map((plan, index) => ({
+  const planByProductId = new Map(products.map((product) => [product.id, product.plan]));
+
+  return mapCatalogToPricingPlans(products, interval).map((plan) => ({
     ...plan,
-    plan: products[index]?.plan ?? "PRO",
+    plan: planByProductId.get(plan.id) ?? "PRO",
   }));
 }
 

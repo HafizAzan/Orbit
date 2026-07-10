@@ -38,7 +38,14 @@ export type ApiWorkspaceProject = {
   themeMeta: ApiProjectThemeMeta;
   leadUserId: string | null;
   createdById: string;
-  members: Array<ProjectTeamMember & { email?: string; projectRole?: string }>;
+  members: Array<
+    ProjectTeamMember & {
+      email?: string;
+      projectRole?: string;
+      /** Organization role when provided by API. */
+      role?: RegisterAs;
+    }
+  >;
   viewerRole: "admin" | "member" | "viewer" | "org_admin" | null;
 };
 
@@ -142,7 +149,12 @@ export function mapApiProjectToFormValues(project: ApiWorkspaceProject): Project
     visibility: project.visibility,
     leadUserId: project.leadUserId,
     memberIds: project.members
-      .map((member) => member.id)
-      .filter((memberId) => memberId !== project.leadUserId),
+      .filter((member) => {
+        if (member.id === project.leadUserId) return false;
+        // Prefer org role when present so managers only keep true members in squad selection.
+        if (member.role) return member.role === "member";
+        return true;
+      })
+      .map((member) => member.id),
   };
 }

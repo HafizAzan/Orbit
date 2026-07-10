@@ -29,6 +29,8 @@ export type TaskAssigneeOption = {
   id: string;
   name: string;
   initials: string;
+  /** Organization workspace role when known. */
+  role?: string;
 };
 
 export const TASK_FORM_STATUS_OPTIONS: {

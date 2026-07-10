@@ -2,6 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import MarkdownContent from "../../component/common/markdown-content";
 import QueryPageGuard from "../../component/common/query-page-guard";
+import TaskAiTipCard from "../../component/workspace/tasks/task-ai-tip-card";
 import TaskDetailAttachments from "../../component/workspace/tasks/task-detail-attachments";
 import TaskDetailHeader from "../../component/workspace/tasks/task-detail-header";
 import TaskDetailSidebar from "../../component/workspace/tasks/task-detail-sidebar";
@@ -41,6 +42,7 @@ function WorkspaceTaskDetail() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
             <div className="space-y-6">
               {canUpdateStatus ? <TaskDetailStatusActions task={task} /> : null}
+              <TaskAiTipCard task={task} />
 
               <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
                 <Text as="p" size="sm" weight="semibold">Description</Text>

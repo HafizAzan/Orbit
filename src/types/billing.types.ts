@@ -48,6 +48,54 @@ export type CurrentSubscriptionResponse = {
   lastPaymentAt: string | null;
 };
 
+export type PlanFeatureFlag =
+  | "projects"
+  | "boards"
+  | "tasks"
+  | "basic_reporting"
+  | "advanced_workflows"
+  | "team_dashboards"
+  | "reports"
+  | "multi_team"
+  | "advanced_permissions"
+  | "workload_reports"
+  | "priority_support"
+  | "dedicated_onboarding"
+  | "sso"
+  | "custom_roles"
+  | "dedicated_success"
+  | "custom_sla";
+
+export type OrganizationUsageMetric = {
+  key: "staff_users" | "projects" | "boards";
+  label: string;
+  used: number;
+  limit: number | null;
+  unlimited: boolean;
+};
+
+export type OrganizationUsageResponse = {
+  organizationId: string;
+  plan: PlanCode;
+  productId: string | null;
+  productName: string | null;
+  status: SubscriptionStatus;
+  features: string[];
+  featureFlags: PlanFeatureFlag[];
+  metadata: Record<string, string>;
+  limits: {
+    max_staff_users: number | null;
+    max_projects: number | null;
+    max_boards: number | null;
+  };
+  usage: {
+    staffUsers: number;
+    projects: number;
+    boards: number;
+  };
+  metrics: OrganizationUsageMetric[];
+};
+
 export type BillingInvoice = {
   id: string;
   number: string | null;
@@ -123,4 +171,6 @@ export type PricingPlanCard = {
   ctaType: CatalogCtaType;
   highlighted: boolean;
   badge?: string;
+  billingCycle?: BillingCycle;
+  savingsLabel?: string;
 };

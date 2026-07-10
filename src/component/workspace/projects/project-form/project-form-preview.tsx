@@ -20,7 +20,10 @@ function ProjectFormPreview({ values, leadName }: ProjectFormPreviewProps) {
   const selectedMembers = useMemo(
     () =>
       assignableMembers.filter(
-        (member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId,
+        (member) =>
+          member.role === "member" &&
+          values.memberIds.includes(member.id) &&
+          member.id !== values.leadUserId,
       ),
     [assignableMembers, values.leadUserId, values.memberIds],
   );

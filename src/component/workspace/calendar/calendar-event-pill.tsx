@@ -11,6 +11,7 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { CALENDAR_EVENT_TYPE_META, type CalendarEvent } from "../../../data/workspace-calendar";
 import { useAppContext } from "../../../context/app-context";
+import useWorkspacePermissions from "../../../hooks/use-workspace-permissions";
 import { useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { isManageableCalendarEvent } from "../../../lib/calendar-utils";
 import { resolveCalendarEventHref } from "../../../lib/workspace-calendar-routing";
@@ -40,10 +41,12 @@ function CalendarEventPill({
   onDeleteEvent,
 }: CalendarEventPillProps) {
   const app = useAppContext();
+  const { can } = useWorkspacePermissions();
   const isDark = useIsDarkAppTheme();
   const meta = CALENDAR_EVENT_TYPE_META[event.type];
   const href = resolveEventHref(event, app?.user?.role);
-  const canManage = isManageableCalendarEvent(event, currentUserId) && app?.user?.role !== "member";
+  const canManage =
+    isManageableCalendarEvent(event, currentUserId) && can("calendar.manage");
 
   const menuItems = useMemo<MenuProps["items"]>(
     () => [

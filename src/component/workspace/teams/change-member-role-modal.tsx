@@ -10,6 +10,7 @@ import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { useUpdateTeamMemberRole } from "../../../hooks/use-workspace-team";
 import Modal from "../../ui/modal";
 import { Label, Paragraph, Title } from "../../ui/typography";
+import MembershipAiImpactNote from "./membership-ai-impact-note";
 
 type ChangeMemberRoleModalProps = {
   member: TeamMember | null;
@@ -23,6 +24,7 @@ type ChangeRoleFormValues = {
 function ChangeMemberRoleModal({ member, onClose }: ChangeMemberRoleModalProps) {
   const [form] = Form.useForm<ChangeRoleFormValues>();
   const { mutateAsync: updateRole, isPending } = useUpdateTeamMemberRole();
+  const selectedRole = Form.useWatch("role", form);
 
   useEffect(() => {
     if (!member) return;
@@ -76,6 +78,19 @@ function ChangeMemberRoleModal({ member, onClose }: ChangeMemberRoleModalProps) 
             <Select size="large" options={TEAM_INVITE_ROLE_OPTIONS} className="w-full" />
           </Form.Item>
         </Form>
+
+        {member && selectedRole ? (
+          <div className="mt-4">
+            <MembershipAiImpactNote
+              changeType="role_change"
+              changeContext={JSON.stringify({
+                memberName: member.name,
+                currentRole: member.role,
+                nextRole: selectedRole,
+              })}
+            />
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-col-reverse gap-2 border-t border-border bg-background/60 px-6 py-4 sm:flex-row sm:justify-end">

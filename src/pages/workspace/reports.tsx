@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import QueryPageGuard from "../../component/common/query-page-guard";
+import ProjectAiHealthCard from "../../component/workspace/projects/project-ai-health-card";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
 import { ReportsPageSkeleton } from "../../component/skeletons";
 import { useWorkspaceReports } from "../../hooks/use-workspace-tasks";
@@ -8,6 +9,7 @@ import { Paragraph, Text, Title } from "../../component/ui/typography";
 function WorkspaceReportsContent() {
   const reportsQuery = useWorkspaceReports();
   const { data } = reportsQuery;
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   return (
     <QueryPageGuard
@@ -43,9 +45,11 @@ function WorkspaceReportsContent() {
                   </Paragraph>
                 ) : (
                   data.tasksByProject.map((project) => (
-                    <div
+                    <button
                       key={project.projectId}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
+                      type="button"
+                      onClick={() => setSelectedProjectId(project.projectId)}
+                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 text-left transition-colors hover:border-primary/40"
                     >
                       <div>
                         <Text as="p" weight="medium">{project.projectName}</Text>
@@ -54,7 +58,7 @@ function WorkspaceReportsContent() {
                       <Text as="p" size="sm" weight="semibold">
                         {project.completed}/{project.total} done
                       </Text>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>
@@ -75,6 +79,28 @@ function WorkspaceReportsContent() {
               </div>
             </section>
           </div>
+
+          {selectedProjectId ? (
+            <div className="mt-6">
+              <ProjectAiHealthCard
+                projectId={selectedProjectId}
+                projectName={
+                  data.tasksByProject.find((project) => project.projectId === selectedProjectId)
+                    ?.projectName ?? "Project"
+                }
+              />
+            </div>
+          ) : data.tasksByProject[0] ? (
+            <div className="mt-6">
+              <Paragraph size="sm" color="muted" className="mb-3!">
+                Select a project above, or generate health for the top project.
+              </Paragraph>
+              <ProjectAiHealthCard
+                projectId={data.tasksByProject[0].projectId}
+                projectName={data.tasksByProject[0].projectName}
+              />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </QueryPageGuard>

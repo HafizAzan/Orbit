@@ -1,6 +1,6 @@
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WorkspaceProjectDetail } from "../../../data/workspace-project-detail";
 import { getProjectTheme, type ProjectThemeId } from "../../../data/project-themes";
@@ -18,6 +18,7 @@ import WorkspaceNavLink from "../common/workspace-nav-link";
 import DeleteProjectButton from "./delete-project-button";
 import ProjectStatusActions from "./project-status-actions";
 import ProjectWorkspaceTabs from "./project-workspace-tabs";
+import WorkBreakdownModal from "./work-breakdown-modal";
 import { Paragraph, Title } from "../../ui/typography";
 
 type ProjectDetailHeaderProps = {
@@ -36,10 +37,12 @@ function ProjectDetailHeader({
   completedTaskCount,
 }: ProjectDetailHeaderProps) {
   const navigate = useNavigate();
-  const { can } = useWorkspacePermissions();
+  const { can, role } = useWorkspacePermissions();
   const { mutateAsync: deleteProject } = useDeleteProject();
   const canEditProject = can("project.edit");
+  const canWorkBreakdown = can("task.create") && (role === "admin" || role === "manager");
   const showDeleteProject = canDelete;
+  const [workBreakdownOpen, setWorkBreakdownOpen] = useState(false);
   const { returnPath } = useWorkspaceReturnTo(WORKSPACE_ROUTES.PROJECTS, "Projects");
   const theme = getProjectTheme(themeId);
   const accent = themeMeta ?? theme;
@@ -109,6 +112,17 @@ function ProjectDetailHeader({
                 taskCount={project.taskCount}
               />
 
+              {canWorkBreakdown ? (
+                <Button
+                  icon={<ThunderboltOutlined />}
+                  size="large"
+                  className="font-semibold!"
+                  onClick={() => setWorkBreakdownOpen(true)}
+                >
+                  AI Breakdown
+                </Button>
+              ) : null}
+
               {canEditProject ? (
                 <WorkspaceNavLink to={getProjectEditPath(project.id)} preserveReturn>
                   <Button type="primary" icon={<EditOutlined />} size="large" className="font-semibold!">
@@ -126,6 +140,13 @@ function ProjectDetailHeader({
       </div>
 
       <ProjectWorkspaceTabs projectId={project.id} active="overview" />
+
+      <WorkBreakdownModal
+        open={workBreakdownOpen}
+        projectId={project.id}
+        projectName={project.title}
+        onClose={() => setWorkBreakdownOpen(false)}
+      />
     </div>
   );
 }

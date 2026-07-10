@@ -32,7 +32,7 @@ function GlobalActivityFeed({ items }: GlobalActivityFeedProps) {
           No recent workspace activity yet. Actions on tasks, projects, and teams will appear here.
         </Paragraph>
       ) : (
-        <ul className="mt-5 flex-1 space-y-5">
+        <ul className="mt-5 min-h-40 max-h-80 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-1">
           {items.slice(0, 5).map((item) => (
             <li key={item.id} className="flex gap-3">
               <div

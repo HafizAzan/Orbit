@@ -1,5 +1,5 @@
-import { DeleteOutlined } from "@ant-design/icons";
-import { Button, Table, Tag } from "antd";
+import { DeleteOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { Button, Space, Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import type { ActivityEvent } from "../../../types/activity.types";
 import { formatDate } from "../../../lib/helper";
@@ -13,6 +13,7 @@ import QueryErrorState from "../../common/query-error-state";
 import { ConfirmModal } from "../../ui/modal";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
 import { Text } from "../../ui/typography";
+import ActivityAiDescribeModal from "./activity-ai-describe-modal";
 
 const MODULE_LABELS: Record<ActivityEvent["module"], string> = {
   tasks: "Tasks",
@@ -35,6 +36,7 @@ function WorkspaceActivityLogsSection({
 }: WorkspaceActivityLogsSectionProps) {
   const [page, setPage] = useState(1);
   const [pendingDelete, setPendingDelete] = useState<ActivityEvent | null>(null);
+  const [describeTarget, setDescribeTarget] = useState<ActivityEvent | null>(null);
   const activitiesQuery = useWorkspaceActivities({ page, limit: pageSize });
   const { mutateAsync: deleteActivityLog, isPending: deleting } = useDeleteWorkspaceActivity();
 
@@ -77,18 +79,27 @@ function WorkspaceActivityLogsSection({
       {
         title: "Actions",
         key: "actions",
-        width: 80,
+        width: 110,
         align: "center" as const,
-        render: (_: unknown, record: ActivityEvent) =>
-          record.canDelete ? (
+        render: (_: unknown, record: ActivityEvent) => (
+          <Space size={0}>
             <Button
               type="text"
-              danger
-              icon={<DeleteOutlined />}
-              aria-label="Delete activity log"
-              onClick={() => setPendingDelete(record)}
+              icon={<ThunderboltOutlined />}
+              aria-label="Describe activity with AI"
+              onClick={() => setDescribeTarget(record)}
             />
-          ) : null,
+            {record.canDelete ? (
+              <Button
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                aria-label="Delete activity log"
+                onClick={() => setPendingDelete(record)}
+              />
+            ) : null}
+          </Space>
+        ),
       },
     ],
     [],
@@ -133,6 +144,12 @@ function WorkspaceActivityLogsSection({
           onChange={setPage}
         />
       ) : null}
+
+      <ActivityAiDescribeModal
+        open={describeTarget !== null}
+        activity={describeTarget}
+        onClose={() => setDescribeTarget(null)}
+      />
 
       <ConfirmModal
         open={pendingDelete !== null}

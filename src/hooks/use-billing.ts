@@ -6,6 +6,7 @@ import {
   createCheckout,
   getCatalog,
   getCurrentSubscription,
+  getOrganizationUsage,
   listInvoices,
   refundPayment,
   selectPlan,
@@ -50,6 +51,17 @@ export function useCurrentSubscription() {
   });
 }
 
+export function useOrganizationUsage() {
+  const { isAuthenticated } = useBillingAccess();
+
+  return useQuery({
+    queryKey: ["billing-usage"],
+    queryFn: getOrganizationUsage,
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+  });
+}
+
 export function useBillingInvoices() {
   const { isAuthenticated, canManage } = useBillingAccess();
 
@@ -86,6 +98,7 @@ export function useCancelPlan() {
     mutationFn: (data: CancelPlanRequest = {}) => cancelPlan(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["billing-subscription"] });
+      queryClient.invalidateQueries({ queryKey: ["billing-usage"] });
       queryClient.invalidateQueries({ queryKey: ["billing-invoices"] });
     },
   });
@@ -98,6 +111,7 @@ export function useChangePlan() {
     mutationFn: (data: ChangePlanRequest) => changePlan(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["billing-subscription"] });
+      queryClient.invalidateQueries({ queryKey: ["billing-usage"] });
       queryClient.invalidateQueries({ queryKey: ["billing-invoices"] });
     },
   });

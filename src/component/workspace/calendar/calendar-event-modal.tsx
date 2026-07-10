@@ -1,6 +1,7 @@
-import { CalendarOutlined } from "@ant-design/icons";
+import { CalendarOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select } from "antd";
 import React, { useEffect } from "react";
+import { useGenerateCalendarDraft } from "../../../hooks/use-ai";
 import { useProjectsForSelect } from "../../../hooks/use-workspace-projects";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import Modal from "../../ui/modal";
@@ -41,7 +42,11 @@ function CalendarEventModal({
 }: CalendarEventModalProps) {
   const [form] = Form.useForm<CalendarEventFormValues>();
   const { data: projects = [] } = useProjectsForSelect();
+  const { mutateAsync: generateDraft, isPending: drafting } = useGenerateCalendarDraft();
   const isEdit = mode === "edit";
+  const watchedTitle = Form.useWatch("title", form) ?? "";
+  const watchedProjectId = Form.useWatch("projectId", form);
+  const watchedDescription = Form.useWatch("description", form) ?? "";
 
   useEffect(() => {
     if (!open) {
@@ -73,13 +78,37 @@ function CalendarEventModal({
     }
   };
 
+  const handleAiDraft = async () => {
+    const notes =
+      watchedDescription.trim() ||
+      watchedTitle.trim() ||
+      "Draft a useful team meeting agenda for this workspace calendar event.";
+    const projectName = projects.find((project) => project.id === watchedProjectId)?.title;
+
+    try {
+      const result = await generateDraft({
+        notes,
+        preferredTitle: watchedTitle.trim() || undefined,
+        projectName,
+      });
+      form.setFieldsValue({
+        title: result.draft.title,
+        type: result.draft.type,
+        description: result.draft.description,
+      });
+      showApiSuccessToast(result.message);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  };
+
   return (
     <Modal
       open={open}
       onCancel={onClose}
       footer={null}
-      closable={!submitting}
-      maskClosable={!submitting}
+      closable={!submitting && !drafting}
+      maskClosable={!submitting && !drafting}
       width={520}
       classNames={{
         container: "rounded-2xl! overflow-hidden! p-0! shadow-xl!",
@@ -88,20 +117,34 @@ function CalendarEventModal({
       }}
     >
       <div className="px-6 pt-6 pb-5">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-feature-sync text-primary">
-            <CalendarOutlined className="text-lg" />
-          </span>
-          <div>
-            <Title level={4} className="mb-0! text-foreground">
-              {isEdit ? "Edit Event" : "New Event"}
-            </Title>
-            <Paragraph size="sm" className="mt-1 mb-0! text-muted">
-              {isEdit
-                ? "Update this scheduled team event or deadline."
-                : "Schedule a team event or deadline on your workspace calendar."}
-            </Paragraph>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-feature-sync text-primary">
+              <CalendarOutlined className="text-lg" />
+            </span>
+            <div>
+              <Title level={4} className="mb-0! text-foreground">
+                {isEdit ? "Edit Event" : "New Event"}
+              </Title>
+              <Paragraph size="sm" className="mt-1 mb-0! text-muted">
+                {isEdit
+                  ? "Update this scheduled team event or deadline."
+                  : "Schedule a team event or deadline on your workspace calendar."}
+              </Paragraph>
+            </div>
           </div>
+          <Button
+            type="link"
+            size="small"
+            icon={<ThunderboltOutlined />}
+            loading={drafting}
+            disabled={submitting}
+            onClick={() => {
+              void handleAiDraft();
+            }}
+          >
+            AI Draft
+          </Button>
         </div>
 
         <Form
@@ -116,7 +159,7 @@ function CalendarEventModal({
             label={<Label>Title</Label>}
             rules={[{ required: true, message: "Please enter an event title" }]}
           >
-            <Input size="large" placeholder="e.g. Sprint planning" className="rounded-xl!" />
+            <Input size="large" placeholder="e.g. Sprint planning" className="rounded-xl!" disabled={drafting} />
           </Form.Item>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -133,7 +176,7 @@ function CalendarEventModal({
               label={<Label>Type</Label>}
               rules={[{ required: true, message: "Please select an event type" }]}
             >
-              <Select size="large" options={EVENT_TYPE_OPTIONS} className="w-full" />
+              <Select size="large" options={EVENT_TYPE_OPTIONS} className="w-full" disabled={drafting} />
             </Form.Item>
           </div>
 
@@ -147,6 +190,7 @@ function CalendarEventModal({
                 label: project.title,
               }))}
               className="w-full"
+              disabled={drafting}
             />
           </Form.Item>
 
@@ -157,19 +201,21 @@ function CalendarEventModal({
               showCount
               placeholder="Add notes for your team..."
               className="rounded-xl!"
+              disabled={drafting}
             />
           </Form.Item>
         </Form>
       </div>
 
       <div className="flex flex-col-reverse gap-2 border-t border-border bg-background/60 px-6 py-4 sm:flex-row sm:justify-end">
-        <Button size="large" onClick={onClose} disabled={submitting} className="rounded-xl!">
+        <Button size="large" onClick={onClose} disabled={submitting || drafting} className="rounded-xl!">
           Cancel
         </Button>
         <Button
           type="primary"
           size="large"
           loading={submitting}
+          disabled={drafting}
           onClick={() => form.submit()}
           className="rounded-xl! font-semibold!"
         >

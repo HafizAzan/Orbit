@@ -12,6 +12,7 @@ import type {
   CreateCheckoutRequest,
   CreateCheckoutResponse,
   CurrentSubscriptionResponse,
+  OrganizationUsageResponse,
   RefundPaymentRequest,
   RefundPaymentResponse,
 } from "../types/billing.types";
@@ -31,6 +32,11 @@ const getCatalog = async (): Promise<BillingCatalogResponse> => {
 const getCurrentSubscription = async (): Promise<CurrentSubscriptionResponse> => {
   const response = await ApiService.get(API_ROUTES.BILLING.SUBSCRIPTION, AUTH_REQUEST);
   return assertApiSuccess<CurrentSubscriptionResponse>(response);
+};
+
+const getOrganizationUsage = async (): Promise<OrganizationUsageResponse> => {
+  const response = await ApiService.get(API_ROUTES.BILLING.USAGE, AUTH_REQUEST);
+  return assertApiSuccess<OrganizationUsageResponse>(response);
 };
 
 const createCheckout = async (data: CreateCheckoutRequest): Promise<CreateCheckoutResponse> => {
@@ -91,6 +97,7 @@ export {
   createPortalSession,
   getCatalog,
   getCurrentSubscription,
+  getOrganizationUsage,
   listInvoices,
   refundPayment,
   selectPlan,

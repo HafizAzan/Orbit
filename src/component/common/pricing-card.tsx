@@ -1,10 +1,10 @@
-import { CheckOutlined } from "@ant-design/icons";
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import { Link } from "react-router-dom";
-import { cn } from "../../lib/utils";
-import { Paragraph, Text, Title } from "../ui/typography";
+import { CheckOutlined } from '@ant-design/icons';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import { cn } from '../../lib/utils';
+import { Paragraph, Text, Title } from '../ui/typography';
 
-type PricingCardProps = ComponentPropsWithoutRef<"article"> & {
+type PricingCardProps = ComponentPropsWithoutRef<'article'> & {
   name: string;
   description: string;
   price: string;
@@ -34,10 +34,10 @@ function PricingCard({
   ...props
 }: PricingCardProps) {
   const ctaClassName = cn(
-    "block w-full rounded-xl px-5 py-3.5 text-center text-sm font-semibold transition-opacity",
+    'block w-full rounded-xl px-5 py-3.5 text-center text-sm font-semibold transition-opacity',
     highlighted
-      ? "bg-primary text-white hover:opacity-90"
-      : "border border-border bg-card text-foreground hover:border-primary hover:text-primary",
+      ? 'bg-primary text-white hover:opacity-90'
+      : 'border border-border bg-card text-foreground hover:border-primary hover:text-primary',
   );
 
   const ctaContent = ctaHref ? (
@@ -53,10 +53,10 @@ function PricingCard({
   return (
     <article
       className={cn(
-        "relative flex h-full min-h-0 flex-col rounded-2xl border bg-card p-6 shadow-sm nav:p-8",
+        'relative flex h-full min-h-0 flex-col rounded-2xl border bg-card p-6 shadow-sm nav:p-8',
         highlighted
-          ? "z-10 border-primary shadow-lg nav:scale-105 nav:px-9 nav:py-10 nav:shadow-xl"
-          : "border-border nav:scale-[0.98]",
+          ? 'z-10 border-primary shadow-lg nav:scale-105 nav:px-9 nav:py-10 nav:shadow-xl'
+          : 'border-border nav:scale-[0.98]',
         className,
       )}
       {...props}
@@ -78,10 +78,14 @@ function PricingCard({
 
       <div className="mt-6 flex items-end gap-1">
         <Text className="text-4xl font-bold text-foreground nav:text-5xl">{price}</Text>
-        {priceSuffix ? <Text size="sm" color="muted" className="pb-1">{priceSuffix}</Text> : null}
+        {priceSuffix ? (
+          <Text size="sm" color="muted" className="pb-1">
+            {priceSuffix}
+          </Text>
+        ) : null}
       </div>
 
-      <ul className="mt-6 flex min-h-52 max-h-72 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgb(148_163_184)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300/80">
+      <ul className="mt-6 flex min-h-52 max-h-72 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pr-1 [scrollbar-color:rgb(148_163_184)_transparent] scrollbar-thin [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300/80">
         {features.map((feature, index) => (
           <li key={`${feature}-${index}`} className="flex items-start gap-2.5">
             <CheckOutlined className="mt-0.5 shrink-0 text-sm text-primary" />

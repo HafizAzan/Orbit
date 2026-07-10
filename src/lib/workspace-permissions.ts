@@ -6,6 +6,7 @@ export type WorkspacePermission =
   | "settings.view"
   | "settings.general"
   | "settings.members"
+  | "settings.usage"
   | "settings.billing"
   | "settings.notifications"
   | "settings.security"
@@ -22,6 +23,7 @@ export type WorkspacePermission =
   | "project.delete"
   | "boards.view"
   | "calendar.view"
+  | "calendar.manage"
   | "task.create"
   | "task.edit"
   | "task.delete_any"
@@ -40,6 +42,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "settings.view",
     "settings.general",
     "settings.members",
+    "settings.usage",
     "settings.billing",
     "settings.notifications",
     "settings.security",
@@ -55,6 +58,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "project.delete",
     "boards.view",
     "calendar.view",
+    "calendar.manage",
     "tasks.view_all",
     "reports.view",
     "activity.view",
@@ -65,6 +69,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "settings.view",
     "settings.general",
     "settings.members",
+    "settings.usage",
     "settings.billing",
     "settings.notifications",
     "settings.security",
@@ -79,6 +84,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "project.delete",
     "boards.view",
     "calendar.view",
+    "calendar.manage",
     "task.create",
     "task.edit",
     "task.delete_any",
@@ -98,12 +104,12 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
     "project.delete",
     "boards.view",
     "calendar.view",
+    "calendar.manage",
     "task.create",
     "task.edit",
     "task.delete_any",
     "tasks.view_all",
     "reports.view",
-    "activity.view",
   ],
   member: [
     "my_tasks.view",
@@ -117,6 +123,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, readonly WorkspacePermission[]> = 
 export const SETTINGS_SECTION_PERMISSIONS: Record<WorkspaceSettingsSectionId, WorkspacePermission> = {
   general: "settings.general",
   members: "settings.members",
+  usage: "settings.usage",
   billing: "settings.billing",
   notifications: "settings.notifications",
   security: "settings.security",

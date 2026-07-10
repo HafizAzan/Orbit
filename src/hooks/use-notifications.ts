@@ -8,6 +8,10 @@ import {
   type ApiNotification,
 } from "../api-services/notification.service";
 import { getSocket } from "../config/socket";
+import {
+  playFlowSyncNotificationSound,
+  unlockFlowSyncNotificationSound,
+} from "../lib/flow-sync-notification-sound";
 
 export const notificationsQueryKey = ["workspace-notifications"] as const;
 export const notificationsUnreadQueryKey = ["workspace-notifications-unread"] as const;
@@ -58,8 +62,17 @@ export function useNotificationSocketListener(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
+    const unlock = () => unlockFlowSyncNotificationSound();
+    window.addEventListener("pointerdown", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+
     const socket = getSocket();
-    if (!socket) return;
+    if (!socket) {
+      return () => {
+        window.removeEventListener("pointerdown", unlock);
+        window.removeEventListener("keydown", unlock);
+      };
+    }
 
     const handleCreated = (notification: ApiNotification) => {
       queryClient.setQueryData<ApiNotification[]>(notificationsQueryKey, (current = []) => {
@@ -71,12 +84,15 @@ export function useNotificationSocketListener(enabled: boolean) {
       });
 
       queryClient.setQueryData<number>(notificationsUnreadQueryKey, (current = 0) => current + 1);
+      playFlowSyncNotificationSound();
     };
 
     socket.on("notification:created", handleCreated);
 
     return () => {
       socket.off("notification:created", handleCreated);
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
     };
   }, [enabled, queryClient]);
 }

@@ -24,6 +24,7 @@ import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { cn } from "../../../lib/utils";
 import Modal from "../../ui/modal";
 import { Label, Paragraph, Text, Title } from "../../ui/typography";
+import MembershipAiImpactNote from "./membership-ai-impact-note";
 
 type InviteMemberModalProps = {
   open: boolean;
@@ -146,6 +147,9 @@ function InviteMemberModal({ open, onClose }: InviteMemberModalProps) {
   );
 
   const selectedRole = Form.useWatch("role", form) ?? DEFAULT_FORM_VALUES.role;
+  const selectedDepartment =
+    Form.useWatch("department", form) ?? DEFAULT_FORM_VALUES.department;
+  const watchedEmail = Form.useWatch("email", form) ?? "";
   const permissions = TEAM_ROLE_PERMISSIONS[selectedRole];
 
   const totalSeats = stats?.totalSeats ?? { used: 0, total: 0 };
@@ -385,6 +389,15 @@ function InviteMemberModal({ open, onClose }: InviteMemberModalProps) {
                     ))}
                   </ul>
                 </div>
+
+                <MembershipAiImpactNote
+                  changeType="invite"
+                  changeContext={JSON.stringify({
+                    role: selectedRole,
+                    department: selectedDepartment,
+                    email: watchedEmail,
+                  })}
+                />
 
                 <Form.Item
                   name="message"

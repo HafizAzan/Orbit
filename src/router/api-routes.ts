@@ -78,6 +78,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
   BILLING: {
     CATALOG: "/billing/catalog",
     SUBSCRIPTION: "/billing/subscription",
+    USAGE: "/billing/usage",
     CHECKOUT: "/billing/checkout",
     CHECKOUT_CONFIRM: "/billing/checkout/confirm",
     SELECT_PLAN: "/billing/select-plan",
@@ -86,6 +87,18 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     REFUND: "/billing/refund",
     INVOICES: "/billing/invoices",
     PORTAL: "/billing/portal",
+  },
+  AI: {
+    WORK_BREAKDOWN_GENERATE: "/ai/work-breakdown/generate",
+    WORK_BREAKDOWN_APPLY: "/ai/work-breakdown/apply",
+    PROJECT_SUMMARY_GENERATE: "/ai/project-summary/generate",
+    PROJECT_DRAFT_GENERATE: "/ai/project-draft/generate",
+    TASK_DRAFT_GENERATE: "/ai/task-draft/generate",
+    ACTIVITY_DESCRIBE: "/ai/activity/describe",
+    TASK_TIP_GENERATE: "/ai/task-tip/generate",
+    MEMBERSHIP_IMPACT_GENERATE: "/ai/membership-impact/generate",
+    CALENDAR_DRAFT_GENERATE: "/ai/calendar-draft/generate",
+    ASK_WORKSPACE: "/ai/ask-workspace",
   },
 };
 

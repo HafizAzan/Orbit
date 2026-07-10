@@ -1,11 +1,10 @@
-import { CloseOutlined, GlobalOutlined, LockOutlined, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { CloseOutlined, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
 import { Input, Select, Button } from "antd";
 import React, { useMemo, useState } from "react";
 import {
   PROJECT_CATEGORY_OPTIONS,
   PROJECT_LEAD_ROLES,
   PROJECT_PRIORITY_OPTIONS,
-  PROJECT_VISIBILITY_OPTIONS,
   generateProjectKey,
   type ProjectFormValues,
 } from "../../../../data/workspace-project-form";
@@ -22,6 +21,8 @@ type ProjectFormFieldsProps = {
   onKeyManualChange: (manual: boolean) => void;
   canAssignLead: boolean;
   requiresDeliveryLead: boolean;
+  showExecutionSquad: boolean;
+  disabled?: boolean;
   currentUserId?: string;
   currentUserName?: string;
 };
@@ -38,6 +39,8 @@ function ProjectFormFields({
   onKeyManualChange,
   canAssignLead,
   requiresDeliveryLead,
+  showExecutionSquad,
+  disabled = false,
   currentUserId,
   currentUserName,
 }: ProjectFormFieldsProps) {
@@ -67,22 +70,27 @@ function ProjectFormFields({
     return null;
   }, [assignableMembers, canAssignLead, currentUserId, values.leadUserId]);
 
+  const squadPool = useMemo(
+    () => assignableMembers.filter((member) => member.role === "member"),
+    [assignableMembers],
+  );
+
   const selectedMembers = useMemo(
-    () => assignableMembers.filter((member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId),
-    [assignableMembers, values.leadUserId, values.memberIds],
+    () => squadPool.filter((member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId),
+    [squadPool, values.leadUserId, values.memberIds],
   );
 
   const availableMembers = useMemo(() => {
     const query = memberSearch.trim().toLowerCase();
 
-    return assignableMembers.filter((member) => {
+    return squadPool.filter((member) => {
       if (member.id === values.leadUserId) return false;
       if (values.memberIds.includes(member.id)) return false;
       if (!query) return true;
 
       return member.name.toLowerCase().includes(query) || member.email.toLowerCase().includes(query);
     });
-  }, [assignableMembers, memberSearch, values.leadUserId, values.memberIds]);
+  }, [memberSearch, squadPool, values.leadUserId, values.memberIds]);
 
   const updateValues = (patch: Partial<ProjectFormValues>) => {
     onChange({ ...values, ...patch });
@@ -134,6 +142,7 @@ function ProjectFormFields({
               placeholder="e.g. Q4 Website Rebrand"
               size="large"
               className="rounded-xl!"
+              disabled={disabled}
             />
           </div>
 
@@ -151,6 +160,7 @@ function ProjectFormFields({
               placeholder="QWR"
               size="large"
               className="rounded-xl! font-mono uppercase"
+              disabled={disabled}
             />
           </div>
         </div>
@@ -166,6 +176,7 @@ function ProjectFormFields({
             rows={4}
             placeholder="What is this project about?"
             className="rounded-xl!"
+            disabled={disabled}
           />
         </div>
       </section>
@@ -197,6 +208,7 @@ function ProjectFormFields({
               placeholder="Select a manager or admin"
               size="large"
               className="w-full"
+              disabled={disabled}
             />
           </div>
         ) : (
@@ -236,6 +248,7 @@ function ProjectFormFields({
               options={PROJECT_CATEGORY_OPTIONS}
               size="large"
               className="w-full"
+              disabled={disabled}
             />
           </div>
 
@@ -247,6 +260,7 @@ function ProjectFormFields({
               options={PROJECT_PRIORITY_OPTIONS}
               size="large"
               className="w-full"
+              disabled={disabled}
             />
           </div>
 
@@ -256,50 +270,23 @@ function ProjectFormFields({
               value={values.startDate || undefined}
               onChange={(startDate) => updateValues({ startDate: startDate ?? "" })}
               className="w-full"
+              disabled={disabled}
             />
           </div>
 
           <div>
             <label className="mb-2 block text-sm font-medium text-foreground">Due Date</label>
-            <DatePicker value={values.dueDate || undefined} onChange={(dueDate) => updateValues({ dueDate: dueDate ?? "" })} className="w-full" />
+            <DatePicker
+              value={values.dueDate || undefined}
+              onChange={(dueDate) => updateValues({ dueDate: dueDate ?? "" })}
+              className="w-full"
+              disabled={disabled}
+            />
           </div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <Text as="p" size="sm" weight="semibold">
-          Visibility
-        </Text>
-
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {PROJECT_VISIBILITY_OPTIONS.map((option) => {
-            const isSelected = values.visibility === option.value;
-            const Icon = option.value === "private" ? LockOutlined : GlobalOutlined;
-
-            return (
-              <Button
-                key={option.value}
-                type="default"
-                block
-                onClick={() => updateValues({ visibility: option.value })}
-                className={cn(
-                  "flex! h-auto! min-h-32 w-full flex-col items-start justify-start rounded-2xl border px-5 py-5 text-left whitespace-normal shadow-none",
-                  isSelected ? "border-primary bg-feature-sync shadow-sm" : "border-border bg-background hover:border-primary/25",
-                )}
-              >
-                <Text as="span" size="sm" weight="semibold" className="flex items-center gap-2">
-                  <Icon className={isSelected ? "text-primary" : "text-muted"} />
-                  {option.label}
-                </Text>
-                <Paragraph size="sm" className="mt-2 font-normal text-muted">
-                  {option.description}
-                </Paragraph>
-              </Button>
-            );
-          })}
-        </div>
-      </section>
-
+      {showExecutionSquad ? (
       <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -307,7 +294,7 @@ function ProjectFormFields({
               Execution Squad
             </Text>
             <Paragraph size="sm" className="mt-1">
-              Add the people who will do the work. The delivery lead is added automatically and does not need to be selected here.
+              Add workspace members who will do the work. Admins and owners are not listed here — you are the delivery lead.
             </Paragraph>
           </div>
         </div>
@@ -322,6 +309,7 @@ function ProjectFormFields({
               <Button
                 type="text"
                 size="small"
+                disabled={disabled}
                 onClick={() => handleRemoveMember(member.id)}
                 icon={<CloseOutlined className="text-xs!" />}
                 aria-label={`Remove ${member.name}`}
@@ -340,6 +328,7 @@ function ProjectFormFields({
             onChange={(event) => setMemberSearch(event.target.value)}
             size="large"
             className="rounded-xl!"
+            disabled={disabled}
           />
         </div>
 
@@ -347,13 +336,14 @@ function ProjectFormFields({
           {membersLoading ? (
             <Paragraph size="sm">Loading team members...</Paragraph>
           ) : availableMembers.length === 0 ? (
-            <Paragraph size="sm">No more team members available.</Paragraph>
+            <Paragraph size="sm">No workspace members available to add.</Paragraph>
           ) : (
             availableMembers.map((member) => (
               <Button
                 key={member.id}
                 type="default"
                 block
+                disabled={disabled}
                 onClick={() => handleAddMember(member.id)}
                 className="h-auto w-fit! justify-between rounded-xl border-border bg-background px-4 py-8! text-left shadow-none hover:border-primary/25 hover:bg-feature-sync/40!"
               >
@@ -376,6 +366,7 @@ function ProjectFormFields({
           )}
         </div>
       </section>
+      ) : null}
     </div>
   );
 }

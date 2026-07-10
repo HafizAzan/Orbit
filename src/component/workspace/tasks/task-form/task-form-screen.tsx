@@ -22,10 +22,14 @@ import {
   type TaskAssigneeOption,
   type TaskFormValues,
 } from "../../../../data/workspace-task-form";
+import { useGenerateTaskDraft } from "../../../../hooks/use-ai";
 import { showApiErrorToast, showApiSuccessToast } from "../../../../lib/api-error";
 import { syncTaskAttachments } from "../../../../lib/sync-task-attachments";
 import { toast } from "../../../../lib/toast";
 import { Paragraph, Title } from "../../../ui/typography";
+import AiGeneratePromptModal, {
+  AiGenerateHeaderButton,
+} from "../../common/ai-generate-prompt-modal";
 import TaskFormFooter from "./task-form-footer";
 import TaskFormMain from "./task-form-main";
 import TaskFormSidebar from "./task-form-sidebar";
@@ -58,30 +62,56 @@ function TaskFormScreen({
   );
   const { mutateAsync: createTask } = useCreateTask();
   const { mutateAsync: updateTask } = useUpdateTask();
+  const { mutateAsync: generateTaskDraft, isPending: isAiGenerating } = useGenerateTaskDraft();
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   const isEdit = mode === "edit";
   const reporterName = app?.user?.name?.trim() || "You";
   const pageTitle = isEdit ? "Edit Task" : "Create New Task";
+  const canUseAi = role === "admin" || role === "manager";
+  const formDisabled = isAiGenerating || isSubmitting;
 
   const projectOptions = useMemo(
     () => projects.map((project) => ({ value: project.id, label: project.title })),
     [projects],
   );
 
+  const currentUserId = app?.user?.id;
+
   const assigneeOptions = useMemo<TaskAssigneeOption[]>(() => {
     const members = selectedProject?.members ?? [];
 
-    return members.map((member) => ({
+    const toOption = (member: (typeof members)[number]): TaskAssigneeOption => ({
       id: member.id,
-      name: member.name,
+      name: member.id === currentUserId ? `${member.name} (Me)` : member.name,
+      role: member.role,
       initials: member.name
         .split(" ")
         .map((part) => part.charAt(0))
         .join("")
         .slice(0, 2)
         .toUpperCase(),
-    }));
-  }, [selectedProject?.members]);
+    });
+
+    if (role === "admin") {
+      return members
+        .filter((member) => (member.role ?? "").toLowerCase() === "manager")
+        .map(toOption);
+    }
+
+    if (role === "manager") {
+      // Members on the project, plus the manager themself.
+      return members
+        .filter((member) => {
+          const orgRole = (member.role ?? "").toLowerCase();
+          if (orgRole === "member") return true;
+          return Boolean(currentUserId && member.id === currentUserId);
+        })
+        .map(toOption);
+    }
+
+    return members.map(toOption);
+  }, [currentUserId, role, selectedProject?.members]);
 
   const projectLabel = useMemo(() => {
     return (
@@ -111,6 +141,24 @@ function TaskFormScreen({
       setValues((current) => ({ ...current, assigneeId: "" }));
     }
   }, [assigneeOptions, values.assigneeId]);
+
+  // Admin: default each new task to the project delivery lead (manager).
+  useEffect(() => {
+    if (isEdit || role !== "admin" || !selectedProject) return;
+    if (values.assigneeId) return;
+
+    const leadId = selectedProject.leadUserId;
+    const defaultManager =
+      (leadId && assigneeOptions.find((option) => option.id === leadId)) ??
+      assigneeOptions[0] ??
+      null;
+
+    if (!defaultManager) return;
+
+    setValues((current) =>
+      current.assigneeId ? current : { ...current, assigneeId: defaultManager.id },
+    );
+  }, [assigneeOptions, isEdit, role, selectedProject, values.assigneeId]);
 
   const breadcrumbs = useMemo(
     () => [
@@ -182,6 +230,41 @@ function TaskFormScreen({
 
     return true;
   }, [values.projectId, values.title]);
+
+  const handleAiGenerate = useCallback(
+    async ({ name, prompt }: { name: string; prompt: string }) => {
+      if (!values.projectId) {
+        toast.error("Select a project first, then use AI Generate.");
+        return;
+      }
+
+      try {
+        const result = await generateTaskDraft({
+          projectId: values.projectId,
+          notes: prompt,
+          taskTitle: isEdit ? undefined : name,
+        });
+        const draft = result.draft;
+
+        setValues((current) => ({
+          ...current,
+          title: draft.title,
+          description: draft.description,
+          status: draft.status,
+          priority: draft.priority,
+          estimatedHours: draft.estimatedHours,
+          assigneeId: draft.assigneeId ?? "",
+          dueDate: draft.dueDate || "",
+          labels: draft.labels,
+        }));
+        setAiModalOpen(false);
+        showApiSuccessToast("AI filled this task form. Review, then save.");
+      } catch (error) {
+        showApiErrorToast(error);
+      }
+    },
+    [generateTaskDraft, isEdit, values.projectId],
+  );
 
   const handleSave = useCallback(async () => {
     if (!validate()) return;
@@ -258,6 +341,17 @@ function TaskFormScreen({
 
   return (
     <div className="mx-auto max-w-8xl">
+      <AiGeneratePromptModal
+        open={aiModalOpen}
+        loading={isAiGenerating}
+        entityLabel="task"
+        requireName={!isEdit}
+        initialName={values.title}
+        initialPrompt={values.description.replace(/<[^>]+>/g, " ").trim()}
+        onClose={() => setAiModalOpen(false)}
+        onGenerate={handleAiGenerate}
+      />
+
       <WorkspaceBackLink fallbackPath={returnPath} fallbackLabel={returnLabel} />
 
       <nav className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
@@ -275,19 +369,37 @@ function TaskFormScreen({
         ))}
       </nav>
 
-      <Title level={2} className="mt-4 text-2xl text-foreground lg:text-3xl">
-        {pageTitle}
-      </Title>
-      <Paragraph size="sm" className="mt-1 text-muted">
-        {isEdit ? "Update task details and keep your squad aligned." : "Create a task for your project squad."}
-      </Paragraph>
+      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <Title level={2} className="text-2xl text-foreground lg:text-3xl">
+            {pageTitle}
+          </Title>
+          <Paragraph size="sm" className="mt-1 text-muted">
+            {isEdit
+              ? "Update task details and keep your squad aligned."
+              : "Create a task for your project squad."}
+          </Paragraph>
+        </div>
+        {canUseAi ? (
+          <AiGenerateHeaderButton
+            disabled={formDisabled}
+            onClick={() => {
+              if (!values.projectId) {
+                toast.error("Select a project first, then use AI Generate.");
+                return;
+              }
+              setAiModalOpen(true);
+            }}
+          />
+        ) : null}
+      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <TaskFormMain
           values={values}
           onChange={setValues}
           projectOptions={projectOptions}
-          disableProject={isEdit}
+          disableProject={isEdit || formDisabled}
         />
         <TaskFormSidebar
           values={values}
@@ -296,6 +408,13 @@ function TaskFormScreen({
           assigneeOptions={assigneeOptions}
           assigneeLoading={isProjectMembersLoading}
           hasSelectedProject={Boolean(values.projectId)}
+          assigneeHint={
+            role === "admin"
+              ? "Defaults to the project manager. You can pick another manager on this project."
+              : role === "manager"
+                ? "Assign a workspace member — or yourself — from this project."
+                : "Only people on the selected project can be assigned."
+          }
         />
       </div>
 

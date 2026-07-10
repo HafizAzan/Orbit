@@ -1,9 +1,15 @@
-import { BellOutlined, CheckOutlined } from "@ant-design/icons";
-import { Badge, Button, Dropdown, Spin } from "antd";
+import { BellOutlined, CheckOutlined, SoundFilled, SoundOutlined } from "@ant-design/icons";
+import { Badge, Button, Dropdown, Spin, Tooltip } from "antd";
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../../context/app-context";
 import type { ApiNotification } from "../../../api-services/notification.service";
+import {
+  isFlowSyncNotificationSoundEnabled,
+  playFlowSyncNotificationSound,
+  setFlowSyncNotificationSoundEnabled,
+  unlockFlowSyncNotificationSound,
+} from "../../../lib/flow-sync-notification-sound";
 import { cn } from "../../../lib/utils";
 import { resolveWorkspaceNotificationHref } from "../../../lib/workspace-notification-routing";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
@@ -27,6 +33,7 @@ function WorkspaceNotificationsDropdown() {
   const role = app?.user?.role;
   const isMember = role === "member";
   const [open, setOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => isFlowSyncNotificationSoundEnabled());
   const notificationsQuery = useNotifications();
   const unreadQuery = useUnreadNotificationCount();
   const { mutate: markAsRead } = useMarkNotificationAsRead();
@@ -34,6 +41,16 @@ function WorkspaceNotificationsDropdown() {
 
   const notifications = notificationsQuery.data ?? [];
   const unreadCount = unreadQuery.data ?? notifications.filter((notification) => !notification.read).length;
+
+  const handleToggleSound = useCallback(() => {
+    unlockFlowSyncNotificationSound();
+    const next = !soundEnabled;
+    setFlowSyncNotificationSoundEnabled(next);
+    setSoundEnabled(next);
+    if (next) {
+      playFlowSyncNotificationSound({ force: true });
+    }
+  }, [soundEnabled]);
 
   const sortedNotifications = useMemo(
     () => [...notifications].sort((a, b) => Number(a.read) - Number(b.read)),
@@ -68,18 +85,30 @@ function WorkspaceNotificationsDropdown() {
           </Text>
         </div>
 
-        {unreadCount > 0 ? (
-          <Button
-            type="link"
-            size="small"
-            loading={isMarkingAll}
-            onClick={() => markAllAsRead()}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold!"
-          >
-            <CheckOutlined className="text-[10px]" />
-            Mark all read
-          </Button>
-        ) : null}
+        <div className="flex shrink-0 items-center gap-1">
+          <Tooltip title={soundEnabled ? "Mute Flow Sync sound" : "Enable Flow Sync sound"}>
+            <Button
+              type="text"
+              size="small"
+              aria-label={soundEnabled ? "Mute notification sound" : "Enable notification sound"}
+              icon={soundEnabled ? <SoundFilled /> : <SoundOutlined />}
+              onClick={handleToggleSound}
+              className={cn("text-muted!", soundEnabled && "text-primary!")}
+            />
+          </Tooltip>
+          {unreadCount > 0 ? (
+            <Button
+              type="link"
+              size="small"
+              loading={isMarkingAll}
+              onClick={() => markAllAsRead()}
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold!"
+            >
+              <CheckOutlined className="text-[10px]" />
+              Mark all read
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div

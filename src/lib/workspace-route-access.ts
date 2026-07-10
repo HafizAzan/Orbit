@@ -1,5 +1,6 @@
 import type { RegisterAs } from "../types/auth.types";
 import { WORKSPACE_ROUTES } from "../router/workspace-routes";
+import { canAccessPathWithPlan } from "./plan-features";
 import {
   getWorkspacePermissions,
   hasWorkspacePermission,
@@ -40,7 +41,11 @@ export function getRequiredRoutePermission(pathname: string): WorkspacePermissio
   return matched?.permission ?? null;
 }
 
-export function canAccessWorkspacePath(role: RegisterAs | undefined, pathname: string) {
+export function canAccessWorkspacePath(
+  role: RegisterAs | undefined,
+  pathname: string,
+  featureFlags?: readonly string[],
+) {
   const permission = getRequiredRoutePermission(pathname);
 
   if (!permission) {
@@ -48,10 +53,12 @@ export function canAccessWorkspacePath(role: RegisterAs | undefined, pathname: s
   }
 
   if (permission === "my_tasks.view" && pathname.startsWith("/tasks/")) {
-    return hasWorkspacePermission(role, "my_tasks.view") || hasWorkspacePermission(role, "tasks.view_all");
+    const roleAllowed =
+      hasWorkspacePermission(role, "my_tasks.view") || hasWorkspacePermission(role, "tasks.view_all");
+    return roleAllowed && canAccessPathWithPlan(pathname, featureFlags);
   }
 
-  return hasWorkspacePermission(role, permission);
+  return hasWorkspacePermission(role, permission) && canAccessPathWithPlan(pathname, featureFlags);
 }
 
 export function getWorkspacePermissionsForRole(role: RegisterAs | undefined) {

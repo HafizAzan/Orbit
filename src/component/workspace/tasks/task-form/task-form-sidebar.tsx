@@ -18,6 +18,7 @@ type TaskFormSidebarProps = {
   assigneeOptions: TaskAssigneeOption[];
   assigneeLoading?: boolean;
   hasSelectedProject?: boolean;
+  assigneeHint?: string;
 };
 
 function TaskFormSidebar({
@@ -27,6 +28,7 @@ function TaskFormSidebar({
   assigneeOptions,
   assigneeLoading = false,
   hasSelectedProject = false,
+  assigneeHint = "Only members added to the selected project can be assigned.",
 }: TaskFormSidebarProps) {
   const [labelsModalOpen, setLabelsModalOpen] = useState(false);
   const [assigneeSearch, setAssigneeSearch] = useState("");
@@ -100,7 +102,7 @@ function TaskFormSidebar({
               </div>
 
               <Paragraph size="xs" className="mt-2">
-                Only members added to the selected project can be assigned.
+                {assigneeHint}
               </Paragraph>
             </div>
 

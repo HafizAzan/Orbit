@@ -27,6 +27,7 @@ import {
   useDeleteCalendarEvent,
   useUpdateCalendarEvent,
 } from "../../hooks/use-workspace-calendar";
+import useWorkspacePermissions from "../../hooks/use-workspace-permissions";
 import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import {
   countEventsInMonth,
@@ -60,7 +61,8 @@ function toEventFormValues(event: CalendarEvent): CalendarEventFormValues {
 
 function WorkspaceCalendar() {
   const app = useAppContext();
-  const isMember = app?.user?.role === "member";
+  const { can } = useWorkspacePermissions();
+  const canManageEvents = can("calendar.manage");
   const currentUserId = app?.user?.id;
 
   const [activeDate, setActiveDate] = useState(() => new Date());
@@ -101,7 +103,7 @@ function WorkspaceCalendar() {
   const eventCountLabel = view === "month" ? "this month" : view === "week" ? "this week" : "today";
 
   const eventInteractionProps = useMemo(() => {
-    if (isMember) {
+    if (!canManageEvents) {
       return { currentUserId };
     }
 
@@ -115,7 +117,7 @@ function WorkspaceCalendar() {
         setDeletingEvent(event);
       },
     };
-  }, [currentUserId, isMember]);
+  }, [canManageEvents, currentUserId]);
 
   const handleNavigate = useCallback(
     (direction: -1 | 1) => {
@@ -208,12 +210,12 @@ function WorkspaceCalendar() {
           eventCount={eventCount}
           eventCountLabel={eventCountLabel}
           eventStats={eventStats}
-          readOnly={isMember}
+          readOnly={!canManageEvents}
           assignedProjectCount={assignedProjects.length}
           onViewChange={setView}
           onNavigate={handleNavigate}
           onToday={handleToday}
-          onNewEvent={isMember ? undefined : handleOpenCreateModal}
+          onNewEvent={canManageEvents ? handleOpenCreateModal : undefined}
         />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
@@ -223,12 +225,12 @@ function WorkspaceCalendar() {
             projects={assignedProjects}
             projectsLoading={projectsQuery.isLoading}
             eventStats={eventStats}
-            readOnly={isMember}
+            readOnly={!canManageEvents}
           />
           {calendarView}
         </div>
 
-        {!isMember ? (
+        {canManageEvents ? (
           <>
             <CalendarEventModal
               open={eventModalOpen}

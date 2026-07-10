@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import MemberProjectDetailHeader from "../../component/workspace/projects/member-project-detail-header";
 import ProjectActivityFeed from "../../component/workspace/projects/project-activity-feed";
+import ProjectAiHealthCard from "../../component/workspace/projects/project-ai-health-card";
 import ProjectAttachmentsCard from "../../component/workspace/projects/project-attachments-card";
 import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
 import ProjectDiscussionCard from "../../component/workspace/projects/project-discussion-card";
@@ -190,6 +191,7 @@ function WorkspaceProjectDetail() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div className="space-y-6 xl:col-span-2">
               <ProjectPhaseProgressCard project={project} />
+              <ProjectAiHealthCard projectId={projectId} projectName={project.title} />
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <ProjectActivityFeed items={project.activities} />
                 <ProjectTasksCard

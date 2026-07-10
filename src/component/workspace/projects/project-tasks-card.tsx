@@ -119,7 +119,7 @@ function ProjectTasksCard({ projectId, tasks, loading = false }: ProjectTasksCar
           ) : null}
         </div>
       ) : (
-        <ul className="mt-5 divide-y divide-border rounded-xl border border-border bg-background/40">
+        <ul className="mt-5 max-h-72 min-h-32 divide-y divide-border overflow-y-auto overscroll-contain rounded-xl border border-border bg-background/40">
           {visibleTasks.map((task) => {
             const statusConfig = TASK_STATUS_CONFIG[task.status];
             const priorityConfig = TASK_PRIORITY_CONFIG[task.priority];

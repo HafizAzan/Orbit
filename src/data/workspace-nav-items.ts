@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import type { AppNavItem } from "../layout/app-shell/app-sidebar-content";
 import type { RegisterAs } from "../types/auth.types";
+import { canAccessNavKey } from "../lib/plan-features";
 import { WORKSPACE_ROUTES } from "../router/workspace-routes";
 
 export type WorkspaceNavItem = AppNavItem & {
@@ -81,7 +82,7 @@ const WORKSPACE_NAV_ITEMS: WorkspaceNavItem[] = [
     label: "Activity Log",
     path: WORKSPACE_ROUTES.ACTIVITY_LOGS,
     icon: AuditOutlined,
-    roles: ["owner", "admin", "manager"],
+    roles: ["owner", "admin"],
   },
   {
     key: "billing",
@@ -102,8 +103,13 @@ const WORKSPACE_BOTTOM_NAV_ITEMS: WorkspaceNavItem[] = [
   },
 ];
 
-export function getWorkspaceNavItemsForRole(role: RegisterAs) {
-  const mainItems = WORKSPACE_NAV_ITEMS.filter((item) => item.roles.includes(role));
+export function getWorkspaceNavItemsForRole(
+  role: RegisterAs,
+  featureFlags?: readonly string[],
+) {
+  const mainItems = WORKSPACE_NAV_ITEMS.filter(
+    (item) => item.roles.includes(role) && canAccessNavKey(item.key, featureFlags),
+  );
   const bottomItems = WORKSPACE_BOTTOM_NAV_ITEMS.filter((item) => item.roles.includes(role));
 
   return { mainItems, bottomItems };

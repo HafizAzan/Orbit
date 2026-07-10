@@ -10,13 +10,19 @@ import WorkspaceRealtimeProvider from "../../component/workspace/workspace-realt
 import { WorkspaceProfileProvider } from "../../context/workspace-profile-context";
 import { useAppContext } from "../../context/app-context";
 import { getWorkspaceNavItemsForRole } from "../../data/workspace-nav-items";
+import { useOrganizationUsage } from "../../hooks/use-billing";
 import { getWorkspaceBrandSubtitle, getWorkspaceHomePath, getWorkspaceRoleLabel } from "../../lib/workspace-routing";
 import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
 
 function WorkspaceSidebarContent(props: { onNavigate?: () => void }) {
   const app = useAppContext();
   const role = app?.user?.role;
-  const { mainItems, bottomItems } = useMemo(() => (role ? getWorkspaceNavItemsForRole(role) : { mainItems: [], bottomItems: [] }), [role]);
+  const usageQuery = useOrganizationUsage();
+  const featureFlags = usageQuery.data?.featureFlags;
+  const { mainItems, bottomItems } = useMemo(
+    () => (role ? getWorkspaceNavItemsForRole(role, featureFlags) : { mainItems: [], bottomItems: [] }),
+    [featureFlags, role],
+  );
 
   const handleNavItemClick = (item: { key: string }) => {
     if (item.key === "dashboard") {

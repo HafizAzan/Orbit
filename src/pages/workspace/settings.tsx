@@ -7,6 +7,7 @@ import WorkspaceGeneralSection from "../../component/workspace/settings/workspac
 import WorkspaceMembersSection from "../../component/workspace/settings/workspace-members-section";
 import WorkspaceNotificationsSection from "../../component/workspace/settings/workspace-notifications-section";
 import WorkspaceSecuritySection from "../../component/workspace/settings/workspace-security-section";
+import WorkspaceUsageSection from "../../component/workspace/settings/workspace-usage-section";
 import WorkspaceSettingsNav from "../../component/workspace/settings/workspace-settings-nav";
 import WorkspaceAccessDenied from "../../component/workspace/workspace-access-denied";
 import WorkspaceRoleGate from "../../component/workspace/workspace-role-gate";
@@ -94,6 +95,10 @@ function WorkspaceSettingsContent() {
 
     if (activeTab === "members") {
       return <WorkspaceMembersSection expanded />;
+    }
+
+    if (activeTab === "usage") {
+      return <WorkspaceUsageSection expanded />;
     }
 
     if (activeTab === "billing") {

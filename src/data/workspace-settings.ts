@@ -1,6 +1,7 @@
 export type WorkspaceSettingsSectionId =
   | "general"
   | "members"
+  | "usage"
   | "billing"
   | "notifications"
   | "security";
@@ -20,6 +21,7 @@ export type WorkspaceSettings = {
 export const WORKSPACE_SETTINGS_TAB_SLUGS: Record<WorkspaceSettingsSectionId, string> = {
   general: "general",
   members: "members",
+  usage: "usage",
   billing: "billing",
   notifications: "notifications",
   security: "security",
@@ -30,6 +32,7 @@ export const DEFAULT_WORKSPACE_SETTINGS_TAB: WorkspaceSettingsSectionId = "gener
 export const WORKSPACE_SETTINGS_NAV_ITEMS: { id: WorkspaceSettingsSectionId; label: string }[] = [
   { id: "general", label: "General" },
   { id: "members", label: "Members" },
+  { id: "usage", label: "Org Usage" },
   { id: "billing", label: "Billing" },
   { id: "notifications", label: "Notifications" },
   { id: "security", label: "Security" },

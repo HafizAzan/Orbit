@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PricingCard from "../../common/pricing-card";
+import PricingIntervalToggle from "../../billing/pricing-interval-toggle";
 import { PricingCardsGridSkeleton } from "../../skeletons";
 import QueryErrorState from "../../common/query-error-state";
 import {
@@ -15,6 +16,10 @@ import {
   useCurrentSubscription,
 } from "../../../hooks/use-billing";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
+import {
+  resolveCatalogSavingsHint,
+  type PricingBillingInterval,
+} from "../../../lib/pricing-catalog";
 import { toast } from "../../../lib/toast";
 import { cn } from "../../../lib/utils";
 import type { CatalogCtaType, PlanCode } from "../../../types/billing.types";
@@ -28,8 +33,14 @@ function WorkspaceBillingPlanCards() {
   const { mutateAsync: changePlan } = useChangePlan();
   const { mutateAsync: startCheckout } = useCreateCheckout();
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
+  const [billingInterval, setBillingInterval] = useState<PricingBillingInterval>("monthly");
 
-  const plans = useMemo(() => resolveWorkspaceBillingPlans(catalogQuery.data?.products), [catalogQuery.data?.products]);
+  const products = catalogQuery.data?.products ?? [];
+  const plans = useMemo(
+    () => resolveWorkspaceBillingPlans(products, billingInterval),
+    [billingInterval, products],
+  );
+  const savingsHint = useMemo(() => resolveCatalogSavingsHint(products), [products]);
   const currentPlan: PlanCode = subscription?.plan ?? "FREE";
 
   const handlePlanAction = async (plan: WorkspaceBillingPlan) => {
@@ -116,26 +127,34 @@ function WorkspaceBillingPlanCards() {
           Billing plans are not available right now. Please try again later.
         </Paragraph>
       ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch">
-          {plans.map((plan) => {
-            const isCurrent = plan.plan === currentPlan;
+        <div className="space-y-6">
+          <PricingIntervalToggle
+            value={billingInterval}
+            onChange={setBillingInterval}
+            savingsHint={savingsHint}
+          />
 
-            return (
-              <PricingCard
-                key={plan.id}
-                name={plan.name}
-                description={plan.description}
-                price={plan.price}
-                priceSuffix={plan.priceSuffix}
-                features={plan.features.length > 0 ? plan.features : ["Plan details coming soon"]}
-                ctaLabel={plan.ctaLabel}
-                highlighted={plan.highlighted && !isCurrent}
-                badge={isCurrent ? "Current plan" : plan.badge}
-                footer={renderPlanFooter(plan, plan.ctaType)}
-                className={cn("h-full", isCurrent && "border-emerald-300 ring-1 ring-emerald-200")}
-              />
-            );
-          })}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch">
+            {plans.map((plan) => {
+              const isCurrent = plan.plan === currentPlan;
+
+              return (
+                <PricingCard
+                  key={`${plan.id}-${plan.priceId}`}
+                  name={plan.name}
+                  description={plan.description}
+                  price={plan.price}
+                  priceSuffix={plan.priceSuffix}
+                  features={plan.features.length > 0 ? plan.features : ["Plan details coming soon"]}
+                  ctaLabel={plan.ctaLabel}
+                  highlighted={plan.highlighted && !isCurrent}
+                  badge={isCurrent ? "Current plan" : plan.badge}
+                  footer={renderPlanFooter(plan, plan.ctaType)}
+                  className={cn("h-full", isCurrent && "border-emerald-300 ring-1 ring-emerald-200")}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
     </SettingsSection>
