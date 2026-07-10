@@ -65,7 +65,8 @@ export type PlanFeatureFlag =
   | "custom_roles"
   | "dedicated_success"
   | "custom_sla"
-  | "ai_assistant";
+  | "ai_assistant"
+  | "github_integration";
 
 export type OrganizationUsageMetric = {
   key: "staff_users" | "projects" | "boards" | "ai_credits";

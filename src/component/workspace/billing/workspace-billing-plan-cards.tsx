@@ -1,6 +1,10 @@
-import React, { useMemo, useState } from "react";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import React, { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import type { Swiper as SwiperInstance } from "swiper";
+import "swiper/css";
+import { Swiper, SwiperSlide } from "swiper/react";
 import PricingCard from "../../common/pricing-card";
 import PricingIntervalToggle from "../../billing/pricing-interval-toggle";
 import { PricingCardsGridSkeleton } from "../../skeletons";
@@ -35,6 +39,9 @@ function WorkspaceBillingPlanCards() {
   const { mutateAsync: startCheckout } = useCreateCheckout();
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<PricingBillingInterval>("monthly");
+  const [canSlidePrev, setCanSlidePrev] = useState(false);
+  const [canSlideNext, setCanSlideNext] = useState(false);
+  const swiperRef = useRef<SwiperInstance | null>(null);
 
   const products = catalogQuery.data?.products ?? [];
   const plans = useMemo(
@@ -43,6 +50,12 @@ function WorkspaceBillingPlanCards() {
   );
   const savingsHint = useMemo(() => resolveCatalogSavingsHint(products), [products]);
   const currentPlan: PlanCode = subscription?.plan ?? "FREE";
+  const showSliderControls = plans.length > 3;
+
+  const syncNavState = (swiper: SwiperInstance) => {
+    setCanSlidePrev(!swiper.isBeginning);
+    setCanSlideNext(!swiper.isEnd);
+  };
 
   const handlePlanAction = async (plan: WorkspaceBillingPlan) => {
     if (plan.plan === currentPlan) return;
@@ -135,26 +148,88 @@ function WorkspaceBillingPlanCards() {
             savingsHint={savingsHint}
           />
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-stretch">
-            {plans.map((plan) => {
-              const isCurrent = plan.plan === currentPlan;
+          <div className="relative px-0 nav:px-6">
+            {showSliderControls ? (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous plans"
+                  disabled={!canSlidePrev}
+                  onClick={() => swiperRef.current?.slidePrev()}
+                  className={cn(
+                    "absolute top-1/2 left-0 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-md transition hover:border-primary hover:text-primary nav:flex",
+                    !canSlidePrev && "pointer-events-none opacity-40",
+                  )}
+                >
+                  <LeftOutlined />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next plans"
+                  disabled={!canSlideNext}
+                  onClick={() => swiperRef.current?.slideNext()}
+                  className={cn(
+                    "absolute top-1/2 right-0 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-md transition hover:border-primary hover:text-primary nav:flex",
+                    !canSlideNext && "pointer-events-none opacity-40",
+                  )}
+                >
+                  <RightOutlined />
+                </button>
+              </>
+            ) : null}
 
-              return (
-                <PricingCard
-                  key={`${plan.id}-${plan.priceId}`}
-                  name={plan.name}
-                  description={plan.description}
-                  price={plan.price}
-                  priceSuffix={plan.priceSuffix}
-                  features={plan.features.length > 0 ? plan.features : ["Plan details coming soon"]}
-                  ctaLabel={plan.ctaLabel}
-                  highlighted={plan.highlighted && !isCurrent}
-                  badge={isCurrent ? "Current plan" : plan.badge}
-                  footer={renderPlanFooter(plan, plan.ctaType)}
-                  className={cn("h-full", isCurrent && "border-emerald-300 ring-1 ring-emerald-200")}
-                />
-              );
-            })}
+            <Swiper
+              key={billingInterval}
+              slidesPerView={1}
+              spaceBetween={24}
+              watchOverflow
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+                syncNavState(swiper);
+              }}
+              onSlideChange={syncNavState}
+              onResize={syncNavState}
+              onBreakpoint={syncNavState}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                  spaceBetween: 20,
+                },
+                880: {
+                  slidesPerView: 3,
+                  spaceBetween: 24,
+                },
+              }}
+              className="plan-catalog-swiper overflow-hidden py-6"
+            >
+              {plans.map((plan) => {
+                const isCurrent = plan.plan === currentPlan;
+
+                return (
+                  <SwiperSlide key={`${plan.id}-${plan.priceId}`} className="h-auto!">
+                    <div className="h-full px-1 py-3">
+                      <PricingCard
+                        name={plan.name}
+                        description={plan.description}
+                        price={plan.price}
+                        priceSuffix={plan.priceSuffix}
+                        features={
+                          plan.features.length > 0 ? plan.features : ["Plan details coming soon"]
+                        }
+                        ctaLabel={plan.ctaLabel}
+                        highlighted={plan.highlighted && !isCurrent}
+                        badge={isCurrent ? "Current plan" : plan.badge}
+                        footer={renderPlanFooter(plan, plan.ctaType)}
+                        className={cn(
+                          "h-full scale-100!",
+                          isCurrent && "border-emerald-300 ring-1 ring-emerald-200",
+                        )}
+                      />
+                    </div>
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
           </div>
         </div>
       )}
