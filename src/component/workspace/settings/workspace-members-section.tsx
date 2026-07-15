@@ -1,4 +1,4 @@
-import { Button, Dropdown, Select, Table } from "antd";
+import { Button, Dropdown, Select } from "antd";
 import { DeleteOutlined, EllipsisOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -20,6 +20,7 @@ import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import QueryErrorState from "../../common/query-error-state";
 import SettingsSection from "../../admin/settings/settings-section";
 import { ConfirmModal } from "../../ui/modal";
+import Table from "../../ui/table";
 import type { RegisterAs } from "../../../types/auth.types";
 import { useAppContext } from "../../../context/app-context";
 import MemberEmailChangeModal from "./member-email-change-modal";
@@ -251,6 +252,8 @@ function WorkspaceMembersSection({ expanded = false }: WorkspaceMembersSectionPr
             dataSource={summary?.data ?? []}
             pagination={false}
             scroll={{ x: 720 }}
+            emptyTitle="No members yet"
+            emptyDescription="Invite teammates from Teams to grow this workspace."
           />
         </div>
       ) : null}

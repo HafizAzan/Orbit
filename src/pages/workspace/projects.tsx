@@ -1,7 +1,10 @@
+import { Button } from 'antd';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageSeo from '../../component/seo/page-seo';
 import QueryPageGuard from '../../component/common/query-page-guard';
 import { ProjectsPageSkeleton } from '../../component/skeletons';
+import EmptyStatePanel from '../../component/ui/empty-state-panel';
 import TablePaginationFooter from '../../component/ui/table-pagination-footer';
 import { Text } from '../../component/ui/typography';
 import ProjectCard from '../../component/workspace/projects/project-card';
@@ -18,6 +21,7 @@ import { showApiErrorToast, showApiSuccessToast } from '../../lib/api-error';
 import { pluralize } from '../../lib/helper';
 import { getDeletableProjectIds } from '../../lib/project-access';
 import { cn } from '../../lib/utils';
+import { WORKSPACE_ROUTES } from '../../router/workspace-routes';
 import {
   DEFAULT_PROJECTS_LIST_PARAMS,
   DEFAULT_PROJECTS_PAGE_SIZE,
@@ -210,25 +214,47 @@ function WorkspaceProjectsContent() {
           onSelectAllChange={handleSelectAllChange}
         />
 
-        <div
-          className={cn(
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'
-              : 'flex flex-col gap-4',
-          )}
-        >
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              viewMode={viewMode}
-              selectable={deletableProjectIds.includes(project.id)}
-              selected={selectedProjectIds.includes(project.id)}
-              onSelectedChange={(selected) => handleProjectSelectedChange(project.id, selected)}
-            />
-          ))}
-          {viewMode === 'grid' && canCreateProject ? <ProjectTemplateCard /> : null}
-        </div>
+        {filteredProjects.length === 0 ? (
+          <EmptyStatePanel
+            title={totalProjects === 0 ? 'No projects yet' : 'No matching projects'}
+            description={
+              totalProjects === 0
+                ? canCreateProject
+                  ? 'Create your first project to start tracking delivery.'
+                  : 'Projects you can access will appear here once they are shared with you.'
+                : 'Try adjusting status, priority, or team filters.'
+            }
+            action={
+              totalProjects === 0 && canCreateProject ? (
+                <Link to={WORKSPACE_ROUTES.PROJECT_CREATE}>
+                  <Button type="primary" className="font-semibold!">
+                    Create project
+                  </Button>
+                </Link>
+              ) : null
+            }
+          />
+        ) : (
+          <div
+            className={cn(
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'
+                : 'flex flex-col gap-4',
+            )}
+          >
+            {filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                viewMode={viewMode}
+                selectable={deletableProjectIds.includes(project.id)}
+                selected={selectedProjectIds.includes(project.id)}
+                onSelectedChange={(selected) => handleProjectSelectedChange(project.id, selected)}
+              />
+            ))}
+            {viewMode === 'grid' && canCreateProject ? <ProjectTemplateCard /> : null}
+          </div>
+        )}
 
         {totalProjects > 0 ? (
           <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">

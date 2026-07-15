@@ -6,13 +6,44 @@ import {
 } from "../../../data/admin-dashboard";
 import { formatCurrency } from "../../../lib/helper";
 import { cn } from "../../../lib/utils";
+import EmptyStatePanel from "../../ui/empty-state-panel";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
+function ListCard({
+  title,
+  emptyDescription,
+  isEmpty,
+  children,
+  footer,
+}: {
+  title: string;
+  emptyDescription: string;
+  isEmpty: boolean;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
+  return (
+    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <Title level={5} color="default">{title}</Title>
+      {isEmpty ? (
+        <EmptyStatePanel className="mt-4" compact description={emptyDescription} />
+      ) : (
+        <>
+          {children}
+          {footer}
+        </>
+      )}
+    </article>
+  );
+}
 
 function TopOrgsList({ items }: { items: TopOrgItem[] }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <Title level={5} color="default">Top Orgs (Revenue)</Title>
+    <ListCard
+      title="Top Orgs (Revenue)"
+      emptyDescription="No revenue-ranked organizations yet."
+      isEmpty={items.length === 0}
+    >
       <ul className="mt-4 divide-y divide-border">
         {items.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
@@ -29,14 +60,17 @@ function TopOrgsList({ items }: { items: TopOrgItem[] }) {
           </li>
         ))}
       </ul>
-    </article>
+    </ListCard>
   );
 }
 
 function MostActiveList({ items }: { items: ActiveOrgItem[] }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <Title level={5} color="default">Most Active</Title>
+    <ListCard
+      title="Most Active"
+      emptyDescription="No recent org activity to rank yet."
+      isEmpty={items.length === 0}
+    >
       <ul className="mt-4 divide-y divide-border">
         {items.map((item) => (
           <li key={item.id} className="py-3 first:pt-0 last:pb-0">
@@ -59,17 +93,17 @@ function MostActiveList({ items }: { items: ActiveOrgItem[] }) {
           </li>
         ))}
       </ul>
-      <button type="button" className="mt-4 text-sm font-medium text-primary hover:opacity-80">
-        View All Activities
-      </button>
-    </article>
+    </ListCard>
   );
 }
 
 function RecentSignupsList({ items }: { items: RecentSignupItem[] }) {
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <Title level={5} color="default">Recent Signups</Title>
+    <ListCard
+      title="Recent Signups"
+      emptyDescription="No new organization signups yet."
+      isEmpty={items.length === 0}
+    >
       <ul className="mt-4 divide-y divide-border">
         {items.map((item) => (
           <li key={item.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
@@ -83,7 +117,7 @@ function RecentSignupsList({ items }: { items: RecentSignupItem[] }) {
           </li>
         ))}
       </ul>
-    </article>
+    </ListCard>
   );
 }
 

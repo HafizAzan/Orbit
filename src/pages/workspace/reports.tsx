@@ -68,15 +68,21 @@ function WorkspaceReportsContent() {
             <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <Text as="p" size="sm" weight="semibold">Tasks by priority</Text>
               <div className="mt-4 space-y-3">
-                {data.tasksByPriority.map((item) => (
-                  <div
-                    key={item.priority}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
-                  >
-                    <Text as="p" weight="medium" className="capitalize">{item.priority}</Text>
-                    <Text as="p" size="sm" weight="semibold">{item.count}</Text>
-                  </div>
-                ))}
+                {data.tasksByPriority.length === 0 ? (
+                  <Paragraph size="sm" className="text-muted">
+                    No priority breakdown yet.
+                  </Paragraph>
+                ) : (
+                  data.tasksByPriority.map((item) => (
+                    <div
+                      key={item.priority}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
+                    >
+                      <Text as="p" weight="medium" className="capitalize">{item.priority}</Text>
+                      <Text as="p" size="sm" weight="semibold">{item.count}</Text>
+                    </div>
+                  ))
+                )}
               </div>
             </section>
           </div>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { DASHBOARD_ACTIVITY_ICONS, type ActivityItem } from "../../../data/admin-dashboard";
 import { ADMIN_ROUTES } from "../../../router/admin-routes";
 import { cn } from "../../../lib/utils";
+import EmptyStatePanel from "../../ui/empty-state-panel";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
 type RecentActivityProps = {
@@ -19,32 +20,44 @@ function RecentActivity({ items }: RecentActivityProps) {
         </Link>
       </div>
 
-      <ul className="divide-y divide-border">
-        {items.map((item) => {
-          const Icon = DASHBOARD_ACTIVITY_ICONS[item.icon];
+      {items.length === 0 ? (
+        <EmptyStatePanel
+          compact
+          description="No platform activity yet. Organization and user events will show up here."
+          action={
+            <Link to={ADMIN_ROUTES.ACTIVITY} className="text-sm font-semibold text-primary hover:opacity-80">
+              Open activity logs
+            </Link>
+          }
+        />
+      ) : (
+        <ul className="divide-y divide-border">
+          {items.map((item) => {
+            const Icon = DASHBOARD_ACTIVITY_ICONS[item.icon];
 
-          return (
-            <li key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
-              <div
-                className={cn(
-                  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                  item.iconBg,
-                  item.iconColor,
-                )}
-              >
-                <Icon className="text-base" />
-              </div>
+            return (
+              <li key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                <div
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                    item.iconBg,
+                    item.iconColor,
+                  )}
+                >
+                  <Icon className="text-base" />
+                </div>
 
-              <div className="min-w-0 flex-1">
-                <Text as="p" size="sm" weight="semibold">{item.title}</Text>
-                <Paragraph size="sm" className="mt-0.5 mb-0!">{item.description}</Paragraph>
-              </div>
+                <div className="min-w-0 flex-1">
+                  <Text as="p" size="sm" weight="semibold">{item.title}</Text>
+                  <Paragraph size="sm" className="mt-0.5 mb-0!">{item.description}</Paragraph>
+                </div>
 
-              <Text as="span" size="xs" color="muted" weight="medium" className="shrink-0">{item.timeAgo}</Text>
-            </li>
-          );
-        })}
-      </ul>
+                <Text as="span" size="xs" color="muted" weight="medium" className="shrink-0">{item.timeAgo}</Text>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </article>
   );
 }

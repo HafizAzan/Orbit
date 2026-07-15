@@ -89,22 +89,30 @@ function WorkspaceInvoiceDetailModal({
               </Text>
             </div>
 
-            {detail.lineItems.map((item, index) => (
-              <div
-                key={`${item.description}-${index}`}
-                className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
-              >
-                <Text as="span" size="sm" weight="medium">
-                  {item.description}
-                </Text>
-                <Text as="span" size="sm" color="muted" className="text-right">
-                  {item.quantity}
-                </Text>
-                <Text as="span" size="sm" weight="medium" className="min-w-24 text-right">
-                  {formatCurrency(item.unitAmount * item.quantity, detail.currency, 2)}
+            {detail.lineItems.length === 0 ? (
+              <div className="px-4 py-6 text-center">
+                <Text as="p" size="sm" color="muted" className="mb-0!">
+                  No line items on this invoice.
                 </Text>
               </div>
-            ))}
+            ) : (
+              detail.lineItems.map((item, index) => (
+                <div
+                  key={`${item.description}-${index}`}
+                  className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
+                >
+                  <Text as="span" size="sm" weight="medium">
+                    {item.description}
+                  </Text>
+                  <Text as="span" size="sm" color="muted" className="text-right">
+                    {item.quantity}
+                  </Text>
+                  <Text as="span" size="sm" weight="medium" className="min-w-24 text-right">
+                    {formatCurrency(item.unitAmount * item.quantity, detail.currency, 2)}
+                  </Text>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="space-y-2 rounded-2xl border border-border bg-background/40 p-4">

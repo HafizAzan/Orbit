@@ -100,13 +100,19 @@ function WorkspaceMyTasksContent() {
           </div>
         ) : null}
 
-        <MyTasksDueTodaySection tasks={groupedTasks.due_today} onOpenTask={handleOpenTask} />
+        {groupedTasks.due_today.length > 0 ? (
+          <MyTasksDueTodaySection tasks={groupedTasks.due_today} onOpenTask={handleOpenTask} />
+        ) : null}
 
-        <MyTasksAssignedSection tasks={groupedTasks.assigned} onToggleComplete={handleToggleComplete} onOpenTask={handleOpenTask} />
+        {groupedTasks.assigned.length > 0 ? (
+          <MyTasksAssignedSection tasks={groupedTasks.assigned} onToggleComplete={handleToggleComplete} onOpenTask={handleOpenTask} />
+        ) : null}
 
-        <MyTasksUpcomingSection tasks={groupedTasks.upcoming} onOpenTask={handleOpenTask} />
+        {groupedTasks.upcoming.length > 0 ? (
+          <MyTasksUpcomingSection tasks={groupedTasks.upcoming} onOpenTask={handleOpenTask} />
+        ) : null}
 
-        {!hideCompleted ? (
+        {!hideCompleted && groupedTasks.completed.length > 0 ? (
           <MyTasksCompletedSection
             tasks={groupedTasks.completed}
             onClearAll={handleHideCompleted}
@@ -117,7 +123,9 @@ function WorkspaceMyTasksContent() {
 
         {filteredTasks.length === 0 ? (
           <Paragraph size="sm" className="rounded-2xl border border-dashed border-border bg-card px-6 py-10 text-center text-muted">
-            No tasks match your filters. Try adjusting status, priority, or project.
+            {tasks.length === 0
+              ? "No tasks assigned to you yet. When someone assigns work, it will show up here."
+              : "No tasks match your filters. Try adjusting status, priority, or project."}
           </Paragraph>
         ) : null}
       </div>

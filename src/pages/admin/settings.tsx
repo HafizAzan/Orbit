@@ -23,14 +23,14 @@ function AdminSettingsInner({ initialSettings }: { initialSettings: PlatformSett
 
   return (
     <div className="mx-auto max-w-8xl">
-      <PageSeo title="Platform Settings" description="Configure platform-wide preferences, branding, and security." noIndex />
+      <PageSeo title="Platform Settings" description="Configure platform-wide preferences, branding, and billing." noIndex />
       <div className="mb-6">
         <Text as="p" size="xs" color="muted" weight="medium">Platform Settings · Workspace · Admin Console</Text>
         <Title level={2} className="mt-1 text-2xl text-foreground lg:text-3xl">
           Platform Settings
         </Title>
         <Paragraph size="sm" className="mt-1 text-muted">
-          Configure platform-wide preferences, branding, security, and billing.
+          Configure platform-wide preferences, branding, email, and billing.
         </Paragraph>
       </div>
 

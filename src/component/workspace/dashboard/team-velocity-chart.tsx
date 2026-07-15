@@ -6,6 +6,7 @@ import {
   VELOCITY_CHART_SUBTITLES,
 } from "../../../data/workspace-dashboard";
 import { useChartTheme } from "../../../lib/chart-theme";
+import EmptyStatePanel from "../../ui/empty-state-panel";
 import { Paragraph, Text, Title } from "../../ui/typography";
 
 type TeamVelocityChartProps = {
@@ -44,66 +45,74 @@ function TeamVelocityChart({ data, period }: TeamVelocityChartProps) {
         </div>
       </div>
 
-      <div className="h-72 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="velocityGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={chart.primary} stopOpacity={0.35} />
-                <stop offset="100%" stopColor={chart.primary} stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: chart.axis, fontSize: 12 }}
-              dy={8}
-              interval="preserveStartEnd"
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: chart.axis, fontSize: 12 }}
-              width={36}
-              allowDecimals={false}
-              domain={[0, yAxisMax]}
-              label={{
-                value: "Tasks",
-                angle: -90,
-                position: "insideLeft",
-                fill: chart.axis,
-                fontSize: 11,
-                offset: 10,
-              }}
-            />
-            <Tooltip
-              contentStyle={{
-                borderRadius: 12,
-                border: `1px solid ${chart.tooltipBorder}`,
-                backgroundColor: chart.tooltipBg,
-                color: chart.axis,
-                boxShadow: chart.tooltipShadow,
-              }}
-              labelFormatter={(label) => `Date: ${label}`}
-              formatter={(value) => [
-                `${value} task${value === 1 ? "" : "s"}`,
-                "Completed",
-              ]}
-            />
-            <Area
-              type="monotone"
-              dataKey="completed"
-              stroke={chart.primary}
-              strokeWidth={3}
-              fill="url(#velocityGradient)"
-              dot={false}
-              activeDot={{ r: 5, fill: chart.primary, stroke: chart.activeDotStroke, strokeWidth: 2 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      {data.length === 0 || totalCompleted === 0 ? (
+        <EmptyStatePanel
+          className="mt-2"
+          compact
+          description="No completed tasks in this period yet. Velocity will populate as work is finished."
+        />
+      ) : (
+        <div className="h-72 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="velocityGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={chart.primary} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={chart.primary} stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chart.grid} />
+              <XAxis
+                dataKey="date"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: chart.axis, fontSize: 12 }}
+                dy={8}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: chart.axis, fontSize: 12 }}
+                width={36}
+                allowDecimals={false}
+                domain={[0, yAxisMax]}
+                label={{
+                  value: "Tasks",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: chart.axis,
+                  fontSize: 11,
+                  offset: 10,
+                }}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 12,
+                  border: `1px solid ${chart.tooltipBorder}`,
+                  backgroundColor: chart.tooltipBg,
+                  color: chart.axis,
+                  boxShadow: chart.tooltipShadow,
+                }}
+                labelFormatter={(label) => `Date: ${label}`}
+                formatter={(value) => [
+                  `${value} task${value === 1 ? "" : "s"}`,
+                  "Completed",
+                ]}
+              />
+              <Area
+                type="monotone"
+                dataKey="completed"
+                stroke={chart.primary}
+                strokeWidth={3}
+                fill="url(#velocityGradient)"
+                dot={false}
+                activeDot={{ r: 5, fill: chart.primary, stroke: chart.activeDotStroke, strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </article>
   );
 }

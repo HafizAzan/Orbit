@@ -4,8 +4,6 @@ import SettingsBillingSection from "./settings-billing-section";
 import SettingsBrandingSection from "./settings-branding-section";
 import SettingsEmailSection from "./settings-email-section";
 import SettingsGeneralSection from "./settings-general-section";
-import SettingsNotificationsSection from "./settings-notifications-section";
-import SettingsSecuritySection from "./settings-security-section";
 
 export type SettingsSectionProps = {
   settings: PlatformSettings;
@@ -16,7 +14,5 @@ export const SETTINGS_SECTION_REGISTRY: Record<SettingsSectionId, ComponentType<
   general: SettingsGeneralSection,
   branding: SettingsBrandingSection,
   email: SettingsEmailSection,
-  security: SettingsSecuritySection,
-  notifications: SettingsNotificationsSection,
   billing: SettingsBillingSection,
 };

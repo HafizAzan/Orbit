@@ -1,5 +1,5 @@
 import { DeleteOutlined, ThunderboltOutlined } from "@ant-design/icons";
-import { Button, Space, Table, Tag } from "antd";
+import { Button, Space, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import type { ActivityEvent } from "../../../types/activity.types";
 import { formatDate } from "../../../lib/helper";
@@ -11,6 +11,7 @@ import {
 } from "../../../hooks/use-workspace-activity";
 import QueryErrorState from "../../common/query-error-state";
 import { ConfirmModal } from "../../ui/modal";
+import Table from "../../ui/table";
 import TablePaginationFooter from "../../ui/table-pagination-footer";
 import { Text } from "../../ui/typography";
 import ActivityAiDescribeModal from "./activity-ai-describe-modal";
@@ -130,6 +131,8 @@ function WorkspaceActivityLogsSection({
         dataSource={summary?.data ?? []}
         pagination={false}
         scroll={{ x: 760 }}
+        emptyTitle="No activity logs yet"
+        emptyDescription="Workspace actions on tasks, projects, and teams will appear here."
       />
 
       {!compact && summary ? (

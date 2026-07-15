@@ -138,9 +138,8 @@ function WorkspaceInvoicesTable({
       dataSource={invoices}
       loading={loading}
       pagination={false}
-      locale={{
-        emptyText: "No invoices yet.",
-      }}
+      emptyTitle="No invoices yet"
+      emptyDescription="Invoices will appear here after your first billing cycle."
     />
   );
 }

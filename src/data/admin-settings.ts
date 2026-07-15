@@ -1,10 +1,4 @@
-export type SettingsSectionId =
-  | "general"
-  | "branding"
-  | "email"
-  | "security"
-  | "notifications"
-  | "billing";
+export type SettingsSectionId = "general" | "branding" | "email" | "billing";
 
 export type PlatformSettings = {
   platformName: string;
@@ -17,25 +11,9 @@ export type PlatformSettings = {
   smtpPort: string;
   smtpUsername: string;
   smtpPassword: string;
-  enforce2fa: boolean;
-  highPasswordComplexity: boolean;
-  autoSessionTimeout: boolean;
-  emailNotifications: boolean;
-  weeklyDigest: boolean;
-  slackWebhook: string;
-  stripeEnabled: boolean;
-  sendgridEnabled: boolean;
-  webhookUrl: string;
   defaultCurrency: string;
   taxId: string;
   invoicePrefix: string;
-};
-
-export type ApiKeyRecord = {
-  id: string;
-  label: string;
-  keyHint: string;
-  createdAt: string;
 };
 
 export type SelectOption = {
@@ -47,8 +25,6 @@ export const SETTINGS_TAB_SLUGS: Record<SettingsSectionId, string> = {
   general: "general-setting",
   branding: "branding",
   email: "email-configuration",
-  security: "security",
-  notifications: "notifications",
   billing: "billing-settings",
 };
 
@@ -58,20 +34,12 @@ export const SETTINGS_NAV_ITEMS: { id: SettingsSectionId; label: string; tab: st
   { id: "general", label: "General Settings", tab: SETTINGS_TAB_SLUGS.general },
   { id: "branding", label: "Branding", tab: SETTINGS_TAB_SLUGS.branding },
   { id: "email", label: "Email Configuration", tab: SETTINGS_TAB_SLUGS.email },
-  { id: "security", label: "Security", tab: SETTINGS_TAB_SLUGS.security },
-  { id: "notifications", label: "Notifications", tab: SETTINGS_TAB_SLUGS.notifications },
   { id: "billing", label: "Billing Settings", tab: SETTINGS_TAB_SLUGS.billing },
 ];
 
 export type BrandColorPreset = {
   label: string;
   colors: string[];
-};
-
-export type SettingsToggleItem<K extends keyof PlatformSettings = keyof PlatformSettings> = {
-  key: K;
-  title: string;
-  description: string;
 };
 
 export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
@@ -85,21 +53,10 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   smtpPort: "587",
   smtpUsername: "apikey",
   smtpPassword: "••••••••••••",
-  enforce2fa: true,
-  highPasswordComplexity: true,
-  autoSessionTimeout: false,
-  emailNotifications: true,
-  weeklyDigest: true,
-  slackWebhook: "",
-  stripeEnabled: true,
-  sendgridEnabled: true,
-  webhookUrl: "https://api.Orbit.io/webhooks/platform",
   defaultCurrency: "USD",
   taxId: "US-84-3928102",
   invoicePrefix: "OR-",
 };
-
-export const API_KEYS: ApiKeyRecord[] = [];
 
 export const LANGUAGE_OPTIONS: SelectOption[] = [
   { value: "en-US", label: "English (US)" },
@@ -138,36 +95,3 @@ export const BRANDING_HINTS = {
 } as const;
 
 export const DEFAULT_PLATFORM_LOGO = "/orbit.svg";
-
-export const NOTIFICATION_TOGGLES: SettingsToggleItem<"emailNotifications" | "weeklyDigest">[] = [
-  {
-    key: "emailNotifications",
-    title: "Email Notifications",
-    description: "Send critical platform alerts to admin inboxes.",
-  },
-  {
-    key: "weeklyDigest",
-    title: "Weekly Digest",
-    description: "Summary of growth, churn, and system events every Monday.",
-  },
-];
-
-export const NOTIFICATION_SLACK_PLACEHOLDER = "https://hooks.slack.com/services/...";
-
-export const SECURITY_POLICIES = [
-  {
-    key: "enforce2fa" as const,
-    title: "Enforce 2FA for all Administrators",
-    description: "Require multi-factor authentication for high-privilege accounts.",
-  },
-  {
-    key: "highPasswordComplexity" as const,
-    title: "High Password Complexity",
-    description: "Require special characters, numbers, and case variation.",
-  },
-  {
-    key: "autoSessionTimeout" as const,
-    title: "Automatic Session Timeout",
-    description: "Logout users after 30 minutes of inactivity.",
-  },
-];

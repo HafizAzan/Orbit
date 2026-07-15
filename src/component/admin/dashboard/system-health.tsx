@@ -56,32 +56,38 @@ function SystemHealth() {
               <Paragraph size="sm" className="mt-1 mb-0! text-muted">
                 Live checks for {health.service}. Last checked {formatDate(health.timestamp)}.
               </Paragraph>
-              <ul className="mt-4 grid gap-2 sm:grid-cols-3">
-                {health.checks.map((check) => {
-                  const isUp = check.status === "up";
-                  return (
-                    <li
-                      key={check.name}
-                      className="rounded-xl border border-border bg-background px-3 py-3"
-                    >
-                      <div className="flex items-center gap-2">
-                        {isUp ? (
-                          <CheckCircleOutlined className="text-emerald-600" />
-                        ) : (
-                          <CloseCircleOutlined className="text-red-600" />
-                        )}
-                        <Text as="span" size="sm" weight="semibold" className="capitalize">
-                          {check.name.replaceAll("_", " ")}
+              {health.checks.length === 0 ? (
+                <Paragraph size="sm" className="mt-4 mb-0! text-muted">
+                  No health checks reported.
+                </Paragraph>
+              ) : (
+                <ul className="mt-4 grid gap-2 sm:grid-cols-3">
+                  {health.checks.map((check) => {
+                    const isUp = check.status === "up";
+                    return (
+                      <li
+                        key={check.name}
+                        className="rounded-xl border border-border bg-background px-3 py-3"
+                      >
+                        <div className="flex items-center gap-2">
+                          {isUp ? (
+                            <CheckCircleOutlined className="text-emerald-600" />
+                          ) : (
+                            <CloseCircleOutlined className="text-red-600" />
+                          )}
+                          <Text as="span" size="sm" weight="semibold" className="capitalize">
+                            {check.name.replaceAll("_", " ")}
+                          </Text>
+                        </div>
+                        <Text as="p" size="xs" color="muted" className="mt-1 mb-0!">
+                          {check.detail ??
+                            (check.latencyMs != null ? `${check.latencyMs} ms` : check.status)}
                         </Text>
-                      </div>
-                      <Text as="p" size="xs" color="muted" className="mt-1 mb-0!">
-                        {check.detail ??
-                          (check.latencyMs != null ? `${check.latencyMs} ms` : check.status)}
-                      </Text>
-                    </li>
-                  );
-                })}
-              </ul>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </>
           ) : null}
         </div>

@@ -8,6 +8,7 @@ import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
 import { saveOtpSession } from "../../lib/otp-session";
 import { cn } from "../../lib/utils";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
+import API_ROUTES from "../../router/api-routes";
 import type { RegisterFormValues } from "../../types/auth.types";
 import AuthFormCard from "./auth-form-card";
 import AuthFormLayout from "./auth-form-layout";
@@ -218,7 +219,7 @@ function RegisterForm() {
             icon={<GoogleOutlined />}
             className="h-11! font-medium!"
             onClick={() => {
-              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/google`);
+              window.location.assign(`${import.meta.env.VITE_API_URL}${API_ROUTES.AUTH.GOOGLE}`);
             }}
           >
             Google
@@ -228,7 +229,7 @@ function RegisterForm() {
             icon={<GithubOutlined />}
             className="h-11! font-medium!"
             onClick={() => {
-              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/github`);
+              window.location.assign(`${import.meta.env.VITE_API_URL}${API_ROUTES.AUTH.GITHUB}`);
             }}
           >
             GitHub

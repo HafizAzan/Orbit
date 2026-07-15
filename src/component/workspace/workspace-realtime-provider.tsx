@@ -1,11 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { getTeamPresence } from "../../api-services/team.service";
 import { getSocket } from "../../config/socket";
 import { useAppContext } from "../../context/app-context";
-import useRealtimeConnection from "../../hooks/use-realtime-connection";
-import usePresencePing from "../../hooks/use-presence-ping";
 import { useNotificationSocketListener } from "../../hooks/use-notifications";
+import usePresencePing from "../../hooks/use-presence-ping";
+import useRealtimeConnection from "../../hooks/use-realtime-connection";
 
 export type OrgPresenceSnapshot = {
   onlineUserIds: string[];

@@ -4,6 +4,7 @@ import {
   CreditCardOutlined,
   DashboardOutlined,
   FlagOutlined,
+  MailOutlined,
   SettingOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -23,6 +24,7 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { key: "organizations", label: "Organizations", path: ADMIN_ROUTES.ORGANIZATIONS, icon: BankOutlined },
   { key: "subscriptions", label: "Subscriptions", path: ADMIN_ROUTES.SUBSCRIPTIONS, icon: CreditCardOutlined },
   { key: "users", label: "Users", path: ADMIN_ROUTES.USERS, icon: TeamOutlined },
+  { key: "leads", label: "Leads", path: ADMIN_ROUTES.LEADS, icon: MailOutlined },
   { key: "activity", label: "Activity", path: ADMIN_ROUTES.ACTIVITY, icon: AuditOutlined },
   {
     key: "activity-review",

@@ -9,6 +9,7 @@ import { getPostAuthRedirectPath } from "../../lib/auth-routing";
 import { saveAuthSession } from "../../lib/auth-session";
 import { saveOtpSession } from "../../lib/otp-session";
 import { UN_AUTH_ROUTES } from "../../router/public-routes";
+import API_ROUTES from "../../router/api-routes";
 import { isTwoFactorChallengeResponse, type LoginFormValues } from "../../types/auth.types";
 import TwoFactorChallengeScreen from "./two-factor-challenge-screen";
 import AuthFormCard from "./auth-form-card";
@@ -177,7 +178,7 @@ function LoginForm() {
             icon={<GoogleOutlined />}
             className="h-11! font-medium!"
             onClick={() => {
-              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/google`);
+              window.location.assign(`${import.meta.env.VITE_API_URL}${API_ROUTES.AUTH.GOOGLE}`);
             }}
           >
             Google
@@ -187,7 +188,7 @@ function LoginForm() {
             icon={<GithubOutlined />}
             className="h-11! font-medium!"
             onClick={() => {
-              window.location.assign(`${import.meta.env.VITE_API_URL}/auth/github`);
+              window.location.assign(`${import.meta.env.VITE_API_URL}${API_ROUTES.AUTH.GITHUB}`);
             }}
           >
             GitHub

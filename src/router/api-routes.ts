@@ -47,7 +47,7 @@ const API_ROUTES: Record<string, Record<string, string>> = {
     SETTINGS: "/admin/settings",
     SETTINGS_LOGO: "/admin/settings/branding/logo",
     SETTINGS_FAVICON: "/admin/settings/branding/favicon",
-    API_KEYS: "/admin/api-keys",
+    LEADS: "/admin/leads",
   },
   ORGANIZATIONS: {
     ME: "/organizations/me",
@@ -73,7 +73,6 @@ const API_ROUTES: Record<string, Record<string, string>> = {
   PROJECTS: {
     LIST: "/projects",
     ASSIGNABLE_MEMBERS: "/projects/assignable-members",
-    THEMES: "/projects/themes/list",
   },
   CALENDAR: {
     EVENTS: "/calendar/events",

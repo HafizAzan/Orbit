@@ -5,6 +5,7 @@ import type { ActiveProject } from "../../../data/workspace-dashboard";
 import { resolveSurfaceClass, useIsDarkAppTheme } from "../../../lib/app-ui-theme-utils";
 import { WORKSPACE_ROUTES } from "../../../router/workspace-routes";
 import { cn } from "../../../lib/utils";
+import EmptyStatePanel from "../../ui/empty-state-panel";
 import { Text, Title } from "../../ui/typography";
 
 type ActiveProjectsCardProps = {
@@ -23,32 +24,44 @@ function ActiveProjectsCard({ items }: ActiveProjectsCardProps) {
         </Link>
       </div>
 
-      <ul className="space-y-5">
-        {items.map((project) => (
-          <li key={project.id}>
-            <div className="flex items-start gap-3">
-              <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-primary", resolveSurfaceClass(project.iconBg, isDark))}>
-                <ProjectOutlined className="text-base" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <Text as="p" weight="semibold" className="truncate">{project.name}</Text>
-                    <Text as="p" size="xs" color="muted" className="mt-0.5">Last updated {project.updatedAt}</Text>
+      {items.length === 0 ? (
+        <EmptyStatePanel
+          compact
+          description="No active projects yet. Create a project to track delivery progress here."
+          action={
+            <Link to={WORKSPACE_ROUTES.PROJECTS} className="text-sm font-semibold text-primary hover:opacity-80">
+              Browse projects
+            </Link>
+          }
+        />
+      ) : (
+        <ul className="space-y-5">
+          {items.map((project) => (
+            <li key={project.id}>
+              <div className="flex items-start gap-3">
+                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-primary", resolveSurfaceClass(project.iconBg, isDark))}>
+                  <ProjectOutlined className="text-base" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Text as="p" weight="semibold" className="truncate">{project.name}</Text>
+                      <Text as="p" size="xs" color="muted" className="mt-0.5">Last updated {project.updatedAt}</Text>
+                    </div>
+                    <Text as="span" size="sm" weight="bold" className="shrink-0">{project.progress}%</Text>
                   </div>
-                  <Text as="span" size="sm" weight="bold" className="shrink-0">{project.progress}%</Text>
-                </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-progress-track">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
-                    style={{ width: `${project.progress}%` }}
-                  />
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-progress-track">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500"
+                      style={{ width: `${project.progress}%` }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
     </article>
   );
 }
