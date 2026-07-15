@@ -13,6 +13,7 @@ import {
   type ChangeWorkspacePasswordInput,
 } from "../lib/workspace-profile";
 import { countObjectChanges } from "../lib/helper";
+import { resolveTaskAttachmentUrl } from "../lib/task-attachments";
 import { toast } from "../lib/toast";
 import type { AuthUser } from "../types/auth.types";
 import { useAppContext } from "./app-context";
@@ -25,6 +26,7 @@ type WorkspaceProfileContextValue = {
   changingEmail: boolean;
   resettingPassword: boolean;
   handleProfileFieldChange: <K extends keyof WorkspaceProfile>(key: K, value: WorkspaceProfile[K]) => void;
+  handleAvatarUploaded: (uploadedUser: AuthUser) => void;
   handleDiscardProfile: () => void;
   handleSaveProfile: () => Promise<void>;
   handleChangePassword: (input: ChangeWorkspacePasswordInput) => Promise<boolean>;
@@ -93,6 +95,26 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
       return { ...current, [key]: value };
     });
   }, []);
+
+  const handleAvatarUploaded = useCallback(
+    (uploadedUser: AuthUser) => {
+      const nextAvatarUrl = uploadedUser.avatarUrl
+        ? resolveTaskAttachmentUrl(uploadedUser.avatarUrl)
+        : "";
+
+      setProfile((current) => ({ ...current, avatarUrl: nextAvatarUrl }));
+      setSavedProfile((current) => ({ ...current, avatarUrl: nextAvatarUrl }));
+
+      if (app?.setUser) {
+        app.setUser({
+          ...(user ?? uploadedUser),
+          ...uploadedUser,
+          avatarUrl: uploadedUser.avatarUrl,
+        });
+      }
+    },
+    [app, user],
+  );
 
   const handleDiscardProfile = useCallback(() => {
     setProfile(savedProfile);
@@ -202,6 +224,7 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
       changingEmail,
       resettingPassword,
       handleProfileFieldChange,
+      handleAvatarUploaded,
       handleDiscardProfile,
       handleSaveProfile,
       handleChangePassword,
@@ -217,6 +240,7 @@ function WorkspaceProfileProvider({ children }: WorkspaceProfileProviderProps) {
       changingEmail,
       resettingPassword,
       handleProfileFieldChange,
+      handleAvatarUploaded,
       handleDiscardProfile,
       handleSaveProfile,
       handleChangePassword,

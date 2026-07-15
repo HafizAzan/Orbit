@@ -24,21 +24,21 @@ Folder: `orbit/frontend`
 
 ### Tech stack
 
-| Piece | Library |
-|---|---|
-| UI framework | React 19 |
-| Language | TypeScript |
-| Bundler/dev server | Vite |
-| Routing | React Router |
-| Server state | TanStack React Query |
-| HTTP | Axios |
-| UI kit | Ant Design |
-| Styling | Tailwind CSS |
-| Charts | Recharts |
-| Realtime | Socket.IO client |
+| Piece              | Library              |
+| ------------------ | -------------------- |
+| UI framework       | React 19             |
+| Language           | TypeScript           |
+| Bundler/dev server | Vite                 |
+| Routing            | React Router         |
+| Server state       | TanStack React Query |
+| HTTP               | Axios                |
+| UI kit             | Ant Design           |
+| Styling            | Tailwind CSS         |
+| Charts             | Recharts             |
+| Realtime           | Socket.IO client     |
 
-Default local FE URL is usually **`http://localhost:5173`** (Vite default).  
-API expected at **`http://localhost:5000/api/v1`**.
+Default local FE URL is usually `http://localhost:5173` (Vite default).
+API expected at `http://localhost:5000/api/v1`.
 
 ---
 
@@ -46,7 +46,7 @@ API expected at **`http://localhost:5000/api/v1`**.
 
 1. **Node.js** LTS (20+ recommended)
 2. **npm**
-3. Backend already runnable (see [`backend.md`](./backend.md))
+3. Backend already runnable (see `[backend.md](./backend.md)`)
 
 Check:
 
@@ -110,13 +110,13 @@ Open the printed local URL (typically `http://localhost:5173`).
 
 ## 4. Important npm scripts
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Vite development server + HMR |
-| `npm run build` | Typecheck + production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | ESLint |
-| `npm test` | Vitest unit tests |
+| Command           | Purpose                       |
+| ----------------- | ----------------------------- |
+| `npm run dev`     | Vite development server + HMR |
+| `npm run build`   | Typecheck + production build  |
+| `npm run preview` | Preview production build      |
+| `npm run lint`    | ESLint                        |
+| `npm test`        | Vitest unit tests             |
 
 ---
 
@@ -200,14 +200,14 @@ Routes are wired in `src/app.tsx`.
 
 Guards live in `src/router/guards/`.
 
-| Guard | Meaning |
-|---|---|
-| `RequireAuth` | Must be logged in |
-| `RequireGuest` | Logged-in users redirected away from login/register |
-| `RequirePlatformAdmin` | Platform admin only |
-| `RequireWorkspaceUser` | Normal org user (not forced to admin) |
-| `RequireWorkspaceRouteAccess` | Role permission + plan feature checks |
-| `RequireMemberRouteAccess` | Member allowlist for specific routes |
+| Guard                          | Meaning                                               |
+| ------------------------------ | ----------------------------------------------------- |
+| `RequireAuth`                  | Must be logged in                                     |
+| `RequireGuest`                 | Logged-in users redirected away from login/register   |
+| `RequirePlatformAdmin`         | Platform admin only                                   |
+| `RequireWorkspaceUser`         | Normal org user (not forced to admin)                 |
+| `RequireWorkspaceRouteAccess`  | Role permission + plan feature checks                 |
+| `RequireMemberRouteAccess`     | Member allowlist for specific routes                  |
 | `RequirePlanSelectionRedirect` | Push users to choose-plan / pending pages when needed |
 
 ### Role behavior (product rules)
@@ -215,7 +215,7 @@ Guards live in `src/router/guards/`.
 - **Owner**: manages org/billing/settings; cannot create/edit tasks (by design)
 - **Admin / Manager**: projects + tasks delivery
 - **Member**: my-tasks, boards, limited project access
-- **Platform admin**: `/admin/*` console
+- **Platform admin**: `/admin/`\* console
 
 Permissions source of truth: `src/lib/workspace-permissions.ts`
 
@@ -312,7 +312,7 @@ Use helpers from `src/lib/api-error.ts` (`showApiErrorToast`, `showApiSuccessToa
 
 ---
 
-## 11. Realtime (Socket.IO)
+## 11. Realtime ([Socket.IO](http://Socket.IO))
 
 Config: `src/config/socket.ts`
 
@@ -328,27 +328,27 @@ Workspace layout wraps realtime provider so team online status and live comments
 
 ### Workspace
 
-| Screen | What it does |
-|---|---|
-| Dashboard | Stats, activity feed, charts |
-| Projects | Grid/list, create/edit, detail, GitHub, discussion |
-| Boards | Kanban by project |
-| Tasks / My Tasks | Delivery lists and personal assignments |
-| Teams | Members, invites, roles |
-| Calendar | Events CRUD |
-| Reports | Task summaries |
-| Billing | Plans, invoices, portal |
-| Settings | Org general/members/security/notifications/usage |
+| Screen           | What it does                                       |
+| ---------------- | -------------------------------------------------- |
+| Dashboard        | Stats, activity feed, charts                       |
+| Projects         | Grid/list, create/edit, detail, GitHub, discussion |
+| Boards           | Kanban by project                                  |
+| Tasks / My Tasks | Delivery lists and personal assignments            |
+| Teams            | Members, invites, roles                            |
+| Calendar         | Events CRUD                                        |
+| Reports          | Task summaries                                     |
+| Billing          | Plans, invoices, portal                            |
+| Settings         | Org general/members/security/notifications/usage   |
 
 ### Admin
 
-| Screen | What it does |
-|---|---|
-| Dashboard | Platform overview + health |
-| Organizations / Users / Subscriptions | CRUD + stats |
-| Leads | Contact form inbox |
-| Activity / Review | Flag/resolve events |
-| Settings | Branding, email SMTP, billing labels |
+| Screen                                | What it does                         |
+| ------------------------------------- | ------------------------------------ |
+| Dashboard                             | Platform overview + health           |
+| Organizations / Users / Subscriptions | CRUD + stats                         |
+| Leads                                 | Contact form inbox                   |
+| Activity / Review                     | Flag/resolve events                  |
+| Settings                              | Branding, email SMTP, billing labels |
 
 ---
 
@@ -356,7 +356,9 @@ Workspace layout wraps realtime provider so team online status and live comments
 
 1. Create page in `src/pages/...`
 2. Add route constant in the right router file:
-   - `public-routes.ts` / `auth-routes.ts` / `workspace-routes.ts` / `admin-routes.ts`
+
+- `public-routes.ts` / `auth-routes.ts` / `workspace-routes.ts` / `admin-routes.ts`
+
 3. Ensure `app.tsx` (or route list factory) mounts it under correct layout + guard
 4. Add nav item if needed (`data/admin-nav-items.ts` or workspace nav data)
 5. Wire API service + hook
@@ -389,14 +391,14 @@ If these mismatch, you get CORS or OAuth callback failures.
 
 ## 15. Common problems & fixes
 
-| Problem | Cause | Fix |
-|---|---|---|
-| Network/CORS errors | Backend down or origin not allowed | Start backend, fix `CORS_ORIGIN` |
-| Infinite login/401 loop | Refresh failing / wrong API URL | Check `VITE_API_URL`, cookies, backend JWT secrets |
-| Blank lists | Empty state missing (older screens) | Use `EmptyStatePanel` / table empty props |
-| OAuth returns then fails | Wrong callback URL / FE origin | Align Google/GitHub callback with backend env |
-| Socket not connecting | Wrong socket URL / no token | Check `VITE_SOCKET_URL`, login state |
-| Role cannot open page | Permission/plan gate | Check `workspace-permissions` + plan feature flags |
+| Problem                  | Cause                               | Fix                                                |
+| ------------------------ | ----------------------------------- | -------------------------------------------------- |
+| Network/CORS errors      | Backend down or origin not allowed  | Start backend, fix `CORS_ORIGIN`                   |
+| Infinite login/401 loop  | Refresh failing / wrong API URL     | Check `VITE_API_URL`, cookies, backend JWT secrets |
+| Blank lists              | Empty state missing (older screens) | Use `EmptyStatePanel` / table empty props          |
+| OAuth returns then fails | Wrong callback URL / FE origin      | Align Google/GitHub callback with backend env      |
+| Socket not connecting    | Wrong socket URL / no token         | Check `VITE_SOCKET_URL`, login state               |
+| Role cannot open page    | Permission/plan gate                | Check `workspace-permissions` + plan feature flags |
 
 ---
 
@@ -448,7 +450,7 @@ Folder: `orbit/frontend`
 - Recharts
 - Socket.IO client
 
-Local FE aksar: `http://localhost:5173`  
+Local FE aksar: `http://localhost:3000`
 API: `http://localhost:5000/api/v1`
 
 ---
@@ -457,7 +459,7 @@ API: `http://localhost:5000/api/v1`
 
 1. Node.js LTS
 2. npm
-3. Backend chalne layak hona chahiye ([`backend.md`](./backend.md))
+3. Backend chalne layak hona chahiye (`[backend.md](./backend.md)`)
 
 ```bash
 node -v
@@ -513,13 +515,13 @@ Browser mein Vite URL open karo.
 
 ## 4. Important commands
 
-| Command | Kaam |
-|---|---|
-| `npm run dev` | Local development |
-| `npm run build` | Production build |
-| `npm run preview` | Build preview |
-| `npm run lint` | Lint |
-| `npm test` | Tests |
+| Command           | Kaam              |
+| ----------------- | ----------------- |
+| `npm run dev`     | Local development |
+| `npm run build`   | Production build  |
+| `npm run preview` | Build preview     |
+| `npm run lint`    | Lint              |
+| `npm test`        | Tests             |
 
 ---
 
@@ -546,10 +548,10 @@ Standard flow:
 
 ## 6. Routes ka map
 
-Public: `/`, `/about`, `/contact`, `/help`, legal pages  
-Auth: `/login`, `/register`, OTP, reset, invite, 2FA, OAuth callbacks  
-Onboarding: `/choose-plan`, `/workspace-pending`  
-Workspace: dashboard/projects/tasks/boards/teams/calendar/billing/settings  
+Public: `/`, `/about`, `/contact`, `/help`, legal pages
+Auth: `/login`, `/register`, OTP, reset, invite, 2FA, OAuth callbacks
+Onboarding: `/choose-plan`, `/workspace-pending`
+Workspace: dashboard/projects/tasks/boards/teams/calendar/billing/settings
 Admin: `/admin/dashboard`, orgs, users, subs, **leads**, activity, settings
 
 Wiring `src/app.tsx` mein hoti hai.
@@ -656,7 +658,7 @@ Admin:
 6. Empty/loading/error states do
 7. Owner/admin/manager/member roles se test karo
 
-Admin lazy route ke liye file name path se match hona chahiye  
+Admin lazy route ke liye file name path se match hona chahiye
 (example: `/admin/leads` → `pages/admin/leads.tsx`).
 
 ---
@@ -683,14 +685,14 @@ Mismatch = CORS / OAuth issues.
 
 ## 15. Common problems
 
-| Masla | Wajah | Fix |
-|---|---|---|
-| CORS / network | Backend band ya origin allow nahi | Backend start + CORS fix |
-| Login loop | Refresh fail / galat API URL | `VITE_API_URL` + JWT check |
-| Lists blank | Empty UI missing | `EmptyStatePanel`/table empty use karo |
-| OAuth fail | Callback mismatch | Backend OAuth URLs align karo |
-| Socket fail | URL/token issue | socket env + login check |
-| Page blocked | Role/plan permission | permissions + plan flags check |
+| Masla          | Wajah                             | Fix                                    |
+| -------------- | --------------------------------- | -------------------------------------- |
+| CORS / network | Backend band ya origin allow nahi | Backend start + CORS fix               |
+| Login loop     | Refresh fail / galat API URL      | `VITE_API_URL` + JWT check             |
+| Lists blank    | Empty UI missing                  | `EmptyStatePanel`/table empty use karo |
+| OAuth fail     | Callback mismatch                 | Backend OAuth URLs align karo          |
+| Socket fail    | URL/token issue                   | socket env + login check               |
+| Page blocked   | Role/plan permission              | permissions + plan flags check         |
 
 ---
 
@@ -718,4 +720,4 @@ Production mein `VITE_API_URL` deployed API pe set karo.
 
 ## Related docs
 
-- Backend guide: [`backend.md`](./backend.md)
+- Backend guide: `[backend.md](./backend.md)`

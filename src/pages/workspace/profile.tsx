@@ -27,6 +27,7 @@ function WorkspaceProfile() {
     changingEmail,
     resettingPassword,
     handleProfileFieldChange,
+    handleAvatarUploaded,
     handleDiscardProfile,
     handleSaveProfile,
     handleChangePassword,
@@ -83,6 +84,7 @@ function WorkspaceProfile() {
             title="Personal Details"
             description="Update how your name appears across the workspace."
             onChange={(key, value) => handleProfileFieldChange(key, value)}
+            onAvatarUploaded={handleAvatarUploaded}
           />
         </div>
       ) : null}

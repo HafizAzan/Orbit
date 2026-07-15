@@ -5,6 +5,7 @@ import { uploadAvatar } from "../../../api-services/auth.service";
 import { PLATFORM_ADMIN_ROLE_LABEL, type AdminProfile } from "../../../data/admin-profile";
 import { showApiErrorToast, showApiSuccessToast } from "../../../lib/api-error";
 import { resolveTaskAttachmentUrl } from "../../../lib/task-attachments";
+import type { AuthUser } from "../../../types/auth.types";
 import { Label, Paragraph, Title } from "../../ui/typography";
 
 type ProfileInfoFormProfile = Pick<AdminProfile, "firstName" | "lastName" | "avatarUrl">;
@@ -16,7 +17,7 @@ type ProfileInfoFormProps = {
   organizationName?: string;
   title?: string;
   description?: string;
-  onAvatarUploaded?: (avatarUrl: string) => void;
+  onAvatarUploaded?: (user: AuthUser) => void;
 };
 
 function ProfileInfoForm({
@@ -39,7 +40,7 @@ function ProfileInfoForm({
         ? resolveTaskAttachmentUrl(user.avatarUrl)
         : profile.avatarUrl;
       onChange("avatarUrl", nextUrl);
-      onAvatarUploaded?.(nextUrl);
+      onAvatarUploaded?.(user);
       showApiSuccessToast("Profile photo updated.");
       options.onSuccess?.(user);
     } catch (error) {
@@ -62,7 +63,12 @@ function ProfileInfoForm({
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-background p-4">
-        <Avatar size={72} className="bg-primary/10! text-primary! font-semibold!" src={profile.avatarUrl} />
+        <Avatar
+          key={profile.avatarUrl || "avatar-empty"}
+          size={72}
+          className="bg-primary/10! text-primary! font-semibold!"
+          src={profile.avatarUrl || undefined}
+        />
         <div>
           <Upload accept="image/png,image/jpeg,image/gif,image/webp" showUploadList={false} customRequest={handleAvatarUpload}>
             <Button icon={<CameraOutlined />} loading={uploading} className="font-medium!">

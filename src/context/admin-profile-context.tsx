@@ -12,6 +12,7 @@ import {
 } from "../lib/admin-profile";
 import { getApiErrorMessage } from "../lib/api-error";
 import { countObjectChanges } from "../lib/helper";
+import { resolveTaskAttachmentUrl } from "../lib/task-attachments";
 import { toast } from "../lib/toast";
 import type { AuthUser } from "../types/auth.types";
 import { useAppContext } from "./app-context";
@@ -24,6 +25,7 @@ type AdminProfileContextValue = {
   changingEmail: boolean;
   resettingPassword: boolean;
   handleProfileFieldChange: <K extends keyof AdminProfile>(key: K, value: AdminProfile[K]) => void;
+  handleAvatarUploaded: (uploadedUser: AuthUser) => void;
   handleDiscardProfile: () => void;
   handleSaveProfile: () => Promise<void>;
   handleChangePassword: (input: ChangeAdminPasswordInput) => Promise<boolean>;
@@ -88,6 +90,26 @@ function AdminProfileProvider({ children }: AdminProfileProviderProps) {
       return { ...current, [key]: value };
     });
   }, []);
+
+  const handleAvatarUploaded = useCallback(
+    (uploadedUser: AuthUser) => {
+      const nextAvatarUrl = uploadedUser.avatarUrl
+        ? resolveTaskAttachmentUrl(uploadedUser.avatarUrl)
+        : "";
+
+      setProfile((current) => ({ ...current, avatarUrl: nextAvatarUrl }));
+      setSavedProfile((current) => ({ ...current, avatarUrl: nextAvatarUrl }));
+
+      if (app?.setUser) {
+        app.setUser({
+          ...(user ?? uploadedUser),
+          ...uploadedUser,
+          avatarUrl: uploadedUser.avatarUrl,
+        });
+      }
+    },
+    [app, user],
+  );
 
   const handleDiscardProfile = useCallback(() => {
     setProfile(savedProfile);
@@ -194,6 +216,7 @@ function AdminProfileProvider({ children }: AdminProfileProviderProps) {
       changingEmail,
       resettingPassword,
       handleProfileFieldChange,
+      handleAvatarUploaded,
       handleDiscardProfile,
       handleSaveProfile,
       handleChangePassword,
@@ -209,6 +232,7 @@ function AdminProfileProvider({ children }: AdminProfileProviderProps) {
       changingEmail,
       resettingPassword,
       handleProfileFieldChange,
+      handleAvatarUploaded,
       handleDiscardProfile,
       handleSaveProfile,
       handleChangePassword,

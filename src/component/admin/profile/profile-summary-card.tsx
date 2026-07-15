@@ -24,7 +24,12 @@ function ProfileSummaryCard({ profile, displayName, roleLabel, accountBadge }: P
     <article className="rounded-2xl border border-border bg-linear-to-r from-card to-feature-sync/40 p-5 shadow-sm sm:p-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <Avatar size={72} className="border-2 border-card bg-primary/10! text-primary! shadow-sm" src={profile.avatarUrl} />
+          <Avatar
+            key={profile.avatarUrl || "avatar-empty"}
+            size={72}
+            className="border-2 border-card bg-primary/10! text-primary! shadow-sm"
+            src={profile.avatarUrl || undefined}
+          />
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <Title level={4} color="default" className="font-bold">{displayName}</Title>

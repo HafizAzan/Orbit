@@ -14,6 +14,7 @@ function AdminProfile() {
     changingPassword,
     resettingPassword,
     handleProfileFieldChange,
+    handleAvatarUploaded,
     handleDiscardProfile,
     handleSaveProfile,
     handleChangePassword,
@@ -34,7 +35,11 @@ function AdminProfile() {
       </div>
 
       <div className="space-y-6">
-        <ProfileInfoForm profile={profile} onChange={handleProfileFieldChange} />
+        <ProfileInfoForm
+          profile={profile}
+          onChange={handleProfileFieldChange}
+          onAvatarUploaded={handleAvatarUploaded}
+        />
 
         <ProfilePasswordForm
           email={profile.email}

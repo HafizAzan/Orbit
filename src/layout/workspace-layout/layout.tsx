@@ -11,6 +11,7 @@ import { WorkspaceProfileProvider } from "../../context/workspace-profile-contex
 import { useAppContext } from "../../context/app-context";
 import { getWorkspaceNavItemsForRole } from "../../data/workspace-nav-items";
 import { useOrganizationUsage } from "../../hooks/use-billing";
+import { resolveTaskAttachmentUrl } from "../../lib/task-attachments";
 import { getWorkspaceBrandSubtitle, getWorkspaceHomePath, getWorkspaceRoleLabel } from "../../lib/workspace-routing";
 import { WORKSPACE_ROUTES } from "../../router/workspace-routes";
 
@@ -53,6 +54,7 @@ function WorkspaceSidebar() {
 function WorkspaceHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const app = useAppContext();
   const user = app?.user;
+  const avatarUrl = user?.avatarUrl ? resolveTaskAttachmentUrl(user.avatarUrl) : undefined;
 
   return (
     <AppHeader
@@ -61,6 +63,7 @@ function WorkspaceHeader({ onMenuOpen }: { onMenuOpen?: () => void }) {
       profileName={user?.name ?? "Workspace User"}
       profileRole={user?.role ? getWorkspaceRoleLabel(user.role) : "User"}
       profilePath={WORKSPACE_ROUTES.PROFILE}
+      avatarUrl={avatarUrl}
       actions={
         <>
           <AppUiThemeDropdown />

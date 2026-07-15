@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { ClockCircleOutlined, LogoutOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import PageSeo from "../component/seo/page-seo";
 import { getMe } from "../api-services/auth.service";
 import { PageHeaderSkeleton } from "../component/skeletons";
@@ -13,12 +13,13 @@ import {
   shouldRedirectToWorkspacePending,
 } from "../lib/auth-routing";
 import { showApiErrorToast, showApiSuccessToast } from "../lib/api-error";
-import { saveStoredUser } from "../lib/auth-session";
+import { clearAuthSession, saveStoredUser } from "../lib/auth-session";
 import { getWorkspaceRoleLabel } from "../lib/workspace-routing";
 import { UN_AUTH_ROUTES } from "../router/public-routes";
 
 function WorkspaceSubscriptionPending() {
   const app = useAppContext();
+  const navigate = useNavigate();
   const { mutateAsync: logout, isPending: isLoggingOut } = useLogout();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -57,13 +58,20 @@ function WorkspaceSubscriptionPending() {
   }, [app?.user, handleRefreshStatus]);
 
   const handleLogout = useCallback(async () => {
+    let logoutMessage: string | null = null;
+
     try {
       const result = await logout();
-      showApiSuccessToast(result.message);
+      logoutMessage = result.message;
     } catch (error) {
       showApiErrorToast(error);
+    } finally {
+      clearAuthSession();
+      app?.setUser(null);
+      showApiSuccessToast(logoutMessage);
+      navigate(UN_AUTH_ROUTES.LOGIN, { replace: true });
     }
-  }, [logout]);
+  }, [app, logout, navigate]);
 
   if (app?.isBootstrapping) {
     return (
