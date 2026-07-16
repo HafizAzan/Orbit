@@ -9,11 +9,11 @@ import OrbitMark from "../orbit-mark";
 import { Paragraph, Text, Title } from "../ui/typography";
 
 function AppUiThemeDropdown() {
-  const { themeId, isSaving, setTheme } = useAppUiTheme();
+  const { preferredThemeId, isSaving, setTheme } = useAppUiTheme();
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = async (nextThemeId: AppUiThemeId) => {
-    if (nextThemeId === themeId || isSaving) return;
+    if (nextThemeId === preferredThemeId || isSaving) return;
     await setTheme(nextThemeId);
   };
 
@@ -28,7 +28,7 @@ function AppUiThemeDropdown() {
 
       <div className="grid grid-cols-2 gap-2">
         {APP_UI_THEMES.map((theme) => {
-          const isSelected = theme.id === themeId;
+          const isSelected = theme.id === preferredThemeId;
           const isDark = isDarkAppUiTheme(theme.id);
           const logoPalette = getOrbitLogoPalette(theme.id);
 

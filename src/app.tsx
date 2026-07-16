@@ -30,8 +30,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <AppUiThemeProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <AppUiThemeProvider>
             <ScrollToTop />
             <Routes>
               <ChildRoute element={<RequirePlatformAdmin />}>
@@ -93,8 +93,8 @@ function App() {
                 element={<APP_NOT_FOUND_ROUTE.component />}
               />
             </Routes>
-          </BrowserRouter>
-        </AppUiThemeProvider>
+          </AppUiThemeProvider>
+        </BrowserRouter>
       </AppProvider>
     </QueryClientProvider>
   );
