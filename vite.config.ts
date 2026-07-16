@@ -11,6 +11,7 @@ const optimizeDepsInclude = [
   "@ant-design/icons",
   "axios",
   "clsx",
+  "dayjs",
   "tailwind-merge",
   "socket.io-client",
   "recharts",
@@ -44,13 +45,13 @@ export default defineConfig({
               name: "antd-icons-vendor",
               test: /node_modules[\\/]@ant-design[\\/]icons/,
               priority: 22,
-              maxSize: 200_000,
             },
             {
+              // Keep antd + rc-* + dayjs together. Splitting antd by maxSize
+              // breaks production (e.g. "g is not a function" in antd-vendor).
               name: "antd-vendor",
-              test: /node_modules[\\/](antd|@ant-design|@rc-component|rc-)/,
+              test: /node_modules[\\/](antd|@ant-design|@rc-component|rc-|dayjs)/,
               priority: 20,
-              maxSize: 250_000,
             },
             {
               name: "charts-vendor",
