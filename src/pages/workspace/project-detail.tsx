@@ -1,47 +1,47 @@
-import React, { useMemo } from "react";
-import { useParams } from "react-router-dom";
-import PageSeo from "../../component/seo/page-seo";
-import MemberProjectDetailHeader from "../../component/workspace/projects/member-project-detail-header";
-import ProjectActivityFeed from "../../component/workspace/projects/project-activity-feed";
-import ProjectAiHealthCard from "../../component/workspace/projects/project-ai-health-card";
-import ProjectAttachmentsCard from "../../component/workspace/projects/project-attachments-card";
-import ProjectDetailHeader from "../../component/workspace/projects/project-detail-header";
-import ProjectDiscussionCard from "../../component/workspace/projects/project-discussion-card";
-import ProjectGithubCard from "../../component/workspace/projects/project-github-card";
-import ProjectNetworkPulseCard from "../../component/workspace/projects/project-network-pulse-card";
-import ProjectPhaseProgressCard from "../../component/workspace/projects/project-phase-progress-card";
-import ProjectTasksCard from "../../component/workspace/projects/project-tasks-card";
-import ProjectTeamCard from "../../component/workspace/projects/project-team-card";
-import QueryPageGuard from "../../component/common/query-page-guard";
-import WorkspaceNotFound from "../../component/workspace/workspace-not-found";
-import { ProjectDetailSkeleton } from "../../component/skeletons";
-import { useProject } from "../../hooks/use-workspace-projects";
+import React, { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import QueryPageGuard from '../../component/common/query-page-guard';
+import PageSeo from '../../component/seo/page-seo';
+import { ProjectDetailSkeleton } from '../../component/skeletons';
+import MemberProjectDetailHeader from '../../component/workspace/projects/member-project-detail-header';
+import ProjectActivityFeed from '../../component/workspace/projects/project-activity-feed';
+import ProjectAiHealthCard from '../../component/workspace/projects/project-ai-health-card';
+import ProjectAttachmentsCard from '../../component/workspace/projects/project-attachments-card';
+import ProjectDetailHeader from '../../component/workspace/projects/project-detail-header';
+import ProjectDiscussionCard from '../../component/workspace/projects/project-discussion-card';
+import ProjectGithubCard from '../../component/workspace/projects/project-github-card';
+import ProjectNetworkPulseCard from '../../component/workspace/projects/project-network-pulse-card';
+import ProjectPhaseProgressCard from '../../component/workspace/projects/project-phase-progress-card';
+import ProjectTasksCard from '../../component/workspace/projects/project-tasks-card';
+import ProjectTeamCard from '../../component/workspace/projects/project-team-card';
+import WorkspaceNotFound from '../../component/workspace/workspace-not-found';
+import { useAppContext } from '../../context/app-context';
+import type { WorkspaceProjectDetail } from '../../data/workspace-project-detail';
 import {
   useCreateProjectComment,
   useDeleteProjectComment,
   useProjectComments,
-} from "../../hooks/use-project-comments";
-import { useMyTasks, useTasks } from "../../hooks/use-workspace-tasks";
-import useProjectDiscussionSocket from "../../hooks/use-project-discussion-socket";
-import { useAppContext } from "../../context/app-context";
-import type { WorkspaceProjectDetail } from "../../data/workspace-project-detail";
-import type { ApiWorkspaceProject } from "../../types/project.types";
-import { mapApiProjectToWorkspaceProject } from "../../types/project.types";
-import { mapApiProjectCommentToMessage } from "../../types/project-comment.types";
-import { getWorkspaceHomePath } from "../../lib/workspace-routing";
-import { showApiErrorToast, showApiSuccessToast } from "../../lib/api-error";
-import { canDeleteWorkspaceProject } from "../../lib/project-access";
+} from '../../hooks/use-project-comments';
+import useProjectDiscussionSocket from '../../hooks/use-project-discussion-socket';
+import { useProject } from '../../hooks/use-workspace-projects';
+import { useMyTasks, useTasks } from '../../hooks/use-workspace-tasks';
+import { showApiErrorToast, showApiSuccessToast } from '../../lib/api-error';
+import { canDeleteWorkspaceProject } from '../../lib/project-access';
 import {
   computeRemainingDays,
   formatProjectEstimatedHours,
   mapProjectTasksToActivities,
   mapProjectTasksToAttachments,
   resolveProjectPhaseLabel,
-} from "../../lib/project-detail-utils";
+} from '../../lib/project-detail-utils';
+import { getWorkspaceHomePath } from '../../lib/workspace-routing';
+import { mapApiProjectCommentToMessage } from '../../types/project-comment.types';
+import type { ApiWorkspaceProject } from '../../types/project.types';
+import { mapApiProjectToWorkspaceProject } from '../../types/project.types';
 
 function mapProjectToDetail(
   apiProject: ApiWorkspaceProject,
-  projectTasks: import("../../types/task.types").ApiWorkspaceTask[],
+  projectTasks: import('../../types/task.types').ApiWorkspaceTask[],
 ): WorkspaceProjectDetail {
   const project = mapApiProjectToWorkspaceProject(apiProject);
 
@@ -56,7 +56,7 @@ function mapProjectToDetail(
     teamMembers: apiProject.members.map((member) => ({
       id: member.id,
       name: member.name,
-      role: member.projectRole ?? "member",
+      role: member.projectRole ?? 'member',
       avatarColor: member.avatarColor,
     })),
     activities: mapProjectTasksToActivities(projectTasks),
@@ -66,14 +66,15 @@ function mapProjectToDetail(
 }
 
 function WorkspaceProjectDetail() {
-  const { projectId = "" } = useParams();
+  const { projectId = '' } = useParams();
   const app = useAppContext();
-  const isMember = app?.user?.role === "member";
+  const isMember = app?.user?.role === 'member';
   const projectQuery = useProject(projectId);
   const commentsQuery = useProjectComments(projectId);
   const allTasksQuery = useTasks({ limit: 100 });
   const myTasksQuery = useMyTasks();
-  const { mutateAsync: createComment, isPending: isCreatingComment } = useCreateProjectComment(projectId);
+  const { mutateAsync: createComment, isPending: isCreatingComment } =
+    useCreateProjectComment(projectId);
   const { mutateAsync: deleteComment } = useDeleteProjectComment(projectId);
   const { data: apiProject } = projectQuery;
 
@@ -100,7 +101,7 @@ function WorkspaceProjectDetail() {
   const handleSubmitComment = async (message: string) => {
     try {
       await createComment({ body: message });
-      showApiSuccessToast("Comment posted.");
+      showApiSuccessToast('Comment posted.');
     } catch (error) {
       showApiErrorToast(error);
     }
@@ -109,7 +110,7 @@ function WorkspaceProjectDetail() {
   const handleDeleteComment = async (commentId: string) => {
     try {
       await deleteComment(commentId);
-      showApiSuccessToast("Comment deleted.");
+      showApiSuccessToast('Comment deleted.');
     } catch (error) {
       showApiErrorToast(error);
     }
@@ -126,7 +127,7 @@ function WorkspaceProjectDetail() {
     onRefresh: () => {
       void commentsQuery.refetch();
     },
-    messagesClassName: "max-h-80 lg:max-h-96",
+    messagesClassName: 'max-h-80 lg:max-h-96',
   };
 
   const projectCollaborationSection = (
@@ -138,85 +139,90 @@ function WorkspaceProjectDetail() {
 
   return (
     <>
-      <PageSeo title="Project Detail" description="View and manage project tasks, activity, and discussions." noIndex />
-    <QueryPageGuard
-      query={projectQuery}
-      loading={<ProjectDetailSkeleton />}
-      errorTitle="Unable to load project"
-      homePath={getWorkspaceHomePath(app?.user?.role)}
-    >
-      {!project ? (
-        <WorkspaceNotFound
-          title="Project not found"
-          description="This project does not exist or you do not have access to it."
-        />
-      ) : isMember ? (
-        <div className="mx-auto max-w-8xl">
-          <MemberProjectDetailHeader
-            project={project}
-            themeId={apiProject!.theme}
-            themeMeta={apiProject!.themeMeta}
-            assignedTaskCount={projectTasks.length}
+      <PageSeo
+        title="Project Detail"
+        description="View and manage project tasks, activity, and discussions."
+        noIndex
+      />
+      <QueryPageGuard
+        query={projectQuery}
+        loading={<ProjectDetailSkeleton />}
+        errorTitle="Unable to load project"
+        homePath={getWorkspaceHomePath(app?.user?.role)}
+      >
+        {!project ? (
+          <WorkspaceNotFound
+            title="Project not found"
+            description="This project does not exist or you do not have access to it."
           />
+        ) : isMember ? (
+          <div className="mx-auto max-w-8xl">
+            <MemberProjectDetailHeader
+              project={project}
+              themeId={apiProject!.theme}
+              themeMeta={apiProject!.themeMeta}
+              assignedTaskCount={projectTasks.length}
+            />
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <div className="space-y-6 xl:col-span-2">
-              <ProjectTasksCard
-                projectId={projectId}
-                tasks={projectTasks}
-                loading={myTasksQuery.isLoading}
-              />
-
-              {projectCollaborationSection}
-            </div>
-
-            <div className="space-y-6">
-              <ProjectTeamCard members={project.teamMembers} />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="mx-auto max-w-8xl">
-          <ProjectDetailHeader
-            project={project}
-            themeId={apiProject!.theme}
-            themeMeta={apiProject!.themeMeta}
-            completedTaskCount={apiProject!.completedTaskCount}
-            canDelete={
-              apiProject
-                ? canDeleteWorkspaceProject(
-                    app?.user ? { id: app.user.id, role: app.user.role } : null,
-                    apiProject,
-                  )
-                : false
-            }
-          />
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <div className="space-y-6 xl:col-span-2">
-              <ProjectPhaseProgressCard project={project} />
-              <ProjectAiHealthCard projectId={projectId} projectName={project.title} />
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <ProjectActivityFeed items={project.activities} />
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+              <div className="space-y-6 xl:col-span-2">
                 <ProjectTasksCard
                   projectId={projectId}
                   tasks={projectTasks}
-                  loading={allTasksQuery.isLoading}
+                  loading={myTasksQuery.isLoading}
                 />
+
+                {projectCollaborationSection}
               </div>
 
-              {projectCollaborationSection}
-            </div>
-
-            <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-              <ProjectNetworkPulseCard members={project.teamMembers} tasks={projectTasks} />
-              <ProjectTeamCard members={project.teamMembers} />
-              <ProjectGithubCard projectId={projectId} viewerRole={apiProject!.viewerRole} />
+              <div className="space-y-6">
+                <ProjectTeamCard members={project.teamMembers} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </QueryPageGuard>
+        ) : (
+          <div className="mx-auto max-w-8xl">
+            <ProjectDetailHeader
+              project={project}
+              themeId={apiProject!.theme}
+              themeMeta={apiProject!.themeMeta}
+              completedTaskCount={apiProject!.completedTaskCount}
+              canDelete={
+                apiProject
+                  ? canDeleteWorkspaceProject(
+                      app?.user ? { id: app.user.id, role: app.user.role } : null,
+                      apiProject,
+                    )
+                  : false
+              }
+            />
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+              <div className="space-y-6 xl:col-span-2">
+                <ProjectPhaseProgressCard project={project} />
+                <ProjectAiHealthCard projectId={projectId} projectName={project.title} />
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  <ProjectActivityFeed items={project.activities} />
+                  <ProjectTasksCard
+                    projectId={projectId}
+                    tasks={projectTasks}
+                    loading={allTasksQuery.isLoading}
+                  />
+                </div>
+
+                <ProjectGithubCard projectId={projectId} viewerRole={apiProject!.viewerRole} />
+
+                {projectCollaborationSection}
+              </div>
+
+              <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+                <ProjectNetworkPulseCard members={project.teamMembers} tasks={projectTasks} />
+                <ProjectTeamCard members={project.teamMembers} />
+              </div>
+            </div>
+          </div>
+        )}
+      </QueryPageGuard>
     </>
   );
 }

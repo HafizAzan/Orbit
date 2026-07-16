@@ -1,18 +1,21 @@
-import { CloseOutlined, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { Input, Select, Button } from "antd";
-import React, { useMemo, useState } from "react";
+import { CloseOutlined, PlusOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Input, Select } from 'antd';
+import dayjs, { type Dayjs } from 'dayjs';
+import React, { useMemo, useState } from 'react';
 import {
   PROJECT_CATEGORY_OPTIONS,
   PROJECT_LEAD_ROLES,
   PROJECT_PRIORITY_OPTIONS,
   generateProjectKey,
   type ProjectFormValues,
-} from "../../../../data/workspace-project-form";
-import { useAssignableProjectMembers } from "../../../../hooks/use-workspace-projects";
-import { getInitial } from "../../../../lib/helper";
-import { cn } from "../../../../lib/utils";
-import DatePicker from "../../../ui/date-picker";
-import { Paragraph, Text } from "../../../ui/typography";
+} from '../../../../data/workspace-project-form';
+import { useAssignableProjectMembers } from '../../../../hooks/use-workspace-projects';
+import { getInitial } from '../../../../lib/helper';
+import { cn } from '../../../../lib/utils';
+import DatePicker, { parseDatePickerValue } from '../../../ui/date-picker';
+import { Paragraph, Text } from '../../../ui/typography';
+
+const disablePastDates = (current: Dayjs) => current.isBefore(dayjs(), 'day');
 
 type ProjectFormFieldsProps = {
   values: ProjectFormValues;
@@ -28,8 +31,8 @@ type ProjectFormFieldsProps = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  manager: "Manager",
-  admin: "Admin",
+  manager: 'Manager',
+  admin: 'Admin',
 };
 
 function ProjectFormFields({
@@ -44,7 +47,7 @@ function ProjectFormFields({
   currentUserId,
   currentUserName,
 }: ProjectFormFieldsProps) {
-  const [memberSearch, setMemberSearch] = useState("");
+  const [memberSearch, setMemberSearch] = useState('');
   const { data: assignableMembers = [], isLoading: membersLoading } = useAssignableProjectMembers();
 
   const leadOptions = useMemo(
@@ -71,12 +74,15 @@ function ProjectFormFields({
   }, [assignableMembers, canAssignLead, currentUserId, values.leadUserId]);
 
   const squadPool = useMemo(
-    () => assignableMembers.filter((member) => member.role === "member"),
+    () => assignableMembers.filter((member) => member.role === 'member'),
     [assignableMembers],
   );
 
   const selectedMembers = useMemo(
-    () => squadPool.filter((member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId),
+    () =>
+      squadPool.filter(
+        (member) => values.memberIds.includes(member.id) && member.id !== values.leadUserId,
+      ),
     [squadPool, values.leadUserId, values.memberIds],
   );
 
@@ -88,7 +94,9 @@ function ProjectFormFields({
       if (values.memberIds.includes(member.id)) return false;
       if (!query) return true;
 
-      return member.name.toLowerCase().includes(query) || member.email.toLowerCase().includes(query);
+      return (
+        member.name.toLowerCase().includes(query) || member.email.toLowerCase().includes(query)
+      );
     });
   }, [memberSearch, squadPool, values.leadUserId, values.memberIds]);
 
@@ -116,7 +124,7 @@ function ProjectFormFields({
   const handleAddMember = (memberId: string) => {
     if (values.memberIds.includes(memberId) || memberId === values.leadUserId) return;
     updateValues({ memberIds: [...values.memberIds, memberId] });
-    setMemberSearch("");
+    setMemberSearch('');
   };
 
   const handleRemoveMember = (memberId: string) => {
@@ -132,7 +140,10 @@ function ProjectFormFields({
 
         <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_180px]">
           <div>
-            <label className="mb-2 block text-sm font-medium text-foreground" htmlFor="project-name">
+            <label
+              className="mb-2 block text-sm font-medium text-foreground"
+              htmlFor="project-name"
+            >
               Project Name
             </label>
             <Input
@@ -166,7 +177,10 @@ function ProjectFormFields({
         </div>
 
         <div className="mt-4">
-          <label className="mb-2 block text-sm font-medium text-foreground" htmlFor="project-description">
+          <label
+            className="mb-2 block text-sm font-medium text-foreground"
+            htmlFor="project-description"
+          >
             Description
           </label>
           <Input.TextArea
@@ -188,14 +202,17 @@ function ProjectFormFields({
         <Paragraph size="sm" className="mt-1">
           {canAssignLead
             ? requiresDeliveryLead
-              ? "Assign a manager to run delivery. Owners oversee projects without joining the execution squad."
-              : "Choose who leads day-to-day delivery. You can assign another manager or keep yourself as lead."
-            : "You will lead this project and manage tasks for your execution team."}
+              ? 'Assign a manager to run delivery. Owners oversee projects without joining the execution squad.'
+              : 'Choose who leads day-to-day delivery. You can assign another manager or keep yourself as lead.'
+            : 'You will lead this project and manage tasks for your execution team.'}
         </Paragraph>
 
         {canAssignLead ? (
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-medium text-foreground" htmlFor="project-lead">
+            <label
+              className="mb-2 block text-sm font-medium text-foreground"
+              htmlFor="project-lead"
+            >
               Delivery Lead {requiresDeliveryLead ? <span className="text-red-500">*</span> : null}
             </label>
             <Select
@@ -218,7 +235,7 @@ function ProjectFormFields({
             </span>
             <span>
               <Text as="span" size="sm" weight="semibold" className="block">
-                {currentUserName ?? "You"}
+                {currentUserName ?? 'You'}
               </Text>
               <Text as="span" size="xs" color="muted" className="block">
                 Delivery lead on this project
@@ -268,9 +285,10 @@ function ProjectFormFields({
             <label className="mb-2 block text-sm font-medium text-foreground">Start Date</label>
             <DatePicker
               value={values.startDate || undefined}
-              onChange={(startDate) => updateValues({ startDate: startDate ?? "" })}
+              onChange={(startDate) => updateValues({ startDate: startDate ?? '' })}
               className="w-full"
               disabled={disabled}
+              disabledDate={disablePastDates}
             />
           </div>
 
@@ -278,94 +296,114 @@ function ProjectFormFields({
             <label className="mb-2 block text-sm font-medium text-foreground">Due Date</label>
             <DatePicker
               value={values.dueDate || undefined}
-              onChange={(dueDate) => updateValues({ dueDate: dueDate ?? "" })}
+              onChange={(dueDate) => updateValues({ dueDate: dueDate ?? '' })}
               className="w-full"
               disabled={disabled}
+              allowClear
+              disabledDate={(current) => {
+                if (disablePastDates(current)) return true;
+                const start = parseDatePickerValue(values.startDate);
+                return !!start && current.isBefore(start, 'day');
+              }}
             />
           </div>
         </div>
       </section>
 
       {showExecutionSquad ? (
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Text as="p" size="sm" weight="semibold">
-              Execution Squad
-            </Text>
-            <Paragraph size="sm" className="mt-1">
-              Add workspace members who will do the work. Admins and owners are not listed here — you are the delivery lead.
-            </Paragraph>
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <Text as="p" size="sm" weight="semibold">
+                Execution Squad
+              </Text>
+              <Paragraph size="sm" className="mt-1">
+                Add workspace members who will do the work. Admins and owners are not listed here —
+                you are the delivery lead.
+              </Paragraph>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          {selectedMembers.map((member) => (
-            <span key={member.id} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm">
-              <span className={cn("flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold", member.avatarColor)}>
-                {getInitial(member.name)}
-              </span>
-              {member.name}
-              <Button
-                type="text"
-                size="small"
-                disabled={disabled}
-                onClick={() => handleRemoveMember(member.id)}
-                icon={<CloseOutlined className="text-xs!" />}
-                aria-label={`Remove ${member.name}`}
-                className="text-muted hover:text-foreground!"
-              />
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-4">
-          <Input
-            allowClear
-            prefix={<SearchOutlined className="text-muted" />}
-            placeholder="Search team members..."
-            value={memberSearch}
-            onChange={(event) => setMemberSearch(event.target.value)}
-            size="large"
-            className="rounded-xl!"
-            disabled={disabled}
-          />
-        </div>
-
-        <div className="mt-4 space-y-2">
-          {membersLoading ? (
-            <Paragraph size="sm">Loading team members...</Paragraph>
-          ) : availableMembers.length === 0 ? (
-            <Paragraph size="sm">No workspace members available to add.</Paragraph>
-          ) : (
-            availableMembers.map((member) => (
-              <Button
+          <div className="mt-5 flex flex-wrap gap-2">
+            {selectedMembers.map((member) => (
+              <span
                 key={member.id}
-                type="default"
-                block
-                disabled={disabled}
-                onClick={() => handleAddMember(member.id)}
-                className="h-auto w-fit! justify-between rounded-xl border-border bg-background px-4 py-8! text-left shadow-none hover:border-primary/25 hover:bg-feature-sync/40!"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm"
               >
-                <span className="flex items-start gap-3">
-                  <span className={cn("flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold shadow-sm", member.avatarColor)}>
-                    {getInitial(member.name)}
-                  </span>
-                  <span>
-                    <Text as="span" size="sm" weight="semibold" className="block text-start">
-                      {member.name}
-                    </Text>
-                    <Text as="span" size="xs" color="muted" className="block text-start">
-                      {member.email}
-                    </Text>
-                  </span>
+                <span
+                  className={cn(
+                    'flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold',
+                    member.avatarColor,
+                  )}
+                >
+                  {getInitial(member.name)}
                 </span>
-                <PlusOutlined className="text-primary" />
-              </Button>
-            ))
-          )}
-        </div>
-      </section>
+                {member.name}
+                <Button
+                  type="text"
+                  size="small"
+                  disabled={disabled}
+                  onClick={() => handleRemoveMember(member.id)}
+                  icon={<CloseOutlined className="text-xs!" />}
+                  aria-label={`Remove ${member.name}`}
+                  className="text-muted hover:text-foreground!"
+                />
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-4">
+            <Input
+              allowClear
+              prefix={<SearchOutlined className="text-muted" />}
+              placeholder="Search team members..."
+              value={memberSearch}
+              onChange={(event) => setMemberSearch(event.target.value)}
+              size="large"
+              className="rounded-xl!"
+              disabled={disabled}
+            />
+          </div>
+
+          <div className="mt-4 space-y-2">
+            {membersLoading ? (
+              <Paragraph size="sm">Loading team members...</Paragraph>
+            ) : availableMembers.length === 0 ? (
+              <Paragraph size="sm">No workspace members available to add.</Paragraph>
+            ) : (
+              availableMembers.map((member) => (
+                <Button
+                  key={member.id}
+                  type="default"
+                  block
+                  disabled={disabled}
+                  onClick={() => handleAddMember(member.id)}
+                  className="h-auto w-fit! justify-between rounded-xl border-border bg-background px-4 py-8! text-left shadow-none hover:border-primary/25 hover:bg-feature-sync/40!"
+                >
+                  <span className="flex items-start gap-3">
+                    <span
+                      className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold shadow-sm',
+                        member.avatarColor,
+                      )}
+                    >
+                      {getInitial(member.name)}
+                    </span>
+                    <span>
+                      <Text as="span" size="sm" weight="semibold" className="block text-start">
+                        {member.name}
+                      </Text>
+                      <Text as="span" size="xs" color="muted" className="block text-start">
+                        {member.email}
+                      </Text>
+                    </span>
+                  </span>
+                  <PlusOutlined className="text-primary" />
+                </Button>
+              ))
+            )}
+          </div>
+        </section>
       ) : null}
     </div>
   );
